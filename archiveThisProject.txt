@@ -1,0 +1,1258 @@
+﻿
+               =====    БЭКАП ОТ 20 авг. 2020 г. Что мы коммитим?    ======
+
+
+        Сегодня начинается работа по уже довольно крупному для меня проекту - чату по заданию
+Димона Трепачёва. Это должен быть полноценный чат со всеми необходимыми атрибутами работающего в Сети
+(а не просто учебного) чата. Поэтому для начала я скопировал в новую рут - папку "chatHomeworkDT" свой
+старый, чисто учебный проект "chat". Я возьму оттуда целиком работающий сервер, блоки подключения
+веб - сокетов и Монги. Клиентскую сторону сделаю заново, с элементами ООП, применю классы и т.п.
+        Сейчас мы коммитим тот самый изначальный вариант - "chat", где для удобства удалена папка "chat-root",
+изменены названия папок и скриптов, изменён рабочий порт с 4000 на 7777, и заново подключена Нода
+со всеми нужными зависимостями("WebSocket.io" и пр.). Т.е. я воccтановил его, чтобы иметь работоспособный
+ прототип (в т.ч. и как источник "запчастей"). Переношу сюда и бэкенд (скрипт server), и клиентскую сторону,
+ скрипт chatHomeworkDT.
+
+ var http = require('http');
+ var fs = require('fs');
+//     var Binary = require('mongodb').Binary;
+
+ const MongoClient = require("mongodb").MongoClient;
+ const url = "mongodb://localhost:27017/";
+
+ var Jmas_poset = [];
+ var mas_poset = new Map();
+ var  jasmas = [];
+ var flag = true;
+ var ident;
+ var adres;
+ var buffer = '';
+ var buffer1 = '';
+ var keyName;
+ var db;
+ var foto;
+
+// Создаём шаблон обьекта(сложная структура данных, экземпляр которой будет создан
+// для каждого участника чата), а также массив для хранения всех этих обьектов.
+// Именно этот массив, masPers, будет сохраняться во внешней базе данных (возможно,
+// даже созданной для практики в среде MONGOdb.), а при запуске скрипта скачиваться
+// оттуда в ОП. Для временного использования в качестве БД на диске, в той же папке
+// что и скрипты, создан файл  base_str.txt .
+
+ var mas_color = ['#ffff00', '#00ff7f', '#00ff00', '#faebd7', '#00ffff', '#ffffff', '#0000ff','#ba55d3' , '#ff00ff', '#ee82ee'];
+ var masPers = [];
+ var masPersMongo = [];
+ var JmasPers = [];
+
+let pers = {
+   sv1:    "name",
+   sv2:    "id",
+   sv3:    "colorb",
+   sv4:    "avatarka",
+   sv5:    "indeks"
+};
+
+function User(colorb, name) {
+ this.message;
+ this.colorb = colorb;
+ this.name = name;
+}
+
+function Images(position, buffer) {
+this._bsontype;
+this.sub_type;
+this.position = position;
+this.buffer = buffer;
+}
+//№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№
+// ЭТО РАБОТАЕТ, БРАТАНЧИК! ВСЁ ХОРОШО ПОКА: СОЗДАЛ ОТСЮДА, ИЗ СКРИПТА, БАЗУ
+// ДАННЫХ, В НЕЙ - КОЛЛЕКЦИЮ, А В НЕЙ - ПРОБНУЮ ЗАПИСЬ. ТЕПЕРЬ МОЖНО УЧИТЬСЯ
+// РАБОТАТЬ С БАЗОЙ, ОБНОВЛЯТЬ ЕЁ, РАСШИРЯТЬ ЗАПИСИ, КОЛЛЕКЦИИ И САМУ БД.
+// ОЧЕНЬ ИНТЕРЕСНАЯ ТЕМА!
+
+// Cоздаем объект MongoClient и передаем ему строку подключения:
+/*
+const mongoClient = new MongoClient(url, { useNewUrlParser: true });
+mongoClient.connect(function(err, client){
+const db = client.db("Pioner");
+const collection = db.collection("CHAT1");
+   collection.find().toArray((err, result) => {
+    if (err) throw err;
+    else {
+        masPers = result;
+        console.log(masPers);
+    }
+});
+//  }
+  client.close();
+});
+*/
+//№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№
+
+var server = http.createServer(function(req, res) {
+
+        if (req.url.endsWith('.css')) {
+
+    fs.readFile(req.url, (err, data) => {
+        if (err) throw err;
+        else {
+            res.writeHead(200, {"Content-Type": "text/css"});
+            res.end(data);
+        }
+    });
+}
+
+else  if (req.url.endsWith('.png')) {
+
+    fs.readFile(req.url, (err, data) => {
+        if (err) throw err;
+        else {
+            res.writeHead(200, {"Content-Type": "image/png"});
+            res.end(data);
+        }
+    });
+}
+
+else  if (req.url.endsWith('.jpg')) {
+
+    fs.readFile(req.url, (err, data) => {
+        if (err) throw err;
+        else {
+            res.writeHead(200, {"Content-Type": "image/jpg"});
+            res.end(data);
+        }
+    });
+}
+
+else  if (req.url.endsWith('.js')) {
+
+    fs.readFile(req.url, (err, data) => {
+        if (err) throw err;
+        else {
+            res.writeHead(200, {"Content-Type": "text/javascript"});
+            res.end(data);
+        }
+    });
+}
+
+ else fs.readFile('/projects/chatHomeworkDT/client/chatHomeworkDT.html', 'utf-8', (err, data) => {
+if (err) throw err; else {
+res.writeHead(200, {"Content-Type": "text/html"});
+res.end(data);
+        }
+
+  });
+
+});
+
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+// === БЛОК № . ЗДЕСЬ КОД, СКАЧИВАЮЩИЙ ДАННЫЕ ИЗ БД (ФАЙЛ base_str.txt)
+// === И ПОМЕЩАЮЩИЙ ИХ В МАССИВ ОБЬЕКТОВ masPers.
+/*
+   fs.readFile('base_str.txt', 'utf-8', (err, data) => {
+          if (err) throw err; else {
+              buffer1 = data;
+           console.log("Произошло скачивание внешнего файла base_str.txt в буфер buffer1.");
+           console.log("Буфер  buffer1 на данный момент содержит: " +  buffer1);
+           console.log("buffer1.length =  " + buffer1.length);
+         }
+   });
+
+   setTimeout(function() {
+       if (buffer1.length != 0) {
+      JmasPers = JSON.parse(buffer1);
+      console.log("Массив masPers сейчас содержит:");
+       for (let i = 0; i < JmasPers.length; i++) {
+         console.log(masPers[i] = JSON.parse(JmasPers[i]));
+    }
+    JmasPers = [];
+} else {
+    console.log("БАЗА ДАННЫХ ПОКА ПУСТА!");
+}
+  },500);
+*/
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+// Загружаем socket.io
+var io = require('socket.io').listen(server);
+
+io.sockets.on('connection', function(socket) {
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ЭТО - КРОШЕЧНЫЙ БЛОЧОК, ГДЕ Я ПРОБУЮ ПЕРЕСЛАТЬ ФОТО ИЗ ДОКУМЕНТА,
+//  ХРАНЯЩЕГОСЯ В БАЗЕ ДАННЫХ MongoDB.
+socket.on("fotku_please", message => {
+   if (message === "expect_to_foto") {
+ const mongoClient = new MongoClient(url, { useNewUrlParser: true });
+ mongoClient.connect(function(err, client){
+ const db = client.db("Pioner");
+ const collection = db.collection("CHAT1");
+
+//     let sohran = {};
+//         sohran.id = 1962;
+//      sohran.bin = fs.readFileSync("kartinki/logotip.jpg");
+//       collection.insertOne(sohran, (err,data) => {
+//           if (err) console.error(err);
+//       })
+
+  collection.findOne({id: 1962}, function(err, doc){
+ if (err) {
+   console.error(err);
+   }
+   socket.emit("fotka_proba", doc.bin.buffer);
+   });
+   client.close();
+ });
+}
+});
+// Оно пересылается в бинарном виде нормально,на сторону клиента
+// долетает, но там не хочет нормально открываться. Ничего не могу
+// понять!
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    socket.on("message_foto", message => {
+        socket.broadcast.emit("broadcast_foto", message);
+    });
+
+ socket.on('little_newbie', function(username) {
+    socket.username = username;
+    ident = socket.id;
+
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    if (masPers.length != 0) {                 // для нового обьекта
+      for (let masP of masPers) {               // для нового обьекта
+        if (masP.sv1 === socket.username) {     // для нового обьекта
+            masP.sv2 = ident;
+            socket.usercolorb = masP.sv3;
+
+// Здесь нужно делать обновление данной записи в БД.Тогда в функции funcStopServer()
+// не придётся производить обновление всей БД целиком.
+//************************************************************************
+ const mongoClient = new MongoClient(url, { useNewUrlParser: true });
+ mongoClient.connect(function(err, client){
+ const db = client.db("Pioner");
+ const collection = db.collection("CHAT1");
+    collection.findOneAndUpdate({sv1: masP.sv1}, {$set: {sv2: ident}}, (err, result) => {
+     if (err) throw err;
+  });
+client.close();
+});
+//************************************************************************
+            socket.emit("message", socket.usercolorb);
+            let shablon = `В чат только что вернулся:  ${socket.username}`;
+            socket.broadcast.emit('message', shablon);
+            flag = false;
+        }
+    }
+}
+
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+if (flag) {
+    mas_poset.set(socket.username, ident);
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+// === В этом блоке создаётся обьект(учётная запись) нового участника чата.
+
+  pers.sv1 = socket.username;
+  pers.sv2 = ident;
+  let ind2 = Math.floor(Math.random() * mas_color.length);
+  let elem1 =  mas_color[ind2];
+  pers.sv3 = elem1;
+  socket.usercolorb = elem1;
+//      socket.emit("message", pers.sv3);
+// ВОТ В ЭТОМ САМОМ МЕСТЕ уже находится КОД ГСЧ ДЛЯ ВЫБОРА НОВОМУ УЧАСТНИКУ ЦВЕТА
+// БАННЕРОВ(стр.175-177), А ТАКЖЕ БУДЕТ БЛОК, ПОЛУЧАЮЩИЙ АВАТАРКУ УЧАСТНИКА
+// И РАЗМЕЩАЮЩИЙ ЕЁ В МАССИВЕ masPers, А ЗАТЕМ И В БАЗЕ ДАННЫХ.
+
+  pers.sv4 = 0;
+  pers.sv5 = 0;
+
+// Хорошо бы запомнить пару методов обьектов(стр.212,213),- ещё пригодятся!
+//      console.log("В ОБЬЕКТЕ СОДЕРЖИТСЯ: " + pers);
+//      console.log(Object.keys(pers));
+//      console.log(Object.values(pers));
+console.log("!!!!!");
+  masPers.push(pers);
+//-----------------------------------------------
+// Добавляем новый документ в MongoDB напрямую,
+// без промежуточного файла, что, конечно, удобнее.
+
+const mongoClient = new MongoClient(url, { useNewUrlParser: true });
+mongoClient.connect(function(err, client){
+    const db = client.db("Pioner");
+    const collection = db.collection("CHAT1");
+                collection.insertOne(pers, function(err, result) {
+                 if (err) throw err;
+             });
+
+   client.close();
+});
+
+//-----------------------------------------------
+  for (let i = 0; i < masPers.length; i++) {
+      console.log(masPers[i]);
+  }
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//        console.log(mas_poset);
+//        console.log(mas_poset.size);
+  console.log(' Клиент ' + socket.username + " он же " + ident + ' подключен!');
+//      let strochka = JSON.stringify("Вы подключены !");
+    socket.emit('message', "Вы подключены !");
+    let shablon = `Только что подключился НОВЫЙ УЧАСТНИК по имени:  ${socket.username}`;
+//        let Jshablon = JSON.stringify(shablon);
+    socket.broadcast.emit('message', shablon);
+      }
+      else flag = true;
+  });
+
+  // Когда сервер получает сообщение типа “message” от клиента
+    socket.on('message', function (message) {
+        if (message != "STOP SERVER!!!") {
+//--------------------------------------------------------------
+
+        for (let mas of masPers) {
+            if (mas.sv2 === socket.id) {
+                socket.emit("message", mas.sv3);
+                console.log('Клиент ' + mas.sv1 + ' ' + ' сказал: ' + message);
+
+                var user = new User();
+                    user.message = message;
+//                        user.colorb = mas.sv3;
+                    user.colorb = socket.usercolorb;
+                    user.name = mas.sv1;
+                    console.log(user.message);
+                    console.log(user.colorb);
+                    console.log(socket.usercolorb);
+                    console.log(user.name);
+                    console.log(user);
+
+                let Jstr = JSON.stringify(user);
+                console.log(Jstr);
+                escapeSpecialChars(Jstr);
+                socket.broadcast.emit('message', Jstr);
+
+            }
+         }
+      }
+          else { funcStopServer(); }
+});
+//--------------------------------------------------------------
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      socket.on('disconnect', function(data) {
+     });
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+   function escapeSpecialChars(jsonString) {
+       return jsonString.replace(/\n/g, "\\n")
+                  .replace(/\r/g, "\\r")
+                  .replace(/\t/g, "\\t")
+                  .replace(/\f/g, "\\f");
+   }
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+    function funcStopServer() {
+/*
+     const url = "mongodb://localhost:27017/";
+     const mongoClient = new MongoClient(url, { useNewUrlParser: true });
+        mongoClient.connect(function(err, client){
+             const db = client.db("Pioner");
+             const collection = db.collection("CHAT1");
+                   collection.drop();
+
+             for (let i = 0; i < masPers.length; i++) {
+                let apart = masPers[i];
+                collection.insertOne(apart, function(err, result) {
+                 if (err) throw err;
+             });
+           }
+
+            client.close();
+        });
+*/
+///              fs.truncate('base_str.txt', err => {
+//                if (err) throw err;
+//             });
+
+            for (let i = 0; i < masPers.length; i++) {
+                 let abcd = JSON.stringify(masPers[i]);
+                    JmasPers.push(abcd);
+            }
+          let JSONstr = JSON.stringify(JmasPers);
+   console.log("Содержимое второй длинной JSON-строки JSONstr: " + JSONstr);
+            fs.writeFile('base_str.txt', JSONstr, err => {
+            if (err) throw err;
+         });
+
+    setTimeout(() => {
+        process.exit();
+    }, 100);
+}
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+});
+//      socket.emit('message', { content: 'You are connected!', importance: '1' });
+
+server.listen(7777, function () {
+   console.log ('Работаем на порт: 7777');
+});
+
+////////////////////////// КОНЕЦ СЕРВЕРНОЙ ЧАСТИ. ///////////////////////////
+
+
+
+////////////////////////////// HYTML- РАЗМЕТКА. ///////////////////////////////
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+
+        <title>ЧАТ по заданию Д.Т.</title>
+
+        <link rel="shortcut icon" href="/projects/chatHomeworkDT/kartinki/logotip.jpg">
+        <link rel="stylesheet" href='/projects/chatHomeworkDT/client/chatHomeworkDT.css'>
+
+        <style></style>
+
+    </head>
+
+    <body id ='body' style='background: url(/projects/chat/kartinki/light-tile-156.png) repeat;'>
+
+        <h2>Домашнее задание<span> .</span></h2>
+
+        <img src='/projects/chatHomeworkDT/kartinki/2020-02-27_02-46-53.png' style='position:absolute; left:490px;
+                      top:55px; width:125px; height:100px;'/>
+
+        <p>Показать фото друзьям: </p><input type='file' style='margin-left:5px;'id='files' name='files[]' multiple />
+	    <output id='list'></output>
+
+        <button id='but' style='width:350px;'>Запрос сокета у сервера</button>
+        <button id='button' style='width:350px;'>Прошу фото для пробы</button>
+        <button id='stopper'>STOP SERVER</button>
+
+         <textarea type='text' cols='40' rows='6' placeholder='Введите своё сообщение' id='inp1' ></textarea>
+
+         <button id="stop" style='margin-top:10px;'>Выйти из чата</button>
+
+  <!--- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> --->
+        <script  src = "/socket.io/socket.io.js"></script>
+        <script src="/projects/chatHomeworkDT/client/chatHomeworkDT.js"></script>
+
+    </body>
+</html>
+
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////// А ТЕПЕРЬ - КЛИЕНТ. ////////////////////////////////
+
+//      window.onload = function() {
+          document.addEventListener('DOMContentLoaded', () => {
+
+//		if('WebSocket' in window) {
+//  alert(" WebSocket поддерживается. Работай, братан!");
+//    } else {
+//  alert(" WebSockets не поддерживается. Досвидос, гражданин!.");
+//    }
+//
+         var chat_exit = true;
+         let username ;
+         let  priznak_close ;
+         let colorbMy;
+         let colorb;
+         let file = 0;
+
+         let but = document.getElementById('but');
+         let button = document.getElementById('button');
+         var endchat = true;
+         var body = document.getElementById("body");
+
+//         console.log("Создаём опытную структуру данных(такая будет создана на каждого участника) : ");
+
+            but.addEventListener('click', funcMain);
+            function funcMain()  {
+            priznak_close = false;
+
+            var socket = io.connect('ws://localhost:7777');
+            socket.binaryType = "arraybuffer";
+
+            stopper.addEventListener('click', funcStopper);
+            function funcStopper()  {
+                alert("STOP SERVER!!!");
+                socket.emit('message', 'STOP SERVER!!!');
+                return;
+            }
+
+            button.addEventListener("click", funcExpect);
+            function funcExpect() {
+                socket.emit("fotku_please", "expect_to_foto");
+                socket.on("fotka_proba", message => {
+                    let image = document.createElement('img');
+                    image.width = 120;
+                    image.src = message;
+                    image.style.marginTop = 12 + "px";
+                    image.style.borderRadius = "15px";
+                    image.style.display = 'block';
+                    body.appendChild(image);
+                });
+            }
+
+//FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+            document.getElementById("files").addEventListener('change', onFileSelect);
+
+            function onFileSelect(e) {
+             var file = e.target.files[0];
+             var reader = new FileReader();
+             reader.onload = function(f)  {
+                socket.emit("message_foto", f.target.result);
+                let image = document.createElement("img");
+                  image.src = f.target.result;
+                  image.style.marginTop = 12 + "px";
+                  image.width = 120 ;
+                  image.style.borderRadius = "15px";
+                  image.style.display = 'block';
+                  body.appendChild(image);
+             }
+
+             reader.readAsDataURL(file);
+
+             }
+//FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
+            let stopChat = document.getElementById('stop');
+            stopChat.onclick = function() {
+            socket.emit('message', 'Я временно выхожу. Всем пока !');
+            endchat = false;
+            priznak_close = true;
+            console.log("Соединение закрыто!");
+            socket.close();
+            location.reload();
+       }
+
+    // Посетителя просят ввести произвольное имя ...
+            username = prompt('Как-нибудь назовите себя: ');
+    // Оно отправляется в сообщении типа "little_newbie" (чтобы отличать его от сообщений типа "message")
+            socket.emit('little_newbie', username);
+
+                socket.on("broadcast_foto", message => {
+                    let image = document.createElement('img');
+                    image.width = 250;
+                    image.style.marginTop = 12 + "px";
+                    image.style.borderRadius = "15px";
+                    image.style.display = 'block';
+                    image.src = message;
+                    body.appendChild(image);
+                })
+
+                  socket.on('message', function(message) {
+
+                    if (message[0] === '#') {}
+
+                    if (message[0] === "{") {
+                        let struc = JSON.parse(message);
+                        let mess = struc.message;
+                        colorb = struc.colorb;
+                        let name = struc.name;
+                        let stroka = "От " + name + ": " + mess;
+               console.log(mess);
+               let dlina1 = mess.length * 13 + 10;
+               funcDin(40, 4, 7, colorb, 7, 'black', body, stroka);
+               return;
+                }
+                else if (message[0] === '#') {} else {
+                    let mess1 = message;
+                    let dlina11 = mess1.length * 13 + 10;
+                    funcDin(50, 3, 7, colorb, 7, 'black', body, mess1);
+                }
+           });
+
+      let inp1 = document.getElementById('inp1');
+          inp1.onkeypress = function () {
+            if (event.keyCode === 13) {
+             if (priznak_close === true) {}
+              else {
+                socket.emit('message', inp1.value);
+//-------------------------------------------------------------
+                socket.on('message', message => {
+                    if (message[0] === "#") {
+                        colorbMy = message;
+                        } else {}
+                });
+//------------------------------------------------------------
+            setTimeout(function() {
+                let dlina = inp1.value.length * 13 + 10;
+                funcDin(30, 6, 7, colorbMy, 15, 'black', body, inp1.value);
+                inp1.value = "";
+            }, 100);
+                }
+             }
+         }
+//-----------------------------------------------------
+// ===  Здесь располагается функция, которая динамически  создаёт элементы-
+// ===  контейнеры для отображения посланий чата, и располагает в них, при
+// ===  этом адаптивно меняя длину контейнера в зависимостм от контента,
+// ===  стр. 109 и 121.
+
+     function funcDin(x, a, b, c, d, e, f, mes) {
+        let h4 = document.createElement('textarea');
+                h4.style.display = 'block';
+                h4.cols = x;
+                h4.rows = a;
+                h4.style.marginTop = 10 + 'px';
+                h4.style.resize = 'none';
+                h4.style.border = '1px solid black';
+                h4.style.boxShadow = '4px 4px 4px black';
+                h4.style.borderRadius = b + 'px';
+                h4.style.background = c;
+                h4.style.fontWeight = "bolder";
+                h4.innerHTML = mes;
+                f.appendChild(h4);
+            return;
+     }
+//-----------------------------------------------------
+
+        }
+//    }
+      });
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+ ===================  КОНЕЦ БЭКАПА от 20 авг. 2020 г.
+
+
+
+
+
+
+
+
+
+             ===========    БЭКАП ОТ 29 авг. 2020 г. Что мы коммитим?    ===========
+
+      На сегодняшний день чат работает нормально, но ограниченно: участники могут обмениваться сообщениями,
+а также работает кнопка "ВЫЙТИ ИЗ ОБЩЕНИЯ": участнику не нужно писать сообщение о своём временном выходе из
+чата, а затем закрывать страницу. Достаточно просто нажать кнопку, и система сама пошлёт в рассылку вежливое
+"пока" и закроет его страницу. Также при возвращении в чат система бродкастит сообщение "В общение вернулся
+такой-то". На сегодня это всё, больше никаких наворотов в чате пока нет, и остальные кнопки тоже не работают.
+
+
+-------------------------------------------------------------------------------------------------------------------------
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+
+        <title>ЧАТ по заданию Д.Т.</title>
+
+        <link rel="shortcut icon" href="/projects/chatHomeworkDT/kartinki/logotip.jpg">
+        <link rel="stylesheet" href='/projects/chatHomeworkDT/chatHomeworkDT.css'>
+
+        <style></style>
+
+    </head>
+
+    <body id ='body' style='background: url(/projects/chatHomeworkDT/kartinki/light-tile-156.png) repeat;'>
+
+        <h2>Учебная работа: <span>ЧАТ НА ВЕБ - СОКЕТАХ И МОНГОдб.</span></h2>
+
+        <div id='pole' style='background: url(/projects/chatHomeworkDT/kartinki/old-newspaper.jpg) repeat;'>
+            <div id='invisible' style='width:1px; height:1px; opacity:0;'></div>
+        </div>
+
+        <img src='/projects/chatHomeworkDT/kartinki/2020-02-27_02-46-53.png' style='position:absolute; left:628px;
+                      top:17px; width:100px; height:78px;'/>
+
+        <textarea cols='30' rows='5' placeholder='Введите своё сообщение' id='textarea'></textarea>
+
+        <div id='showFoto'>Показать фото друзьям:
+           <div id='triangle'></div>
+        </div><input type='file' style='margin-left:5px;' id='files' name='files[]' multiple />
+    <!--- <output id='list'></output> --->
+
+    <!--- <button id='button' style='width:350px;'>Прошу фото для пробы</button>
+        <button id='stopper'>STOP SERVER</button> --->
+
+       <button id="history" style='margin-top:15px;'>Получить историю чата</button>
+       <button id="myLS" style='margin-top:10px;'>Создать личку</button>
+       <button id="room" style='margin-top:5px;'>Создать комнату</button>
+       <button id="stop" style='margin-top:0px;'>Выйти из чата</button>
+
+       <div id='gardina'></<div>
+       <button id='but' style='width:250px;'>Войти в чат</button>
+       <div id='banner'>Вы для нас - новое лицо. Хотите стать полноправным
+                        участником чата?
+          <button id='yes'>Да</button>
+          <button id='no'>Не сейчас</button>
+       </div>
+
+       </div>
+
+<!------------------------------------------------------------------------------------------------------>
+        <script src='/projects/chatHomeworkDT/base.js'></script>
+  <!--- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> --->
+        <script src = "/socket.io/socket.io.js"></script>
+        <script src="/projects/chatHomeworkDT/chatHomeworkDT.js"></script>
+        <script src='/projects/chatHomeworkDT/plugins/pluginColorSelect.js'></script>
+        <script src='/projects/chatHomeworkDT/plugins/pluginMakeMessage.js'></script>
+        <script src='/projects/chatHomeworkDT/plugins/pluginTimeClient.js'></script>
+<!--- <script src='/projects/chatHomeworkDT/tooltip.min..js'></script> --->
+<!------------------------------------------------------------------------------------------------------->
+
+    </body>
+</html>
+----------------------------------------------------------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+document.addEventListener('DOMContentLoaded', () => {
+
+var chat_exit = true;
+let name ;
+let  priznak_close ;
+let colorMessage; // Здесь содержится цвет сообщений участника, передаваемый с сервера в обьекте участника.
+let objMessage;  // А здесь - целиком обьект участника, передаваемый с сервера.
+let file = 0;
+let vibor = "";
+
+let body = document.getElementById("body");
+
+let gardina = document.querySelector("#gardina");
+   gardina.style.width = window.innerWidth + 'px';
+   gardina.style.height = window.innerHeight + 'px';
+
+let banner = document.querySelector("#banner");
+let textarea = document.querySelector("#textarea");
+   console.log(`textarea.id = ${textarea.id}`);
+
+let pole = document.querySelector("#pole");
+
+let yes = document.querySelector("#yes");
+  yes.addEventListener("click", funcYes);
+let no = document.querySelector("#no");
+  no.addEventListener("click", funcNo);
+    function funcYes() {
+       vibor = "yes";
+       return vibor;
+    }
+    function funcNo() {
+       vibor = "no";
+       return vibor;
+    }
+
+const socket = io.connect('ws://localhost:7777');
+
+let stop = document.querySelector("#stop");
+   stop.addEventListener("click", function() {
+     console.log(`Эта функция будет закрывать для участника текущую сессию работы в чате,`);
+     console.log(`передавая на сервер сообщение:`);
+     console.log(`Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`);
+     console.log(`Все остальные действия по корректному завершению сеанса ВЫПОЛНИТ СЕРВЕР.`);
+     let posl = {a:objMessage.sv1, b: `Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`, c:objMessage.sv3};
+     socket.emit("message", posl);
+     location.reload();
+//     location.href = location.href; // Оба варианта работают.
+   });
+
+let but = document.getElementById('but');
+   but.onclick = function() {
+      name = prompt("Как-нибудь назовите себя: ", "");  // Посетителя просят ввести произвольное имя.
+      socket.emit('promptingName', name);           // Оно отправляется на сервер для идентификации.
+      socket.on("otvet", message => {
+//          socket.username = name;
+        if (message === "Это имя уже есть в нашей базе.") {
+          let clientCode = prompt(`Это имя уже есть в нашей базе.
+        Если Вы - новичок в чате, нажмите "Отмена".
+        Если Вы - УЖЕ УЧАСТНИК ЧАТА, то введите ПАРОЛЬ: ${""}`);
+           console.log(`clientCode = ${clientCode}`);
+           console.log(`Тип данных: ${typeof clientCode}`);
+            if (!clientCode) { // Если посетитель нажал "Отмена", значит он новичок в чате.
+              let nameNew = prompt(`Попробуйте другое имя: , ${""}`); // Предлагаем ему ввести
+                if (nameNew === name) {} // другое имя. Если он снова ввёл то же самое - идём в начало.
+                else {
+                  socket.emit('promptingName', nameNew);
+                  socket.username = nameNew;
+                }
+            }
+            else {
+              socket.emit("clientCode", clientCode);
+              socket.on("dostup", message => {
+                objMessage = message.b;
+                if (message.a === "plus") {
+           colorMessage = message.b.sv3;
+           textarea.focus();
+           banner.className = "";
+           gardina.remove();  // Предоставляем старому участнику
+           but.remove();       // доступ к чату, и для этого...
+           let send = document.createElement("button"); //...создаём на странице кнопку, которая
+               send.id = 'send';                        // будет отправлять его сообщения.
+               send.innerHTML = 'Отправить';
+//               send.addEventListener("onclick", funcMakeMessage);
+           body.appendChild(send);
+             funcMain();
+         }
+         else if (message === "minus") {
+             let kod = prompt(`Неверный пароль! Ещё разок: ${""}`); // Это будет продолжаться до тех пор,
+             socket.emit("clientCode", kod);                       // пока не будет введён правильный пароль.
+         } else {}
+         });
+         }
+        }
+
+        else {  // Это ОТКРЫВАЮЩАЯ скобка очень важного блока с промисом.
+           funcShowBanner(); // Вызываем в качестве колбэка функцию, которая покажет нам баннер.
+         }   // Это ЗАКРЫВАЮЩАЯ скобка очень важного блока с промисом.
+      });
+//              return username;
+   }
+
+    function funcShowBanner() {
+//            console.log(`socket.username = ${socket.username}`);
+          banner.className = "trans";
+     let stop = setInterval(function() {
+          if (vibor != "") {
+             console.log(`vibor = ${vibor}`);
+             clearInterval(stop);
+             if (vibor === "no") {
+                banner.remove();
+                but.remove();
+                gardina.style.backgroundColor = "rgba(0, 0, 0, 1)";
+                gardina.innerHTML = "Вход в чат ЗАБЛОКИРОВАН.";
+             }
+             else if (vibor === "yes") {
+                 let account;
+                  let parole = prompt(`Введите любой пароль: ${""}`);
+                  socket.emit("newFace", vibor);
+                  socket.on("colorPlease", message => { // Этот крошечный сокет служит лишь
+                    if (message === "colorPlease") {   // для того, чтобы передать на сервер
+                      let color = PP.pluginColorSelect(); // сгенерированное здесь,на клиенте,
+                      let obj = {b:color, c:parole};      // значение цвета сообщений участника.
+                      console.log(`Когда сервер присылает запрос на цвет, здешний колорпикер генерирует вот это: ${color} ...`);
+                      console.log(`Скрипт обьединяет это в один обьект со значением пароля: ${parole} ...`);
+                      socket.emit("object", obj);
+                      console.log(`...и отправляет этот обьект серверу.`);
+                    }
+                  });     // сокет "colorPlease" закрыт.
+
+                  socket.on("pleaseYourAccount", message => {
+                     objMessage = message;
+                     colorMessage = objMessage.sv3;
+                     console.log(`Новому участнику выбран цвет сообщений: ${objMessage.sv3}`);
+                     textarea.focus();
+                     console.log(`colorMessage = ${colorMessage}`);
+                  console.log(`Новый участник получает с сервера свою учётную запись: ${message}`);
+                    for (let key in message) {
+                       console.log(`${key}: ${message[key]}`);
+                    }
+                      banner.className = "";
+                      but.remove();
+                      gardina.remove();
+                      let send = document.createElement("button"); //...создаём на странице кнопку, которая
+                          send.id = 'send';                        // будет отправлять его сообщения.
+                          send.innerHTML = 'Отправить';
+          //                send.addEventListener("onclick", funcMakeMessage);
+                      body.appendChild(send);
+                      socket.on("masPersNew", message => {
+
+                      });
+                      funcMain();
+                });
+             }
+          }
+     }, 100);
+   }
+
+  function funcMain()  {
+
+// ЗДЕСЬ, В ГЛАВНОЙ ФУНКЦИИ funcMain, БУДЕТ ПРОИСХОДИТЬ ОСНОВНАЯ РАБОТА ЧАТА: СОЗДАНИЕ И ОТСЫЛКА НА СЕРВЕР
+// СООБЩЕНИЙ УЧАСТНИКА(ВКЛЮЧАЯ КАРТИНКИ), А ТАКЖЕ ПРИЁМ И РЕНДЕРИНГ СООБЩЕНИЙ ВСЕХ ДРУГИХ УЧАСТНИКОВ, КОТОРЫЕ
+// БУДУТ ПРИХОДИТЬ С СЕРВЕРА.
+// ЗДЕСЬ ЖЕ, ВИДИМО, БУДУТ СОЗДАВАТЬСЯ КОМНАТЫ И ЛИЧКИ.
+
+         textarea.addEventListener("blur", function() {
+//         console.log("Привет из функции - изготовителя сообщений!");
+       if (textarea.value) {
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// В этом месте должен находиться локальный анализатор текста, который будет парсить содержимое
+// textarea.value и формировать элемент нужных параметров для размещения в нём послания.
+// Для начала хочу научиться вытаскивать размеры в пикселях символов при заданных font- параметрах.
+
+        let mesString = textarea.value + "";
+            console.log(`Длина введённого текста, представленного в виде строки: ${mesString.length} символов.`);
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+             let message = document.createElement("div"); // Здесь создаётся сообщение участника.
+                 message.className = "message";           // Генерируем сам элемент сообщения,
+                 message.innerHTML = textarea.value;     // передаём в него то, что написал участник
+                    let strTime = document.createElement("div");  // в своей textarea,
+                        strTime.id = 'strTime';                   // затем создаём элемент - див,
+                        strTime.innerHTML = PP.pluginTimeClient(); // в котором размещаем время
+                    message.appendChild(strTime);                 // создания сообщения,
+                 message.style.backgroundColor = colorMessage;   // задаём цвет сообщения,
+                 let obj = {a: objMessage.sv1, b: textarea.value, c: colorMessage}; // формируем обьект,
+                 socket.emit("message", obj);      // содержащий сообщение, и отправляем его на сервер.
+                 textarea.value = "";
+                 textarea.focus();
+             pole.insertAdjacentElement("beforeEnd", message);
+      //       pole.scrollTop = 999999;
+             pole.scrollTop = pole.scrollHeight;               // Делаем автоматич. прокрутку поля.
+       }
+     });
+
+     socket.on("otvetMessage", message => {                 // Здесь принимаем с сервера сложный
+       let otvetMessage = document.createElement("div");   // содержащий заголовок "От такого-то"(message.a),
+           otvetMessage.className = "otvetMessage";       // сам текст ответного послания(message.b),
+           let zagolovok = document.createElement("div");   // и цвет его сообщений(message.c), см. ниже...
+               zagolovok.id = 'zagolovok';
+               zagolovok.innerHTML = message.a + ":";  // СООБЩЕНИЕ(message) представляет собой контейнер - оболочку
+           otvetMessage.appendChild(zagolovok);       //  otvetMessage, содержащий три компонента:
+                                                     // 1. zagolovok. В нём находится имя отправителя сообщения...
+           let telo = document.createElement("div"); // 2. telo: блок вариативной высоты(height: auto), поскольку
+               telo.id = 'telo';                     // сообщения бывают разного обьёма...
+               telo.innerHTML = message.b;
+           otvetMessage.appendChild(telo);
+
+           let strTimeOtvet = document.createElement("div"); //... и 3. strTimeOtvet: это подвал, футер, содержащий
+               strTimeOtvet.id = 'strTimeOtvet';             // дату и время поступления сообщения.
+               strTimeOtvet.innerHTML = PP.pluginTimeClient();
+           otvetMessage.appendChild(strTimeOtvet);
+           otvetMessage.style.backgroundColor = message.c; //...и отрисовываем у себя на
+       pole.appendChild(otvetMessage);                     // странице его сообщение.
+       pole.scrollTop = pole.scrollHeight;                // Делаем автоматич. прокрутку поля.
+  //     pole.scrollTop = 999999;
+     });
+
+ } // Эта скобка закрывает главную функцию funcMain.
+
+}); // ЭТО ГЛАВНАЯ ЗАКРЫВАЮЩАЯ СКОБКА СКРИПТА. АККУРАТНЕЙ С НЕЙ!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+var http = require('http');
+var fs = require('fs');
+const timeReg = require("/projects/chatHomeworkDT/plugins/pluginTime.js");
+//   const Tooltip = require('tooltip');
+//   console.log(timeReg());
+
+//     const time = require("plugins/pluginTime");
+//     var Binary = require('mongodb').Binary;
+//        var tip = new Tooltip('Foo bar!');
+//          tip.position(200, 200).show();
+
+const MongoClient = require("mongodb").MongoClient;
+const url = "mongodb://localhost:27017/";
+
+var Jmas_poset = [];
+var mas_poset = new Map();
+var  jasmas = [];
+var flag = true;
+var ident;
+var adres;
+var buffer = '';
+var buffer1 = '';
+var keyName;
+var db;
+var foto;
+
+var masPers = [];
+
+class NewFace {  // Этот класс является шаблоном - прототипом для создания учётных
+ constructor(sv1, sv2, sv3, sv4, sv5, sv6) { //  записей участников чата, где:
+   this.sv1 = sv1,  // имя участника;
+   this.sv2 = sv2,  // его идентификатор, присвоенный сокетом при соединении;
+   this.sv3 = sv3,  // цвет его сообщений, присвоенный сервером;
+   this.sv4 = sv4,  // его аватарка(если есть);
+   this.sv5 = sv5,  // его личный пароль входа;
+   this.sv6 = sv6   // дата и время регистрации в БД.
+ }
+}
+
+// Cоздаем объект MongoClient и передаем ему строку подключения:
+
+const mongoClient = new MongoClient(url, { useNewUrlParser: true });
+mongoClient.connect(function(err, client){
+const db = client.db("Pioner");
+const collection = db.collection("CHAT1");
+  collection.find().toArray((err, result) => {
+   if (err) throw err;
+   else {
+       masPers = result;
+       console.log(masPers);
+         client.close();
+   }
+});
+//  }
+//      client.close();
+});
+
+//№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№
+
+const server = http.createServer(function(req, res) {
+
+       if (req.url.endsWith('.css')) {
+
+   fs.readFile(req.url, (err, data) => {
+       if (err) throw err;
+       else {
+           res.writeHead(200, {"Content-Type": "text/css"});
+           res.end(data);
+       }
+   });
+}
+
+else  if (req.url.endsWith('.png')) {
+
+   fs.readFile(req.url, (err, data) => {
+       if (err) throw err;
+       else {
+           res.writeHead(200, {"Content-Type": "image/png"});
+           res.end(data);
+       }
+   });
+}
+
+else  if (req.url.endsWith('.jpg')) {
+
+   fs.readFile(req.url, (err, data) => {
+       if (err) throw err;
+       else {
+           res.writeHead(200, {"Content-Type": "image/jpg"});
+           res.end(data);
+       }
+   });
+}
+
+else  if (req.url.endsWith('.js')) {
+
+   fs.readFile(req.url, (err, data) => {
+       if (err) throw err;
+       else {
+           res.writeHead(200, {"Content-Type": "text/javascript"});
+           res.end(data);
+       }
+   });
+}
+
+else fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
+if (err) throw err; else {
+res.writeHead(200, {"Content-Type": "text/html"});
+res.end(data);
+       }
+
+ });
+
+});
+
+//№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№
+
+var io = require('socket.io').listen(server);
+
+io.sockets.on('connection', function(socket) {
+//       let username;
+  let ident = socket.id;
+  socket.on('promptingName', message => {
+    let otvet = "";
+//     username = message;
+ //     socket.broadcast.emit("broadcast_foto", message);
+    console.log(`Из браузера от посетителя получено некое имя: ${message}`);
+    for (let i = 0; i < masPers.length; i++) {
+       if (masPers[i].sv1 === message) {
+           otvet = "Это имя уже есть в нашей базе.";
+           console.log(otvet);
+           socket.on("clientCode", message => {
+                console.log("clientCode = " + message);
+                if (message === masPers[i].sv5) {
+                  let obj = {a:"plus", b:masPers[i]};
+                  socket.emit("dostup", obj);
+                  let posl = {a:`админ`, b:`В ОБЩЕНИЕ ВЕРНУЛСЯ ${masPers[i].sv1}`, c:`#a9a9a9`};
+                  socket.broadcast.emit("otvetMessage", posl);
+                }
+                else {socket.emit("dostup", "minus");}
+           });
+       }
+    }
+    if (otvet === "") {
+         otvet = "Этого имени в нашей базе нет.";
+         socket.username = message;
+         console.log(`socket.username = ${socket.username}`);
+         console.log(otvet);
+    }
+
+     socket.emit("otvet", otvet);
+  });
+
+  socket.on("newFace", message => {  // Именно здесь, в этой функции, мы будем формировать
+     let newFace;             // учётную запись нового участника чата, и, конечно,
+      console.log(`В чате намечается новый участник!`); // обновлять БД.
+      console.log(`Он согласился с нашим внутренним распорядком, сказав "${message}",`);
+      console.log(`и предлагает называть его так: ${socket.username}`); //
+      socket.emit("colorPlease", "colorPlease");
+      socket.on("object", message => {
+            newFace = new NewFace(socket.username, ident, message.b, null, message.c, timeReg()); // Создаём конкретный экземпляр
+      socket.emit("pleaseYourAccount", newFace);  //  шаблона - класса, куда передаём конкретные значения его элементов.
+      socket.broadcast.emit(`У нас новый участник. Его имя: ${socket.username}`);
+         for (let key in newFace) {
+             console.log(`${key}: ${newFace[key]}`);
+         }
+
+         const mongoClient = new MongoClient(url, {useNewUrlParser: true});
+            mongoClient.connect(function(err, client){
+                 const db = client.db("Pioner");
+                 const collection = db.collection("CHAT1");
+                             collection.insertOne(newFace, function(err, result) {
+                                 if (err) throw err;
+                                 else {
+                                   //------------------------------------------------------------------------------------
+                                   // ЕЩЁ ОДНА ВЛОЖЕННОСТЬ МАНИПУЛЯЦИЙ С БД ВО ВРЕМЯ ОДНОЙ СЕССИИ РАБОТЫ МОНГО - клиента.
+                                           collection.find().toArray((err, result) => {
+                                                if (err) throw err;
+                                                else {
+                                                    masPers = result;
+                                                    socket.emit("masPersNew", masPers);
+                                               //     console.log(masPers);
+                                           console.log("Ну что, похоже, работа чата подналадилась !");
+                                                }
+                                           });
+                                   //------------------------------------------------------------------------------------
+                                   client.close()
+                                 };
+                             });
+                         });
+            // masPers.push(newFace);     // И сразу же обновляем оперативный массив masPers.
+            //  console.log(`masPers.length = ${masPers.length}`);
+            //  console.log(`Массив masPers после обновления содержит:`);
+            //   for (let i = 0; i < masPers.length; i++) {
+            //     for (let key in masPers[i]) {
+            //        console.log(`${key}: ${masPers[i][key]}`);
+            //     }
+            //   }
+       });
+  });
+
+//========================================================================================
+
+ socket.on("message", message => { // ЭТО - главный сокет, в котором происходит
+   console.log(`ПОЛУЧЕНО С КЛИЕНТА: obj.a = ${message.a}; obj.b = ${message.b}; obj.c = ${message.c}`);
+   console.log(`На сервер с клиента всё приходит нормально!`);
+                                                   // обработка приходящих от клиента сообщений.
+//        if (message.b === `Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`) {
+//             console.log(`Эта функция будет закрывать для участника текущую сессию работы в чате.`);
+//          } else {}
+
+   socket.broadcast.emit("otvetMessage", message);
+});
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ЭТО - КРОШЕЧНЫЙ БЛОЧОК, ГДЕ Я ПРОБУЮ ПЕРЕСЛАТЬ ФОТО ИЗ ДОКУМЕНТА,
+//  ХРАНЯЩЕГОСЯ В БАЗЕ ДАННЫХ MongoDB.
+//    socket.on("fotku_please", message => {
+//        if (message === "expect_to_foto") {
+//      const mongoClient = new MongoClient(url, { useNewUrlParser: true });
+//      mongoClient.connect(function(err, client){
+//      const db = client.db("Pioner");
+//      const collection = db.collection("CHAT1");
+//
+//  //     let sohran = {};
+// //         sohran.id = 1962;
+// //      sohran.bin = fs.readFileSync("kartinki/logotip.jpg");
+// //       collection.insertOne(sohran, (err,data) => {
+// //           if (err) console.error(err);
+// //       })
+//
+//       collection.findOne({id: 1962}, function(err, doc){
+//      if (err) {
+//        console.error(err);
+//        }
+//        socket.emit("fotka_proba", doc.bin.buffer);
+//        });
+//        client.close();
+//      });
+//    }
+//  });
+// Оно пересылается в бинарном виде нормально,на сторону клиента
+// долетает, но там не хочет нормально открываться. Ничего не могу
+// понять!
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   // socket.on("message_foto", message => {
+   //     socket.broadcast.emit("broadcast_foto", message);
+   // });
+/*
+ socket.on('little_newbie', function(username) { // Закрывающая скобка на стр. 296.
+   socket.username = username;
+   ident = socket.id;
+
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   if (masPers.length != 0) {                 // для нового обьекта
+     for (let masP of masPers) {               // для нового обьекта
+       if (masP.sv1 === socket.username) {     // для нового обьекта
+           masP.sv2 = ident;
+           socket.usercolorb = masP.sv3;
+
+// Здесь нужно делать обновление данной записи в БД.Тогда в функции funcStopServer()
+// не придётся производить обновление всей БД целиком.
+//************************************************************************
+const mongoClient = new MongoClient(url, { useNewUrlParser: true });
+mongoClient.connect(function(err, client){
+const db = client.db("Pioner");
+const collection = db.collection("CHAT1");
+   collection.findOneAndUpdate({sv1: masP.sv1}, {$set: {sv2: ident}}, (err, result) => {
+    if (err) throw err;
+ });
+client.close();
+});
+//************************************************************************
+           socket.emit("message", socket.usercolorb);
+           let shablon = `В чат только что вернулся:  ${socket.username}`;
+           socket.broadcast.emit('message', shablon);
+           flag = false;
+       }
+   }
+}
+
+// //        console.log(mas_poset);
+// //        console.log(mas_poset.size);
+//       console.log(' Клиент ' + socket.username + " он же " + ident + ' подключен!');
+// //      let strochka = JSON.stringify("Вы подключены !");
+//         socket.emit('message', "Вы подключены !");
+//         let shablon = `Только что подключился НОВЫЙ УЧАСТНИК по имени:  ${socket.username}`;
+// //        let Jshablon = JSON.stringify(shablon);
+//         socket.broadcast.emit('message', shablon);
+      }
+      else flag = true;
+  });
+*/
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     socket.on('disconnect', function(data) {
+    });
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+  function escapeSpecialChars(jsonString) {
+      return jsonString.replace(/\n/g, "\\n")
+                 .replace(/\r/g, "\\r")
+                 .replace(/\t/g, "\\t")
+                 .replace(/\f/g, "\\f");
+  }
+
+}); // Это закрывающая скобка сокет - коннекта, стр.167
+//      socket.emit('message', { content: 'You are connected!', importance: '1' });
+
+server.listen(7777, function () {
+  console.log ('Работаем на порт: 7777');
+});
+
+
+
+===============================  КОНЕЦ БЭКАПА от 29 авг. 2020 г. ===================================

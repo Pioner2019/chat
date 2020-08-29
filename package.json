@@ -1,0 +1,23 @@
+{
+  "name": "chathomeworkdt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node chatHomeworkDT.js",
+    "dev": "nodemon chatHomeworkDT.js"
+  },
+  "author": "Pioner2020 <pioner2020@com>",
+  "license": "ISC",
+  "devDependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "fs": "0.0.1-security",
+    "http": "0.0.1-security",
+    "mongodb": "^3.6.0",
+    "socket.io": "^2.3.0"
+  }
+}
