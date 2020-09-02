@@ -112,99 +112,6 @@
            z-index: 10;
          }
 
-         #poleHistory {
-           position: absolute;
-           left:270px;
-           top:95px;
-           width: 450px;
-           height: 400px;
-           background-color: #d8bfd8;
-           overflow:scroll;
-           padding-bottom: 10px;
-           border: 4px solid black;
-           border-radius: 5px;
-           font-size: .5rem;
-           font-family: Verdana;
-           font-weight: bold;
-           opacity: 0;
-    /*       transform:            opacity(0); */
-           transition-property:  opacity;
-           transition-duration:  1.6s;
-           z-index: 10;
-         }
-
-         /*================================================================================*/
-         #finish {
-            position: absolute;
-            left: 280px;
-            top: 495px;
-            width: 250px;
-            height: 40px;
-            font-family: Verdana;
-            font-size: 10px;
-            color: black;
-            padding: 10px 10px;
-            background: -moz-linear-gradient(top, #dcdcdc 0%, #a9a9a9);
-            background: -webkit-gradient(linear, left top, left bottom, from(#dcdcdc), to(#696969));
-            border-radius: 10px;
-            border: 1px solid #696969;
-            box-shadow: 0px 1px 3px rgba(000,000,000,0.5),
-                        inset 0px 0px 1px rgba(255,255,255,0.5);
-            text-shadow: 0 1px 0 white;
-            display: block;
-            text-decoration: none;
-            opacity: 0;
-            transition-property:  opacity;
-            transition-duration:  1.6s;
-            z-index: 10;
-           }
-
-           #finish:active {
-             background: -moz-linear-gradient(top, #696969 0%, #dcdcdc);
-             background: -webkit-gradient(linear, left top, left bottom, from(#696969), to(#dcdcdc));
-             text-shadow: 0 -1px 0 white;
-           }
-         /*================================================================================*/
-
-         .wrap {
-               margin-left:   3px;
-               border-radius: 15px;
-               width:         100px;
-               height:        100px;
-               border:        1px solid black;
-               box-sizing: border-box;
-               transition:          0.6s;
-         }
-
-         .wrap:hover {
-               transform: scale(2.5);
-         }
-
-         .image {
-               margin-left: 5px;
-               margin-top: 10px;
-               border-radius: 15px;
-               width:         98px;
-               transition:          0.6s;
-         }
-
-         .image:hover { 
-             transform: scale(2.5);
-         }
-
-        #flexFoto {
-           display: flex;
-           margin-top: 10px;
-           width: 415px;
-           height: 100px;
-           border: 2px red solid;
-           transition:  0.6s;
-        }
-
-    /*    #flexFoto:hover {
-           transform: scale(2.5);
-        } */
-
         #textarea {
             position: absolute;
             height:110px;
@@ -376,7 +283,7 @@
              to(#42aaff));
           }
 /*================================================================================*/
-#stop,#vvod {
+#stop {
    margin-left: 15px;
    height:40px;
    font-family: Verdana;
@@ -395,7 +302,7 @@
    text-decoration: none;
   }
 
-  #stop:active,#vvod:active {
+  #stop:active {
     background: -moz-linear-gradient(top, #800080 0%, #da70d6);
    background: -webkit-gradient(linear, left top, left bottom, from(#800080), to(#da70d6));
   }
@@ -452,8 +359,8 @@
             text-align: center;
             color: #8b008b;
             box-shadow: 50px 50px rgba(0, 0, 0, .5);
-            transform:            translateY(-220px);
-            transition:           transform .8s linear;
+            transform:            translateY(-300px);
+            transition:           transform 1.1s linear;
             z-index: 101;
           }
 
@@ -461,95 +368,29 @@
           transform:              translateY(70px);
     }
 
-    #yes {
-      position: absolute;
-      left: 18px;
-      top: 60px;
-      width: 100px;
-      background-color: #8a2be2;
-      border-radius: 6px;
-    }
+          #yes {
+            position: absolute;
+            left: 18px;
+            top: 60px;
+            width: 100px;
+            background-color: #8a2be2;
+            border-radius: 6px;
+          }
 
-    #no {
-      position: absolute;
-      left: 140px;
-      top: 60px;
-      position: absolute;
-      width: 100px;
-      background-color: #8a2be2;
-      border-radius: 6px;
-    }
+          #no {
+            position: absolute;
+            left: 140px;
+            top: 60px;
+            position: absolute;
+            width: 100px;
+            background-color: #8a2be2;
+            border-radius: 6px;
+          }
 
-    #yes:active,#no:active {
-         background:      #8b008b;
-         color:           white;
-    }
-
-    #bannerHistory {
-      position: absolute;
-      top:170px;
-      left: 100px;
-      width: 250px;
-      height: 200px;
-      border: 1px solid black;
-      background-color: white;
-      font-family: Verdana;
-      font-size: .5rem;
-      font-weight: bolder;
-      text-align: center;
-      color: #8b008b;
-      box-shadow: 50px 50px rgba(0, 0, 0, .5);
-      transform:            translateX(-900px);
-      transition:           transform .8s linear;
-      z-index: 1000;
-    }
-
-     #bannerHistory.move {
-           transform:              translateX(100px);
-     }
-
-     #hour {
-       position: absolute;
-       left: 18px;
-       top: 40px;
-       width: 210px;
-       background-color: #8a2be2;
-       border-radius: 6px;
-     }
-
-     #day {
-       position: absolute;
-       left: 18px;
-       top: 80px;
-       width: 210px;
-       background-color: #8a2be2;
-       border-radius: 6px;
-     }
-
-     #week {
-       position: absolute;
-       left: 18px;
-       top: 120px;
-       width: 210px;
-       background-color: #8a2be2;
-       border-radius: 6px;
-     }
-
-     #variation {
-       position: absolute;
-       left: 18px;
-       top: 160px;
-       width: 210px;
-       background-color: #8a2be2;
-       border-radius: 6px;
-     }
-
-     #day:active,#week:active,#variation:active {
-          background:      #8b008b;
-          color:           white;
-     }
-
-
+          #yes:active,#no:active {
+               background:      #8b008b;
+               color:           white;
+          }
 
           #gardina {
             position: absolute;
@@ -561,18 +402,4 @@
             color:red;
             font-weight: 900;
             z-index: 10;
-          }
-
-          #podmenu {
-             position: absolute;
-             left:120px;
-             top:195px;
-             width: 200px;
-             height: 140px;
-             padding: 10px;
-             background-color: white;
-             border: 1px solid black;
-             opacity: 0;
-             transition-property:  opacity;
-             transition-duration:  1s;
           }

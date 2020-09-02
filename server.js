@@ -2,6 +2,11 @@
      var http = require('http');
      var fs = require('fs');
      const timeReg = require("/projects/chatHomeworkDT/plugins/pluginTime.js");
+     const figlet = require("figlet");
+          figlet.text("E = mc**2 !", (err, data) => {
+              if (err) console.log("err!");
+              else console.log(data);
+          });
   //   const Tooltip = require('tooltip');
   //   console.log(timeReg());
 
@@ -28,13 +33,17 @@
      var masPers = [];
 
    class NewFace {  // Этот класс является шаблоном - прототипом для создания учётных
-      constructor(sv1, sv2, sv3, sv4, sv5, sv6) { //  записей участников чата, где:
+      constructor(sv1, sv2, sv3, sv4, sv5, sv6, sv7, sv8, sv9, sv10) { //  записей участников чата, где:
         this.sv1 = sv1,  // имя участника;
         this.sv2 = sv2,  // его идентификатор, присвоенный сокетом при соединении;
         this.sv3 = sv3,  // цвет его сообщений, присвоенный сервером;
         this.sv4 = sv4,  // его аватарка(если есть);
         this.sv5 = sv5,  // его личный пароль входа;
-        this.sv6 = sv6   // дата и время регистрации в БД.
+        this.sv6 = sv6,   // дата и время регистрации в БД;
+        this.sv7 = sv7    // массив значений времени в числовой форме;
+        this.sv5 = sv8,   // зарезервировано;
+        this.sv6 = sv9,   // зарезервировано;
+        this.sv7 = sv10   // зарезервировано.
       }
    }
 
@@ -137,6 +146,21 @@ var io = require('socket.io').listen(server);
                        socket.emit("dostup", obj);
                        let posl = {a:`админ`, b:`В ОБЩЕНИЕ ВЕРНУЛСЯ ${masPers[i].sv1}`, c:`#a9a9a9`};
                        socket.broadcast.emit("otvetMessage", posl);
+          //----------------------------------------------------------------------
+                             const mongoClient = new MongoClient(url, {useNewUrlParser: true});
+                                   mongoClient.connect(function(err, client){
+                                   const db = client.db("Pioner");
+                                   const collection = db.collection("CHAT1history");
+                                         let objTime = timeReg();
+                                         posl.d = objTime.a; posl.e = objTime.b;
+                                         collection.insertOne(posl, function(err, result) {
+                                               if (err) throw err;
+                                               else {
+                                                  client.close();
+                                               };
+                                          });
+                                   });
+          //----------------------------------------------------------------------
                      }
                      else {socket.emit("dostup", "minus");}
                 });
@@ -159,7 +183,8 @@ var io = require('socket.io').listen(server);
            console.log(`и предлагает называть его так: ${socket.username}`); //
            socket.emit("colorPlease", "colorPlease");
            socket.on("object", message => {
-                 newFace = new NewFace(socket.username, ident, message.b, null, message.c, timeReg()); // Создаём конкретный экземпляр
+                 let objTime = timeReg();
+                 newFace = new NewFace(socket.username, ident, message.b, null, message.c, objTime.a, objTime.b, null, null, null); // Создаём конкретный экземпляр
            socket.emit("pleaseYourAccount", newFace);  //  шаблона - класса, куда передаём конкретные значения его элементов.
            socket.broadcast.emit(`У нас новый участник. Его имя: ${socket.username}`);
               for (let key in newFace) {
@@ -206,12 +231,90 @@ var io = require('socket.io').listen(server);
         console.log(`ПОЛУЧЕНО С КЛИЕНТА: obj.a = ${message.a}; obj.b = ${message.b}; obj.c = ${message.c}`);
         console.log(`На сервер с клиента всё приходит нормально!`);
                                                         // обработка приходящих от клиента сообщений.
-    //        if (message.b === `Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`) {
-  //             console.log(`Эта функция будет закрывать для участника текущую сессию работы в чате.`);
-  //          } else {}
+            //----------------------------------------------------------------------
+                               const mongoClient = new MongoClient(url, {useNewUrlParser: true});
+                                     mongoClient.connect(function(err, client){
+                                     const db = client.db("Pioner");
+                                     const collection = db.collection("CHAT1history");
+                                     let time = timeReg();
+                                     let posl = {a:message.a, b:message.b, c:message.c, d:time.a, e:time.b};
+                                           collection.insertOne(posl, function(err, result) {
+                                                 if (err) throw err;
+                                                 else {
+                                                    client.close();
+                                                 };
+                                            });
+                                     });
+            //----------------------------------------------------------------------
 
         socket.broadcast.emit("otvetMessage", message);
     });
+
+        socket.on(`history, please!`, message => {
+
+            let key = message.a;
+            let date = new Date();
+            let time1 = date.getTime();
+            const mongoClient = new MongoClient(url, {useNewUrlParser: true});
+             switch (key) {
+               case 1:
+                    console.log(`Запрашиваем в Монге получение истории чата за час.`);
+                    let time2 = time1 - 3600000; // Получаем таймстамп момента, который был час назад.
+                    getHistory(mongoClient, time2);
+               break;
+
+               case 2:
+                    console.log(`Запрашиваем в Монге получение истории чата за сутки.`);
+                    let time3 = time1 - 86400000; // Получаем таймстамп момента, который был сутки назад.
+                      getHistory(mongoClient, time3);
+               break;
+
+               case 3:
+                    console.log(`Запрашиваем в Монге получение истории чата за неделю.`);
+                    let time4 = time1 - 604800000; // Получаем таймстамп момента, который был неделю назад.
+                      getHistory(mongoClient, time4);
+               break;
+
+               case 4:
+                    console.log(`Запрашиваем в Монге получение истории чата за диапазон.`);
+                    let date1 = new Date(message.b[2], message.b[1], message.b[0], 0, 0, 0);
+                    let date2 = new Date(message.c[2], message.c[1], message.c[0], 0, 0, 0);
+//---------------------------------------------------------------------------------
+                        let massHistory = [];
+                        mongoClient.connect(function(err, client){
+                        const db = client.db("Pioner");
+                        const collection = db.collection("CHAT1history");
+//  ТАЙМСТАМП КОНКРЕТНОГО СООБЩЕНИЯ ХРАНИТСЯ В ЕГО ОБЬЕКТЕ ПОДКЛЮЧОМ "е".
+                        collection.find().toArray((err, result) => {
+                            if (err) throw err;
+                            else {
+                               massHistory = result;
+                                for (let i = 0; i < massHistory.length; i++) {
+                                  if (massHistory.e >= date1 && massHistory.e <= date2) {
+                                     for (let key in massHistory[i]) {
+                                         delete massHistory[i]._id;
+                                         delete massHistory[i].c;
+                                         delete massHistory[i].e;
+                                     }
+                                  }
+                                }
+            //                 console.log(`massiv.length = ${massHistory.length}`);
+                             console.log(`massiv = ${massHistory}`);
+                        socket.emit("massHistory", massHistory);
+                        client.close();
+                         }
+                      });
+                  });
+//---------------------------------------------------------------------------------
+               break;
+
+             }
+        });
+
+        socket.on("message_foto", message => {
+          socket.broadcast.emit("broadcast_foto", message);
+        });
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ЭТО - КРОШЕЧНЫЙ БЛОЧОК, ГДЕ Я ПРОБУЮ ПЕРЕСЛАТЬ ФОТО ИЗ ДОКУМЕНТА,
 //  ХРАНЯЩЕГОСЯ В БАЗЕ ДАННЫХ MongoDB.
@@ -244,55 +347,33 @@ var io = require('socket.io').listen(server);
 // понять!
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-        // socket.on("message_foto", message => {
-        //     socket.broadcast.emit("broadcast_foto", message);
-        // });
-  /*
-	    socket.on('little_newbie', function(username) { // Закрывающая скобка на стр. 296.
-        socket.username = username;
-        ident = socket.id;
-
-//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-        if (masPers.length != 0) {                 // для нового обьекта
-          for (let masP of masPers) {               // для нового обьекта
-            if (masP.sv1 === socket.username) {     // для нового обьекта
-                masP.sv2 = ident;
-                socket.usercolorb = masP.sv3;
-
-// Здесь нужно делать обновление данной записи в БД.Тогда в функции funcStopServer()
-// не придётся производить обновление всей БД целиком.
-//************************************************************************
-     const mongoClient = new MongoClient(url, { useNewUrlParser: true });
-     mongoClient.connect(function(err, client){
-     const db = client.db("Pioner");
-     const collection = db.collection("CHAT1");
-        collection.findOneAndUpdate({sv1: masP.sv1}, {$set: {sv2: ident}}, (err, result) => {
-         if (err) throw err;
-      });
-    client.close();
-   });
-//************************************************************************
-                socket.emit("message", socket.usercolorb);
-                let shablon = `В чат только что вернулся:  ${socket.username}`;
-                socket.broadcast.emit('message', shablon);
-                flag = false;
-            }
+        function getHistory(param1, param2) {
+              let massHistory = [];
+              param1.connect(function(err, client){
+              const db = client.db("Pioner");
+              const collection = db.collection("CHAT1history");
+      //  ТАЙМСТАМП КОНКРЕТНОГО СООБЩЕНИЯ ХРАНИТСЯ В ЕГО ОБЬЕКТЕ ПОДКЛЮЧОМ "е".
+                   collection.find({e: {$gte: param2}}).toArray((err, result) => {
+                         if (err) throw err;
+                         else {
+                             massHistory = result;
+                             for (let i = 0; i < massHistory.length; i++) {
+                                      for (let key in massHistory[i]) {
+                                         delete massHistory[i]._id;
+                                         delete massHistory[i].c;
+                                         delete massHistory[i].e;
+                                      }
+                              }
+                             console.log(`massiv.length = ${massHistory.length}`);
+                             console.log(`massiv = ${massHistory}`);
+                             socket.emit("massHistory", massHistory);
+              //               return massHistory;
+                             client.close();
+                         }
+                    });
+               });
+        //    return massHistory;
         }
-    }
-
-// //        console.log(mas_poset);
-// //        console.log(mas_poset.size);
-//       console.log(' Клиент ' + socket.username + " он же " + ident + ' подключен!');
-// //      let strochka = JSON.stringify("Вы подключены !");
-//         socket.emit('message', "Вы подключены !");
-//         let shablon = `Только что подключился НОВЫЙ УЧАСТНИК по имени:  ${socket.username}`;
-// //        let Jshablon = JSON.stringify(shablon);
-//         socket.broadcast.emit('message', shablon);
-           }
-           else flag = true;
-       });
-  */
 
  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
           socket.on('disconnect', function(data) {

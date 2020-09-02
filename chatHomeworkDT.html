@@ -17,27 +17,60 @@
 
         <h2>Учебная работа: <span>ЧАТ НА ВЕБ - СОКЕТАХ И МОНГОдб.</span></h2>
 
-        <div id='pole' style='background: url(/projects/chatHomeworkDT/kartinki/old-newspaper.jpg) repeat;'>
-            <div id='invisible' style='width:1px; height:1px; opacity:0;'></div>
-        </div>
+        <div id='pole' style='background: url(/projects/chatHomeworkDT/kartinki/old-newspaper.jpg) repeat;'></div>
+
+        <div id='poleHistory'></div>
+
+        <button id="finish">Закончить работу с историей</button>
 
         <img src='/projects/chatHomeworkDT/kartinki/2020-02-27_02-46-53.png' style='position:absolute; left:628px;
                       top:17px; width:100px; height:78px;'/>
+
+        <div id='flexFoto'>
+             <div id='wrapid0' class='wrap'><img class='image' style='width:100px;'/></div>
+             <div id='wrapid1' class='wrap'><img class='image' style='width:100px;'/></div>
+             <div id='wrapid2' class='wrap'><img class='image' style='width:100px;'/></div>
+             <div id='wrapid3' class='wrap'><img class='image' style='width:100px;'/></div>
+        </div>
 
         <textarea cols='30' rows='5' placeholder='Введите своё сообщение' id='textarea'></textarea>
 
         <div id='showFoto'>Показать фото друзьям:
            <div id='triangle'></div>
-        </div><input type='file' style='margin-left:5px;' id='files' name='files[]' multiple />
-	  <!--- <output id='list'></output> --->
-
-    <!--- <button id='button' style='width:350px;'>Прошу фото для пробы</button>
-        <button id='stopper'>STOP SERVER</button> --->
+        </div>
+        <input type='file' style='margin-left:5px;' id='files' multiple />
 
        <button id="history" style='margin-top:15px;'>Получить историю чата</button>
        <button id="myLS" style='margin-top:10px;'>Создать личку</button>
        <button id="room" style='margin-top:5px;'>Создать комнату</button>
        <button id="stop" style='margin-top:0px;'>Выйти из чата</button>
+
+       <div id='bannerHistory'>Выберите интересующий вас диапазон истории чата:
+          <button id='hour'>За последний час</button>
+          <button id='day'>За последние сутки</button>
+          <button id='week'>За последнюю неделю</button>
+          <button id='variation'>В произвольном диапазоне</button>
+              <div id='podmenu'>Введите начальную дату искомого диапазона в поле "с",
+                                а конечную - в поле "до", в формате ДЕНЬ-МЕСЯЦ-ГОД.
+                                День и месяц вводить двумя цифрами, а год четырьмя,
+                                XX-XX-XXXX:
+                                <p> </p>
+                                <div id='flex' style='display:flex;'>
+                                    <div style='width:90px; margin-left:5px;'>c</div>
+                                    <div style='width:90px; margin-left:10px;'>до</div>
+                                </div>
+                                <p></p>
+                                <div id='flexInputs' style='display:flex;'>
+                                    <input id='inp1' class="inp" type='text' style='width:83px; margin-left:5px;'/>
+                                    <input id='inp2' class="inp" type='text' style='width:83px; margin-left:10px;'/>
+                                </div>
+                                <p> </p>
+                                <p> </p>
+                                <p> </p>
+                                <button id='vvod' style='width:140px; margin-left:30px;'>Ввод данных</button>
+              </div>
+    <!--- </button> --->
+       </div>
 
        <div id='gardina'></<div>
        <button id='but' style='width:250px;'>Войти в чат</button>
@@ -47,17 +80,13 @@
           <button id='no'>Не сейчас</button>
        </div>
 
-       </div>
-
 <!------------------------------------------------------------------------------------------------------>
         <script src='/projects/chatHomeworkDT/base.js'></script>
-  <!--- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> --->
         <script src = "/socket.io/socket.io.js"></script>
         <script src="/projects/chatHomeworkDT/chatHomeworkDT.js"></script>
         <script src='/projects/chatHomeworkDT/plugins/pluginColorSelect.js'></script>
         <script src='/projects/chatHomeworkDT/plugins/pluginMakeMessage.js'></script>
         <script src='/projects/chatHomeworkDT/plugins/pluginTimeClient.js'></script>
-<!--- <script src='/projects/chatHomeworkDT/tooltip.min..js'></script> --->
 <!------------------------------------------------------------------------------------------------------->
 
     </body>

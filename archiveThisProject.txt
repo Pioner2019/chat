@@ -1256,3 +1256,158 @@ server.listen(7777, function () {
 
 
 ===============================  КОНЕЦ БЭКАПА от 29 авг. 2020 г. ===================================
+
+
+
+
+//+++++++++++++++++++++++ КУСОЧЕК БЭКАПА от 02 сент. 2020 г. ++++++++++++++++++++++++++++++
+
+socket.on("broadcast_foto", message => {      // Получаем рассылку с сервера.
+      let massiv = message;
+      let flexFoto;
+      console.log("massiv.length = " + massiv.length);
+      flexFoto = document.createElement('div');
+      flexFoto.id = 'flexFoto';
+         for (let i = 0; i < massiv.length; i++) {
+           let wrap = document.createElement('div');
+               wrap.className = "wrap";
+               // wrap.addEventListener("click", function() {
+               //      console.log("wrap.className = " + this.className);
+               //      this.style.transform = "scale(2.5)";
+               // });
+               let image = document.createElement('img');
+                   image.className = "image";
+                   image.src = massiv[i];
+               wrap.appendChild(image);
+          flexFoto.appendChild(wrap);
+     }
+       pole.appendChild(flexFoto);
+//           console.log("flexFoto.id = " + fl.id);
+//        document.addEventListener("DOMContentLoaded", function() {
+//============================================================================
+              let elbody = document.querySelector("#body");
+                  elbody.addEventListener("click", function(e) {
+                      console.log(`e.target.id = ${e.target.id}`);
+                  });
+//============================================================================
+             // let wrapes = document.querySelectorAll(".wrap");
+             // for (let i = 0; i < wrapes.length; i++) {
+             //       console.log("wrapes[i] = " + wrapes[i]);
+             //       console.log("this = " + this);
+             //       console.log("wrapes[i].className = " + wrapes[i].className + " , " + i + "!");
+             //  //     func(wrapes[i]);
+             //       wrapes[i].addEventListener("click", func.bind(wrapes[i], wrapes[i]));
+             //     }
+//            });
+       pole.scrollTop = pole.scrollHeight;
+});
+
+function func(param) {
+  console.log("param = " + param);
+  console.log("param.className = " + param.className);
+    console.log("this = " + this);
+    console.log("ЧТО ЗА ХЕРНЯ ТВОРИТСЯ, ТВОЮ МАТЬ ???!!!");
+    this.style.transform = "scale(2.5)";
+}
+
+  function funcScaleMax(param) {
+    console.log("image.className = " + param.className);
+      param.transform = "scale(2.5)";
+  }
+
+  function funcScaleMin(param) {
+      param.transform = "scale(1)";
+  }
+
+//============================== ЗАКОНЧЕН БЛОК ОТПРАВКИ И ПОЛУЧЕНИЯ ИЗОБРАЖЕНИЙ. ===================================
+
+//+++++++++++++++++++++++++++  КОНЕЦ КУСОЧКА БЭКАПА от 02 сент. 2020 г.++++++++++++++++++++++++++++++++++
+
+
+//==============================  БЛОК ОТПРАВКИ И ПОЛУЧЕНИЯ ИЗОБРАЖЕНИЙ. 02 сент. 2020 г. ======================
+// ЭТОТ ВАРИАНТ НЕ РАБОТАЕТ КАК ХОТЕЛОСЬ БЫ. ПОЭТОМУ Я ЕГО АРХИВИРУЮ И НА ПРОДАКШЕНЕ ВОЗВРАЩАЮСЬ ===============
+// К БОЛЕЕ ПРОСТОМУ, НО ЗАТО РАБОТАЮЩЕМУ ВАРИАНТУ: ЗДЕСЬ ФОТКИ НОРМАЛЬНО ЛЕТАЮТ ПО СОКЕТАМ И ПЕРЕДАЮТСЯ НА СЕРВЕР
+// И ОБРАТНО, НО НЕТ ФУНКЦИИ УВЕЛИЧЕНИЯ КАРТИНКИ ПО КЛИКУ НА НЕЁ. ИМЕННО ЭТА ПРОСТЕЙШАЯ, КАЗАЛОСЬ БЫ, ВЕЩЬ И СТАЛА
+// ПРЕПЯТСТВИЕМ, В КОТОРОЕ Я УПЁРСЯ. Я ПОТЕРЯЛ ЦЕЛЫЕ СУТКИ, И ТАК И НЕ ПОБЕДИЛ. ТЕРПЛЮ ТАКТИЧЕСКОЕ ПОРАЖЕНИЕ.
+//  МОЖЕТ, ПОЗЖЕ ВЕРНУСЬ К ЭТОМУ ВОПРОСУ, - ВЕДЬ РАБОТА НАД ЧАТОМ ПРОДОЛЖАЕТСЯ.
+//    КРОМЕ ТОГО, ПОЧЕМУ-ТО ОТКАЗАЛСЯ РАБОТАТЬ nodemon. А ВЕДЬ ТАК ХОРОШО БЫЛО С НИМ! ПРИШЛОСЬ ВЕРНУТЬСЯ К ОБЫЧНОМУ
+// ЗАПУСКУ ЧЕРЕЗ node server. ХРЕН ЕГО ЗНАЕТ, ЧТО УЖЕ СЛУЧИЛОСЬ. ПОКА НЕ МОГУ ПОНЯТЬ.
+
+document.getElementById("files").addEventListener('change', onFileSelect);
+
+     function onFileSelect(e) {
+        let file = e.target.files;
+        let massImage = [];
+            console.log("file.length = " + file.length);
+        for (let j = 0; j < file.length; j++) {
+        let reader = new FileReader();
+        reader.onload = function(f)  {
+        //      socket.emit("message_foto", f.target.result);
+                   let image = document.createElement("img");
+                       image.id = `imid ${j}`;
+                       image.className = "image";
+                       image.src = f.target.result;
+                       console.log("image.id = " + image.id);
+                   pole.appendChild(image);
+                   pole.scrollTop = pole.scrollHeight;
+                    massImage.push(f.target.result);
+                    console.log("massImage.length = " + massImage.length);
+            //        console.log("massImage: " + massImage);
+                    if (massImage.length < file.length) {}
+                    else {
+                       socket.emit("message_foto", massImage);
+                    }
+        }
+        reader.readAsDataURL(file[j]);
+    //    console.log("massImage: " + massImage);
+      }
+     }
+
+    socket.on("broadcast_foto", message => {      // Получаем рассылку с сервера.
+          let massiv = message;
+              // for (let i = 0; i < massiv.length; i++) {
+              // console.log(`massiv[${i}] = ${massiv[i]}`);
+              // }
+
+              console.log("massiv.length = " + massiv.length);
+          let pole = document.querySelector("#pole");
+          let flexFoto = document.querySelector("#flexFoto");
+          let wraps = document.querySelectorAll(".wrap");
+              console.log("wraps.length = " + wraps.length);
+          let images = document.querySelectorAll(".image");
+              console.log("images.length = " + images.length);
+              for (let i = 0; i < images.length; i++) {
+                  images[i].innerHTML = massiv[i];
+                  console.log("images[i].className = " + images[i].className);
+                  console.log("wraps[i].id = " + wraps[i].id);
+                  if (!images[i].addEventListener("click", func.bind(images[i], images[i]))) {
+                      console.log("ЧТО ЗА ХЕРНЯ ТВОРИТСЯ, ТВОЮ МАТЬ ???!!!");
+                  };
+              }
+              flexFoto.addEventListener("click", function() {
+                   console.log("flexFoto.id = " + flexFoto.id);
+                   flexFoto.style.transform = 'scale(2)';
+              });
+           pole.appendChild(flexFoto);
+           pole.scrollTop = pole.scrollHeight;
+    });
+
+    function func(param) {
+        console.log("param = " + param);
+        console.log("param.className = " + param.className);
+        console.log("this = " + this);
+        console.log("this.id = " + this.id);
+        console.log("ЧТО-ТО ПОЛУЧИЛОСЬ НАКОНЕЦ-ТО !");
+        this.style.transform = "scale(2.5)";//
+   }
+
+      function funcScaleMax(param) {
+        console.log("image.className = " + param.className);
+          param.transform = "scale(2.5)";
+      }
+
+      function funcScaleMin(param) {
+          param.transform = "scale(1)";
+      }
+
+//============================== ЗАКОНЧЕН БЛОК ОТПРАВКИ И ПОЛУЧЕНИЯ ИЗОБРАЖЕНИЙ. ===============================
