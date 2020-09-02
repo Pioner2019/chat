@@ -9,7 +9,6 @@
          let file = 0;
          let vibor = "";
          let flag = 0;
-  //       let massImage;
 
          let body = document.getElementById("body");
 
