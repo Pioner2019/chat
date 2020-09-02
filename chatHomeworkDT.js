@@ -162,8 +162,6 @@ document.getElementById("files").addEventListener('change', onFileSelect);
       }
      }
 
-
-//;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
                   socket.on("broadcast_foto", message => {      // Получаем рассылку с сервера.
                        let image = document.createElement('img');
                            image.className = "image";
@@ -171,7 +169,6 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                        pole.appendChild(image);
                        pole.scrollTop = pole.scrollHeight;
                   });
-//;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 //============================== ЗАКОНЧЕН БЛОК ОТПРАВКИ И ПОЛУЧЕНИЯ ИЗОБРАЖЕНИЙ. ===================================
 
