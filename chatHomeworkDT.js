@@ -49,6 +49,7 @@
         let finish = document.querySelector("#finish").addEventListener("click", funcFinish); // особую функцию:
                                                                                               //  funcGetHistoryRange.
         function funcGetHistory(param1) {
+            //      poleHistory.style.display = 'block';
                   bannerHistory.className = "";                  // Здесь мы просим покинуть страницу баннер с меню;
                   poleHistory.style.opacity = "1";               // и, напротив, появиться - поле для размещения искомой
                   let finish = document.querySelector("#finish"); // истории чата, а также кнопку для прекращения сеанса
@@ -96,10 +97,12 @@
                     });
         }
 
-        function funcFinish() {               // Нажатие на кнопку "Закончить работу с историей"
-           poleHistory.style.opacity = "0";   // приводит к исчезновению поля, отображающего историю,
+        function funcFinish() {
+                                               // Нажатие на кнопку "Закончить работу с историей"
+           poleHistory.style.opacity = "0";     // приводит к исчезновению поля, отображающего историю,
            let finish = document.querySelector("#finish"); // а также самой этой кнопки.
            finish.style.opacity = "0";
+           poleHistory.innerHTML = "";
         }
 
          const socket = io.connect('ws://localhost:7777');
@@ -116,6 +119,10 @@
              let history = document.querySelector("#history");
                  history.addEventListener("click", function() {  // Фактически - это хендлер нажатия
                        bannerHistory.className = "move";        // кнопки "Получить историю чата".
+                       poleHistory.style.zIndex = '100';
+                       let finish = document.querySelector("#finish");
+                       finish.style.xIndex = '110';
+                       pole.style.zIndex = '10';
                  });
 
                  socket.on("massHistory", message => {
@@ -141,35 +148,45 @@
 //==============================  БЛОК ОТПРАВКИ И ПОЛУЧЕНИЯ ИЗОБРАЖЕНИЙ. ================================
 
 document.getElementById("files").addEventListener('change', onFileSelect);
-
      function onFileSelect(e) {
         let file = e.target.files;
         let massImage = [];
-            console.log("file.length = " + file.length);
         for (let j = 0; j < file.length; j++) {
         let reader = new FileReader();
         reader.onload = function(f)  {
-              socket.emit("message_foto", f.target.result);
                    let image = document.createElement("img");
                        image.id = `imid ${j}`;
-                       image.className = "image";
+                       image.className = "imagine";
                        image.src = f.target.result;
-                       console.log("image.id = " + image.id);
                    pole.appendChild(image);
                    pole.scrollTop = pole.scrollHeight;
+                    massImage.push(f.target.result);
+                    if (massImage.length < file.length) {}
+                    else {
+                       socket.emit("message_foto", massImage);
+                    }
         }
         reader.readAsDataURL(file[j]);
       }
      }
 
-                  socket.on("broadcast_foto", message => {      // Получаем рассылку с сервера.
-                       let image = document.createElement('img');
-                           image.className = "image";
-                           image.src = message;
-                       pole.appendChild(image);
-                       pole.scrollTop = pole.scrollHeight;
-                  });
+    socket.on("broadcast_foto", message => {      // Получаем рассылку с сервера.
+          let massiv = [];
+              massiv = message;
 
+          let pole = document.querySelector("#pole");
+              pole.style.zIndex = "100";
+
+          let flexFoto = document.querySelector("#flexFoto");
+          let wraps = document.querySelectorAll(".wrap");
+          let images = document.querySelectorAll(".imagine");
+              for (let i = 0; i < images.length; i++) {
+                  images[i].src = massiv[i];
+              }
+           pole.appendChild(flexFoto);
+           pole.scrollTop = pole.scrollHeight;
+         });
+       });
 //============================== ЗАКОНЧЕН БЛОК ОТПРАВКИ И ПОЛУЧЕНИЯ ИЗОБРАЖЕНИЙ. ===================================
 
 
