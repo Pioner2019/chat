@@ -219,7 +219,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                   else {              // Если это - новенький, то формируется его учётная запись, для чего
                      funcShowBanner(); // вызываем в качестве колбэка функцию, которая покажет нам форму,
                    }                   // на вопросы которой должен ответить претендент.
-                });
+                });//
              }
 
               function funcShowBanner() {
