@@ -178,7 +178,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                 name = prompt("Как-нибудь назовите себя: ", "");  // Посетителя просят ввести произвольное имя.
                 socket.emit('promptingName', name);               // Оно отправляется на сервер для идентификации.
                 socket.on("otvet", message => {
-                  if (message === "Это имя уже есть в нашей базе.") {
+                  if (message === "Это имя уже есть в нашей базе.") { // Сервер сообщил, что такое имя в базе уже есть.
                     let clientCode = prompt(`Это имя уже есть в нашей базе.
                   Если Вы - новичок в чате, нажмите "Отмена".
                   Если Вы - УЖЕ УЧАСТНИК ЧАТА, то введите ПАРОЛЬ: ${""}`);
@@ -188,19 +188,19 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                         let nameNew = prompt(`Попробуйте другое имя: , ${""}`); // Предлагаем ему ввести
                           if (nameNew === name) {} // другое имя. Если он снова ввёл то же самое - идём в начало.
                           else {
-                            socket.emit('promptingName', nameNew);
-                            socket.username = nameNew;
-                          }
+                            socket.emit('promptingName', nameNew); // Если он ввёл наконец нормальное имя, которого
+                            socket.username = nameNew;            // в БД нет,- отсылаем его серверу для формирования
+                          }                                        // учётной записи нового участника чата.
                       }
-                      else {
-                        socket.emit("clientCode", clientCode);
-                        socket.on("dostup", message => {
+                      else {                                   // Если же это - старый участник чата,
+                        socket.emit("clientCode", clientCode); // то на сервере проверяется введённый
+                        socket.on("dostup", message => {       // им пароль...
                           objMessage = message.b;
-                          if (message.a === "plus") {
+                          if (message.a === "plus") {          //...и если он правильный...
                      colorMessage = message.b.sv3;
                      textarea.focus();
                      banner.className = "";
-                     gardina.remove();  // Предоставляем старому участнику
+                     gardina.remove();  //...Предоставляем старому участнику
                      but.remove();       // доступ к чату, и для этого...
                      let send = document.createElement("button"); //...создаём на странице кнопку, которая
                          send.id = 'send';                        // будет отправлять его сообщения.
@@ -208,7 +208,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                      body.appendChild(send);
                        funcMain();
                    }
-                   else if (message === "minus") {
+                   else if (message === "minus") { // Если же он по ошибке ввёл неверный пароль, то...
                        let kod = prompt(`Неверный пароль! Ещё разок: ${""}`); // Это будет продолжаться до тех пор,
                        socket.emit("clientCode", kod);                       // пока не будет введён правильный пароль.
                    } else {}
@@ -216,9 +216,9 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                    }
                   }
 
-                  else {  // Это ОТКРЫВАЮЩАЯ скобка очень важного блока с промисом.
-                     funcShowBanner(); // Вызываем в качестве колбэка функцию, которая покажет нам баннер.
-                   }   // Это ЗАКРЫВАЮЩАЯ скобка очень важного блока с промисом.
+                  else {              // Если это - новенький, то формируется его учётная запись, для чего
+                     funcShowBanner(); // вызываем в качестве колбэка функцию, которая покажет нам форму,
+                   }                   // на вопросы которой должен ответить претендент.
                 });
              }
 
