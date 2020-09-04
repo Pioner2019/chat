@@ -186,8 +186,39 @@ document.getElementById("files").addEventListener('change', onFileSelect);
            pole.appendChild(flexFoto);
            pole.scrollTop = pole.scrollHeight;
          });
-       });
+//       });
 //============================== ЗАКОНЧЕН БЛОК ОТПРАВКИ И ПОЛУЧЕНИЯ ИЗОБРАЖЕНИЙ. ===================================
+
+//======================================= БЛОК РАБОТЫ С ЛИЧКОЙ . =======================================
+
+            let userLS = document.querySelector("#userLS");
+                userLS.addEventListener("click", function() {
+                     console.log("Эта кнопка будет предоставлять участнику доступ к его личке.");
+                     let obj = {a:objMessage.sv1, b:"my userLS status", c:objMessage.sv3};
+                     socket.emit("message", obj);
+                     socket.on("getYouLichka", message => {
+                          let lichka = document.createElement("div");
+                              lichka.id = 'lichka';
+                              if (message.length === 0) {
+                                  console.log("Ваша личка пока пуста.");
+                                  lichka.innerHTML = `<p>&nbsp;&nbsp;Ваша личка пока пуста.</p>
+                                  <p>&nbsp;&nbsp;Хотите написать кому-нибудь в личку?</p>
+                                  <p>&nbsp;&nbsp;Если да -</p>
+                                  <p> </p>
+                                  <input type:text style='margin-left:15px;' placeholder='введите здесь его имя:'/>
+                                  <p> </p>
+                                  <textarea cols='25' rows='3' style='margin-left:15px;' placeholder='введите здесь своё сообщение' id='dialogs'></textarea>
+                                  <p> </p>
+                                  <button id='button' style='margin-left:15px; width:100px;'>Отправить</button>`;
+                              }
+                              else {
+                                  console.log(message);
+                                  lichka.innerHTML = message;
+                              }
+                         body.appendChild(lichka);
+                     });
+                });
+//=================================== ЗАКОНЧЕН БЛОК РАБОТЫ С ЛИЧКОЙ . =======================================
 
 
          let but = document.getElementById('but');                // НАЧАЛО работы на странице - нажатие

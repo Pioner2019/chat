@@ -7,13 +7,6 @@
               if (err) console.log("err!");
               else console.log(data);
           });
-  //   const Tooltip = require('tooltip');
-  //   console.log(timeReg());
-
-//     const time = require("plugins/pluginTime");
-//     var Binary = require('mongodb').Binary;
-  //        var tip = new Tooltip('Foo bar!');
-//          tip.position(200, 200).show();
 
      const MongoClient = require("mongodb").MongoClient;
      const url = "mongodb://localhost:27017/";
@@ -231,6 +224,23 @@ var io = require('socket.io').listen(server);
         console.log(`ПОЛУЧЕНО С КЛИЕНТА: obj.a = ${message.a}; obj.b = ${message.b}; obj.c = ${message.c}`);
         console.log(`На сервер с клиента всё приходит нормально!`);
                                                         // обработка приходящих от клиента сообщений.
+
+              //----------------------------------------------------------------------
+                        if (message.b === "my userLS status") {
+                            const mongoClient1 = new MongoClient(url, {useNewUrlParser: true});
+                                  mongoClient1.connect((err, client) => {
+                                       const db = client.db("Pioner");
+                                       const collection = db.collection(`${message.a}_userLS`);
+                                       collection.find().toArray((err, result) => {
+                                       if (err) throw err;
+                                       else {
+                                          socket.emit("getYouLichka", result);
+                                          client.close();
+                                       }
+                                  });
+                                });
+                              }
+            //----------------------------------------------------------------------
             //----------------------------------------------------------------------
                                const mongoClient = new MongoClient(url, {useNewUrlParser: true});
                                      mongoClient.connect(function(err, client){
