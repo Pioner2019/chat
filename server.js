@@ -33,7 +33,7 @@
         this.sv4 = sv4,  // его аватарка(если есть);
         this.sv5 = sv5,  // его личный пароль входа;
         this.sv6 = sv6,   // дата и время регистрации в БД;
-        this.sv7 = sv7    // массив значений времени в числовой форме;
+        this.sv7 = sv7,   // таймстамп этого момента;
         this.sv5 = sv8,   // зарезервировано;
         this.sv6 = sv9,   // зарезервировано;
         this.sv7 = sv10   // зарезервировано.
@@ -241,6 +241,25 @@ var io = require('socket.io').listen(server);
                                 });
                               }
             //----------------------------------------------------------------------
+
+            //----------------------------------------------------------------------
+                      if (message.b === "messageLS") {
+                          const mongoClient2 = new MongoClient(url, {useNewUrlParser: true});
+                                mongoClient2.connect((err, client) => {
+                                     const db = client.db("Pioner");
+                                     const collection = db.collection(`${message.d}_userLS`);
+                                     let time = timeReg();
+                                     let posl = {a:message.a, b:message.e, c:message.c, d:time.a};
+                                     collection.insertOne(posl, function(err, result) {
+                                     if (err) throw err;
+                                     else {
+                                        client.close();
+                                     }
+                                });
+                              });
+                            }
+          //----------------------------------------------------------------------
+
             //----------------------------------------------------------------------
                                const mongoClient = new MongoClient(url, {useNewUrlParser: true});
                                      mongoClient.connect(function(err, client){
@@ -256,8 +275,9 @@ var io = require('socket.io').listen(server);
                                             });
                                      });
             //----------------------------------------------------------------------
-
-        socket.broadcast.emit("otvetMessage", message);
+       if (message.b != "messageLS" && message.b != "my userLS status") {
+             socket.broadcast.emit("otvetMessage", message);
+       }
     });
 
         socket.on(`history, please!`, message => {

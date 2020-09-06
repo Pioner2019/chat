@@ -15,7 +15,7 @@
 		   --kakbylo_a4:       #ffa07a;
               }
 
-                    button  {
+  /*                  button  {
         width:                250px;
         height:               30px;
 		display:              block;
@@ -26,7 +26,7 @@
 		  }
 		        button:active {
 		background:           #dc143c;
-		  }
+		  }  */
 
         h2 {
          position: absolute;
@@ -135,16 +135,16 @@
          }
 
          /*================================================================================*/
-         #finish {
+         #finish,#stopLS,#stopLS1,#male {
             position: absolute;
             left: 280px;
             top: 513px;
             width: 250px;
-            height: 40px;
+            height: 30px;
             font-family: Verdana;
             font-size: 10px;
             color: black;
-            padding: 10px 10px;
+            padding: 5px 0px;
             background: -moz-linear-gradient(top, #dcdcdc 0%, #a9a9a9);
             background: -webkit-gradient(linear, left top, left bottom, from(#dcdcdc), to(#696969));
             border-radius: 10px;
@@ -160,7 +160,7 @@
             z-index: 10;
            }
 
-           #finish:active {
+           #finish:active,#stopLS:active,#stopLS1:active,#male:active {
              background: -moz-linear-gradient(top, #696969 0%, #dcdcdc);
              background: -webkit-gradient(linear, left top, left bottom, from(#696969), to(#dcdcdc));
              text-shadow: 0 -1px 0 white;
@@ -328,14 +328,14 @@
             outline:none;
         }
 
-        #but,#history,#userLS,#room,#button {
+        #but,#history,#userLS,#room,#button,#bt {
     /*       margin-top:  20px; */
            margin-left: 15px;
-           height:40px;
+           height:30px;
            font-family: Arial, Helvetica, sans-serif;
-           font-size: 15px;
+           font-size: 10px;
            color: #ffffff;
-           padding: 10px 10px;
+           padding: 7px 7px;
            background: -moz-linear-gradient(
              top,
              #42aaff 0%,
@@ -363,7 +363,7 @@
            display: block;
            text-decoration: none;
           }
-           a:hover,.but:hover,#button:hover,#history:hover,#userLS:hover,#room:hover,#admin2:hover {
+           a:hover,.but:hover,#button:hover,#history:hover,#userLS:hover,#room:hover,#admin2:hover,#bt:hover {
            background: -moz-linear-gradient(
              top,
              #42aaff 0%,
@@ -373,7 +373,7 @@
              from(#42aaff),
              to(#0d5aa7));
           }
-          a:active,.but:active,#button:active,#history:active,#userLS:active,#room:active,#admin2:active {
+          a:active,.but:active,#button:active,#history:active,#userLS:active,#room:active,#admin2:active,#bt:active {
            background: -moz-linear-gradient(
              top,
              #003366 0%,
@@ -384,13 +384,13 @@
              to(#42aaff));
           }
 /*================================================================================*/
-#stop,#vvod {
+#stop,#vvod,.knopki {
    margin-left: 15px;
-   height:40px;
+   height:30px;
    font-family: Verdana;
-   font-size: 15px;
+   font-size: 10px;
    color: #ffffff;
-   padding: 10px 10px;
+   padding: 7px 7px;
    background: -moz-linear-gradient(top, #da70d6 0%, #800080);
    background: -webkit-gradient(linear, left top, left bottom, from(#da70d6), to(#800080));
    border-radius: 10px;
@@ -403,7 +403,7 @@
    text-decoration: none;
   }
 
-  #stop:active,#vvod:active {
+  #stop:active,#vvod:active,.knopki:active {
     background: -moz-linear-gradient(top, #800080 0%, #da70d6);
    background: -webkit-gradient(linear, left top, left bottom, from(#800080), to(#da70d6));
   }
@@ -431,15 +431,118 @@
             background-color: white;
             top:100px;
             left:350px;
+            overflow:scroll;
             font-family: Verdana;
-            font-size: .6em;
+            font-size: .5em;
             font-weight: bolder;
             z-index: 1000;
           }
 
-          #dialogs {
-              margin-left:15px;
+          #lichkaMakeMale {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border: 1px solid black;
+            background-color: #dcdcdc;
+            top:100px;
+            left:100px;
+            font-family: Verdana;
+            font-size: .5em;
+            font-weight: bolder;
+            z-index: 1300;
+            transform:    translateY(-201px);
+            transition:   transform .6s linear;
           }
+
+          #lichkaMakeMale.trans {
+               transform:    translateY(170px);
+          }
+
+          p {
+            font-family: Verdana;
+            font-size: .6em;
+            font-weight: bolder;
+          }
+
+          #stopLS,#stopLS1 {
+             position: absolute;
+             width: 110px;
+             left:352px;
+             top:495px;
+             font-size: 10px;
+             padding: 7px 7px;
+             height: 30px;
+             z-index: 1001;
+             opacity: 1;
+          }
+
+          #male {
+             position: absolute;
+             width: 150px;
+             left:470px;
+             top:495px;
+             font-size: 10px;
+             padding: 7px 7px;
+             height: 30px;
+             z-index: 1001;
+             opacity: 1;
+          }
+
+          #inputin,#inputin1,#inn {
+             margin-left: 15px;
+             font-size: 10px;
+             margin-bottom: 10px;
+          }
+
+          #inn,#tr {
+            margin-top: 10px;
+          }
+
+          #dialogs,#dialogs1,#tr {
+             margin-left: 15px;
+             font-size: 10px;
+             margin-bottom: 10px;
+          }
+
+          #button,#button1 {
+              font-size: 10px;
+              width: 100px;
+              height: 30px;
+          }
+
+          #bt {
+            font-size: 10px;
+            width: 80px;
+            height: 25px;
+      /*      text-align: center;
+            line-height: 25px; */
+            padding: 6px 5px;
+            margin-left: 10px;
+      /*      display: block;  */
+          }
+
+          #menuLS {
+             position: absolute;
+             left: -200px;
+             top:220px;
+             width: 150px;
+             height: 150px;
+             z-index:    2000;
+             transform:    translateX(-200px);
+             transition:   transform 1s linear;
+          }
+
+          #menuLS.transport {
+               transform:    translateX(460px);
+          }
+
+          .knopki {
+             width: 140px;
+             height: 40px;
+             font-size: .5em;
+             margin-left: 10px;
+          }
+
           #room {
             position: absolute;
             top: 430px;
@@ -451,7 +554,7 @@
             position: absolute;
             top: 480px;
             left:  0px;
-            height:60px;
+            height:30px;
             z-index: 1;
           }
 
@@ -459,7 +562,8 @@
             position: absolute;
             left: 320px;
             top: 250px;
-            height:80px;
+            width: 170px;
+            height:60px;
             z-index: 102;
           }
 
