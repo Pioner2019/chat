@@ -436,6 +436,12 @@
             font-size: .5em;
             font-weight: bolder;
             z-index: 1000;
+            transform:    translateY(-500px);
+            transition:   transform .6s linear;
+          }
+
+          #lichka.trans {
+               transform:    translateY(100px);
           }
 
           #lichkaMakeMale {
@@ -450,12 +456,32 @@
             font-size: .5em;
             font-weight: bolder;
             z-index: 1300;
-            transform:    translateY(-201px);
+            transform:    translateY(-300px);
             transition:   transform .6s linear;
           }
 
           #lichkaMakeMale.trans {
                transform:    translateY(170px);
+          }
+
+          #forma1 {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border: 1px solid black;
+            background-color: #dcdcdc;
+            top:100px;
+            left:100px;
+            font-family: Verdana;
+            font-size: .5em;
+            font-weight: bolder;
+            z-index: 1300;
+            transform:    translateY(-400px);
+            transition:   transform .6s linear;
+          }
+
+          #forma1.trans {
+               transform:    translateY(100px);
           }
 
           p {

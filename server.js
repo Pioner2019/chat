@@ -226,11 +226,11 @@ var io = require('socket.io').listen(server);
                                                         // обработка приходящих от клиента сообщений.
 
               //----------------------------------------------------------------------
-                        if (message.b === "my userLS status") {
+                        if (message.b === "myLichka") {
                             const mongoClient1 = new MongoClient(url, {useNewUrlParser: true});
                                   mongoClient1.connect((err, client) => {
                                        const db = client.db("Pioner");
-                                       const collection = db.collection(`${message.a}_userLS`);
+                                       const collection = db.collection(`lichkaGlobal`);
                                        collection.find().toArray((err, result) => {
                                        if (err) throw err;
                                        else {
@@ -243,11 +243,11 @@ var io = require('socket.io').listen(server);
             //----------------------------------------------------------------------
 
             //----------------------------------------------------------------------
-                      if (message.b === "messageLS") {
+                      else if (message.b === "messageLS") {
                           const mongoClient2 = new MongoClient(url, {useNewUrlParser: true});
                                 mongoClient2.connect((err, client) => {
                                      const db = client.db("Pioner");
-                                     const collection = db.collection(`${message.d}_userLS`);
+                                     const collection = db.collection(`lichkaGlobal`);
                                      let time = timeReg();
                                      let posl = {a:message.a, b:message.e, c:message.c, d:time.a};
                                      collection.insertOne(posl, function(err, result) {
@@ -257,10 +257,13 @@ var io = require('socket.io').listen(server);
                                      }
                                 });
                               });
-                            }
+                            } else {}
           //----------------------------------------------------------------------
 
             //----------------------------------------------------------------------
+            if (message.b != "messageLS" && message.b != "myLichka") {
+                  socket.broadcast.emit("otvetMessage", message);
+
                                const mongoClient = new MongoClient(url, {useNewUrlParser: true});
                                      mongoClient.connect(function(err, client){
                                      const db = client.db("Pioner");
@@ -274,10 +277,11 @@ var io = require('socket.io').listen(server);
                                                  };
                                             });
                                      });
-            //----------------------------------------------------------------------
-       if (message.b != "messageLS" && message.b != "my userLS status") {
-             socket.broadcast.emit("otvetMessage", message);
+
+  //     if (message.b != "messageLS" && message.b != "myLichka") {
+  //           socket.broadcast.emit("otvetMessage", message);
        }
+    //----------------------------------------------------------------------
     });
 
         socket.on(`history, please!`, message => {

@@ -22,6 +22,7 @@
 
          let lichka = document.createElement("div");
          lichka.id = 'lichka';
+         lichka.className = "";
 
             let p1 = document.createElement("p");
                 p1.innerHTML = '&nbsp;&nbsp;Ваша личка пока пуста.';
