@@ -193,6 +193,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
 
 //======================================= БЛОК РАБОТЫ С ЛИЧКОЙ. =======================================
 
+            let nameVisavi;
             let userLS = document.querySelector("#userLS");
                 userLS.addEventListener("click", function func() {
                   PP.pluginMenuLS();
@@ -205,117 +206,115 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                      let inputForma1 = document.querySelector("#inputForma1");
                      let submitForma1 = document.querySelector("#submitForma1");
                      let allForma1 = document.querySelector("#allForma1");
+
                          forma1.className = "trans";
-            //             forma1.setAttribute("className", "trans");
                          inputForma1.addEventListener("blur", function() {
                                zapros.a = objMessage.sv1;
+                               zapros.b = "myLichka";
                                zapros.c = inputForma1.value;
+                               nameVisavi = inputForma1.value;
+                               socket.emit("message", zapros);
+                               forma1.className = "";
                          });
 
-                         submitForma1.addEventListener("click", function() {
-                              zapros.b = "myLichka";
+                         allForma1.addEventListener("click", function() {
+                              zapros.a = objMessage.sv1;
+                              zapros.b = "myLichkaAll";
                               socket.emit("message", zapros);
+                              forma1.className = "";
                          });
 
-          //           let obj = {a:objMessage.sv1, b:"myLichka", c:objMessage.sv3};
-        //             socket.emit("message", obj);
                      socket.on("getYouLichka", message => {
                           let objLS = {};
                               if (message.length === 0) {
-              //                 PP.pluginMenuLS();
-              //                 PP.pluginMakeLS(func, menuLS);
-    // Здесь мы обрабатываем ситуацию, когда в личке участника ещё нет сообщений. В поле "личка" создаётся форма, в которой система сообщает
-    // участнику об этом, а также предлагает ему начать диалог с кем - нибудь, чтобы "оживить" свою личку.
+    // Здесь мы обрабатываем ситуацию, когда у нас ещё нет диалога с данным участником. В поле "личка" создаётся форма,
+    //  в которой система сообщает нам об этом, а также предлагает начать диалог с ним.
 //-------------------------------------------------------------------------
                 let lichka = document.querySelector("#lichka");
                     lichka.className = 'trans';
-                    lichka.style.height = '220px';
+                    lichka.style.height = '200px';
                     lichka.style.overflow = "visible";
                     stopLS.style.top = "292px";
+                let stop = document.querySelector("#stopLS");
+                    stop.style.top = "160px";
+                    stop.style.left = "10px";
 
-                    let inp = document.querySelector("#inputin");        // Если участник решил начать с кем - нибудь диалог,
-                        inp.addEventListener("blur", function() {       // он вводит его имя в инпут, а затем текст своего послания
-                            console.log("this.id = " + this.id);        // в текстарею. Система, используя эти данные, а также
-                            objLS.a = objMessage.sv1;                  // имя участника, цвет его сообщений, содержащиеся в оперативном
-                            objLS.b = "messageLS";                      // массиве objMessage, и обозначив тип сообщения как "messageLS",
-                            objLS.c = objMessage.sv3;                  // формирует обьект objLS, который по нажатию кнопки "Отправить"...
-                            objLS.d = inp.value;
-                        });
                     let textarea = document.querySelector("#dialogs");
                         textarea.addEventListener("blur", function() {
                         console.log("this.id = " + this.id);
+                        objLS.a = objMessage.sv1;
+                        objLS.b = "messageLS";
+                        objLS.c = objMessage.sv3;
+                        objLS.d = nameVisavi;
                         objLS.e = textarea.value;
                         socket.emit("message", objLS);  //...передаётся на сервер, где сразу же и происходит отправка послания
-                    });                                // в личку адресата, находящуюся в Монге как коллекция, носящая его имя.
+                    });                                // в единую личку всей БД чата, называемую lichkaGlobal.
 //--------------------------------------------------------------------------
                       }
 
-                              else {
+                              else {                                             // А эта ветка работает, когда в личке уже есть сообщения.
                                 let lichka = document.querySelector("#lichka");
                                     lichka.className = 'trans';
-                                let p = document.querySelectorAll("#lichka>p");
-                                    for (let i = 0; i < p.length; i++) {
+                                    lichka.style.height = '400px';
+                                let stop = document.querySelector("#stopLS");
+                                    stop.style.top = "400px";
+                                let p = document.querySelectorAll("#lichka>p"); // Для начала отключаем рендеринг всей "шапки", необходимой
+                                    for (let i = 0; i < p.length; i++) {        // в случае, когда личка пуста, а здесь - не нужной.
                                       p[i].remove();
                                     }
-                                let inputin = document.querySelector("#inputin");
-                                    inputin.remove();
                                 let tar = document.querySelector("#dialogs");
                                     tar.remove();
                                 let button = document.querySelector("#button");
                                     button.remove();
-                        //        PP.pluginMenuLS();
-                        //        PP.pluginMakeLS(func, menuLS);                                                  // А эта ветка работает, когда в личке уже есть сообщения.
+                                    console.log(`message.length = ${message.length}`);
                                      for (let i = 0; i < message.length; i++) {       // Получив массив обьектов с сервера(а он получил его из БД),
-                                          let elem = PP.pluginRenderMessages(lichka, message[i]); // отрисовываем их у себя в поле "личка".
-                                  //            elem.addEventListener("click", funcResponse.bind(elem, menuLS));       // Отрисовка заложена в самом плагине, а здесь
-                                              elem.addEventListener("click", funcResponse);    // мы имеем уже результат его работы.
+                                          let elem = PP.pluginRenderLichkaMessages(lichka, message[i]); // Плагин отрисовывает их у нас в поле "личка".
+                                   // Передаём созданный элемент в функцию как параметр(по методике Д.Т.):
+                                              elem.addEventListener("click", funcResponse.bind(elem, elem));
                                      }  // Превращаем каждое сообщение в кнопку, нажатие на которую вызывает исполнительное подменю(функцию funcResponse).
                               }
 
-                 function funcResponse() {
+                 function funcResponse(param) {
+        //             console.log(`elem.id = ${p} !!!???`);
+        //             console.log(`elem.firstChild.id = ${p.children[0].id}`);
+                     let nameElem = param.children[0].innerHTML.replace(":", ""); // Получаем имя переданного сюда элемента.
+      //                   console.log(`nameElem = ${nameElem}`);
                      let menuLS = document.querySelector("#menuLS"); // По нажатию на сообщение слева из-за края экрана выезжает
-                     console.log("menuLS.id = " + menuLS.id);        // исполнительное подменю, состоящее из трёх пунктов: ответить
+      //               console.log("menuLS.id = " + menuLS.id);        // исполнительное подменю, состоящее из трёх пунктов: ответить
                      menuLS.className = 'transport';               // адресату, заблокировать адресата(забанить), и разблокировать его.
                      menuLSchildren = document.querySelectorAll(".knopki");
-                     console.log(`menuLS.children.length = ${menuLS.children.length}`);
+    //                 console.log(`menuLS.children.length = ${menuLS.children.length}`);
                      for (let i = 0; i < menuLSchildren.length; i++) {
                          console.log(`menuLSchildren[i].id = ${menuLSchildren[i].id}`);
-                         if (menuLSchildren[i].innerHTML === 'Ответить') {menuLSchildren[i].addEventListener("click", funcOtvet); continue;}
-                         else if (menuLSchildren[i].innerHTML === 'Заблокировать') {menuLSchildren[i].addEventListener("click", funcOnban); continue;}
+                         if (menuLSchildren[i].innerHTML === 'Ответить') {menuLSchildren[i].addEventListener("click", funcOtvet.bind(menuLSchildren[i], nameElem));}
+                         else if (menuLSchildren[i].innerHTML === 'Заблокировать') {menuLSchildren[i].addEventListener("click", funcOnban);}
                          else menuLSchildren[i].addEventListener("click", funcOffban);
                      }
                  }
 
-                   function funcOtvet() {
-                        console.log(`Эта функция будет создавать форму для написания ответного сообщения в личку адресата.`);
-              //           let forma = document.querySelector("#lichkaMakeMale"); // Вызываем сюда формочку для создания и отправки сообщений.
-              //               forma.className = 'trans';                         // Просим её снизойти до нас, грешных, и спуститься с небес.
-              //               let formaChildren = forma.children;               // Получаем у неё список её детёнышей: это инпут, текстарея
-              //               console.log(`formaChildren.length = ${formaChildren.length}`);  // и кнопка "Отправить".
-              //               for (let i = 0; i < formaChildren.length; i++) {}             // Обходим их всех по списку в цикле, и просим по
-              //                 if (formaChildren[i].id === 'inn') {                  // очереди выполнить свои обязанности: сначала инпут
-              //               formaChildren[i].addEventListener("blur", function() {       // предоставляет нам имя адресата; заполним заодно
-              //                   console.log("this.id = " + this.id);        // обьект objLS значениями имени пишущего, цвета его посланий
-              //                   objLS.a = objMessage.sv1;                  // и типом сообщения - это "messageLS".
-              //                   objLS.b = "messageLS";                      //
-              //                   objLS.c = objMessage.sv3;                  //
-              //                   objLS.d = formaChildren[i].value;
-              //               });
-              //   //            continue;
-              //             }
-              //             else if (formaChildren[i].id === 'tr') {
-              //               formaChildren[i].addEventListener("blur", function() { // Затем текстарея сообщает нам
-              //               console.log("this.id = " + this.id);                   // содержимое написанного послания,...
-              //               objLS.e = formaChildren[i].value;
-              //               socket.emit("message", objLS);  //
-              //             });
-              // //            continue;
-              //           }
-              //           else {
-              //             formaChildren[i].addEventListener("click", function() {
-              //                  socket.emit("message", objLS); //...и, наконец, мы отсылаем обьект на сервер.
-              //             });
-              //           }
+                   function funcOtvet(argum) {
+                        let forma = document.querySelector("#lichkaMakeMale"); // Вызываем сюда формочку для создания и отправки сообщений.
+                            forma.className = 'trans';                         // Просим её снизойти до нас, грешных, и спуститься с небес.
+                            let formaChildren = forma.children;               // Получаем у неё список её детёнышей: это текстарея
+                            console.log(`formaChildren.length = ${formaChildren.length}`);  // и кнопка "Отправить".
+                            for (let i = 0; i < formaChildren.length; i++) {             // Обходим их по списку в цикле, и просим
+                           if (formaChildren[i].id === 'tr') {                      // по очереди выполнить свои обязанности: сначала
+                            formaChildren[i].addEventListener("blur", function() { // текстарея сообщает нам
+                            console.log("this.id = " + this.id);                   // содержимое написанного послания,...
+                            objLS.a = objMessage.sv1;                            // заполним заодно
+                            objLS.b = "messageLS";                      // обьект objLS значениями имени пишущего, цвета его посланий
+                            objLS.c = objMessage.sv3;                  // и типом сообщения - это "messageLS"...
+                            objLS.d = argum;
+                            objLS.e = formaChildren[i].value;
+                            socket.emit("message", objLS); //...и затем мы отсылаем обьект на сервер.
+                          });
+                        }
+                        else {
+                          formaChildren[i].addEventListener("click", function() {
+                               forma.className = "";
+                          });
+                        }
+                      }
                    }
 
                    function funcOnban() {

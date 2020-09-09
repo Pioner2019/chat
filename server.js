@@ -220,36 +220,47 @@ var io = require('socket.io').listen(server);
 
 //========================================================================================
 
-      socket.on("message", message => { // ЭТО - главный сокет, в котором происходит
+      socket.on("message", message => { // ЭТО - главный сокет, в котором происходит обработка приходящих от клиента сообщений.
         console.log(`ПОЛУЧЕНО С КЛИЕНТА: obj.a = ${message.a}; obj.b = ${message.b}; obj.c = ${message.c}`);
         console.log(`На сервер с клиента всё приходит нормально!`);
-                                                        // обработка приходящих от клиента сообщений.
 
               //----------------------------------------------------------------------
-                        if (message.b === "myLichka") {
+                        if (message.b === "myLichka" || message.b === "myLichkaAll") {
                             const mongoClient1 = new MongoClient(url, {useNewUrlParser: true});
                                   mongoClient1.connect((err, client) => {
                                        const db = client.db("Pioner");
                                        const collection = db.collection(`lichkaGlobal`);
-                                       collection.find().toArray((err, result) => {
+                                       let strJSON;
+                                       if (message.b === "myLichka") {
+                                         strJSON = JSON.stringify({$or: [{$and: [{toWhom: message.a}, {fromWhom: message.c}]}, {$and: [{toWhom: message.c}, {fromWhom: message.a}]}]});
+                                       }
+                                       else {
+                                         strJSON = JSON.stringify({$or: [{toWhom: message.a}, {fromWhom: message.a}]});
+                                       }
+                                       collection.find(JSON.parse(strJSON)).toArray((err, result) => {
                                        if (err) throw err;
                                        else {
+                                         for (let i = 0; i < result.length; i++ ) {
+                                            for (let key in result[i]) {
+                                                console.log(`Вот что получено из Монги: ${key}: ${result[i][key]}`);
+                                            }
+                                        }
                                           socket.emit("getYouLichka", result);
                                           client.close();
                                        }
                                   });
                                 });
-                              }
+                             }
             //----------------------------------------------------------------------
 
             //----------------------------------------------------------------------
-                      else if (message.b === "messageLS") {
+                          if (message.b === "messageLS") {
                           const mongoClient2 = new MongoClient(url, {useNewUrlParser: true});
                                 mongoClient2.connect((err, client) => {
                                      const db = client.db("Pioner");
                                      const collection = db.collection(`lichkaGlobal`);
                                      let time = timeReg();
-                                     let posl = {a:message.a, b:message.e, c:message.c, d:time.a};
+                                     let posl = {toWhom:message.d, fromWhom:message.a, text:message.e, time:time.a, timeStamp:time.b, color:message.c};
                                      collection.insertOne(posl, function(err, result) {
                                      if (err) throw err;
                                      else {
@@ -257,11 +268,11 @@ var io = require('socket.io').listen(server);
                                      }
                                 });
                               });
-                            } else {}
+                            }
           //----------------------------------------------------------------------
 
             //----------------------------------------------------------------------
-            if (message.b != "messageLS" && message.b != "myLichka") {
+            else if (message.b != "messageLS" && message.b != "myLichka" && message.b != "myLichkaAll") {
                   socket.broadcast.emit("otvetMessage", message);
 
                                const mongoClient = new MongoClient(url, {useNewUrlParser: true});
@@ -277,10 +288,7 @@ var io = require('socket.io').listen(server);
                                                  };
                                             });
                                      });
-
-  //     if (message.b != "messageLS" && message.b != "myLichka") {
-  //           socket.broadcast.emit("otvetMessage", message);
-       }
+            } else {}
     //----------------------------------------------------------------------
     });
 
