@@ -484,6 +484,26 @@
                transform:    translateY(100px);
           }
 
+          #forma1New {
+            position: absolute;
+            width: 200px;
+            height: 190px;
+            border: 1px solid black;
+            background-color: #dcdcdc;
+            top:100px;
+            left:100px;
+            font-family: Verdana;
+            font-size: .5em;
+            font-weight: bolder;
+            z-index: 1400;
+            transform:    translateY(-300px);
+            transition:   transform .6s linear;
+          }
+
+          #forma1New.transp {
+               transform:    translateY(100px);
+          }
+
           p {
             font-family: Verdana;
             font-size: .6em;

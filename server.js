@@ -177,12 +177,13 @@ var io = require('socket.io').listen(server);
            socket.emit("colorPlease", "colorPlease");
            socket.on("object", message => {
                  let objTime = timeReg();
-                 let lichkaBan = [];
+                 let lichkaBan = []; // В этом массиве, при создании пустом, будут храниться имена участников, которых я забанил в моей личке.
+                 // Если нужно "отбанить", т.е. разблокировать, участника, - его имя просто удаляется из этого массива.
                  newFace = new NewFace(socket.username, ident, message.b, null, message.c, objTime.a, objTime.b, lichkaBan, null, null); // Создаём конкретный экземпляр
            socket.emit("pleaseYourAccount", newFace);  //  шаблона - класса, куда передаём конкретные значения его элементов.
            let objAdmin = {};
                objAdmin.a = "админ:";
-               objAdmin.b = `У нас новый участник. его имя: ${newFace.sv1}`;
+               objAdmin.b = `У нас новый участник. Его имя ${newFace.sv1}`;
                objAdmin.c = "#dcdcdc";
         //   socket.broadcast.emit(`У нас новый участник. Его имя: ${socket.username}`);
            socket.broadcast.emit("otvetMessage", objAdmin);
@@ -230,8 +231,30 @@ var io = require('socket.io').listen(server);
         console.log(`ПОЛУЧЕНО С КЛИЕНТА: obj.a = ${message.a}; obj.b = ${message.b}; obj.c = ${message.c}`);
         console.log(`На сервер с клиента всё приходит нормально!`);
 
+        //----------------------------------------------------------------------
+                  if (message.b === "proverkaNaPusto") {
+                      const mongoClient2 = new MongoClient(url, {useNewUrlParser: true});
+                            mongoClient2.connect((err, client) => {
+                                 const db = client.db("Pioner");
+                                 const collection = db.collection(`lichkaGlobal`);
+                                 let strJSON;
+                                 let resultProverka;
+                                 strJSON = JSON.stringify({$or: [{toWhom: message.a}, {fromWhom: message.a}]});
+                                 collection.find(JSON.parse(strJSON)).toArray((err, result) => {
+                                 if (err) throw err;
+                                 else {
+                                  if (result) {resultProverka = false;}  // Если личка НЕ ПУСТА, то назначаем resultProverka = 'false';
+                                  else {resultProverka = true;} // А если ПУСТА, т.е. проверка была успешной, - тогда 'true'.
+                                    socket.emit("resultProverkaNaPusto", resultProverka);
+                                    client.close();
+                                 }
+                            });
+                          });
+                       }
+      //----------------------------------------------------------------------
+
               //----------------------------------------------------------------------
-                        if (message.b === "myLichka" || message.b === "myLichkaAll") {
+                      else if (message.b === "myLichka" || message.b === "myLichkaAll") {
                             const mongoClient1 = new MongoClient(url, {useNewUrlParser: true});
                                   mongoClient1.connect((err, client) => {
                                        const db = client.db("Pioner");
@@ -246,11 +269,13 @@ var io = require('socket.io').listen(server);
                                        collection.find(JSON.parse(strJSON)).toArray((err, result) => {
                                        if (err) throw err;
                                        else {
-                                         for (let i = 0; i < result.length; i++ ) {
-                                            for (let key in result[i]) {
-                                                console.log(`Вот что получено из Монги: ${key}: ${result[i][key]}`);
-                                            }
-                                        }
+                                        //  for (let i = 0; i < result.length; i++ ) {
+                                        //     for (let key in result[i]) {
+                                        //         console.log(`Вот что получено из Монги: ${key}: ${result[i][key]}`);
+                                        //     }
+                                        // }
+                                        let objLichka = {};
+                                        if (result) {}
                                           socket.emit("getYouLichka", result);
                                           client.close();
                                        }
@@ -260,7 +285,7 @@ var io = require('socket.io').listen(server);
             //----------------------------------------------------------------------
 
             //----------------------------------------------------------------------
-                          if (message.b === "messageLS") {
+                        else if (message.b === "messageLS") {
                           const mongoClient2 = new MongoClient(url, {useNewUrlParser: true});
                                 mongoClient2.connect((err, client) => {
                                      const db = client.db("Pioner");
@@ -278,7 +303,7 @@ var io = require('socket.io').listen(server);
           //----------------------------------------------------------------------
 
             //----------------------------------------------------------------------
-            else if (message.b != "messageLS" && message.b != "myLichka" && message.b != "myLichkaAll") {
+            else if (message.b != "messageLS" && message.b != "myLichka" && message.b != "myLichkaAll" && message.b != "proverkaNaPusto") {
                   socket.broadcast.emit("otvetMessage", message);
 
                                const mongoClient = new MongoClient(url, {useNewUrlParser: true});

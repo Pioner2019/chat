@@ -11,6 +11,14 @@
          let flag = 0;
          let flagLS = 0;
          let lichkaNull = 'true';
+         let forma1New = document.querySelector("#forma1New");
+      //       forma1New.className = "";
+         let inputForma1New = document.querySelector("#inputForma1New");
+         let poleForMessage = document.querySelector("#poleForMessage");
+         let submitForma1New = document.querySelector("#submitForma1New");
+             submitForma1New.addEventListener("click", function() {
+                  forma1New.className = "";
+             });
 
          let body = document.getElementById("body");
 
@@ -202,6 +210,35 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                     userLS.removeEventListener("click", func);
 
                      let zapros = {};
+                     // let forma1New = document.querySelector("#forma1New");
+                     // let inputForma1New = document.querySelector("#inputForma1New");
+                     // let poleForMessage = document.querySelector("#poleForMessage");
+                     // let submitForma1New = document.querySelector("#submitForma1New");
+                     //     submitForma1New.addEventListener("click", function() {
+                     //          forma1New.className = "";
+                     //     });
+                     //
+                     //     forma1New.className = "";
+
+                         zapros.a = objMessage.sv1;
+                         zapros.b = "proverkaNaPusto";
+                         socket.emit("message", zapros);
+
+                         socket.on("resultProverkaNaPusto", message => {
+                           console.log("message = " + message);
+                             if (message === false) {
+                               // let forma1New = document.querySelector("#forma1New");
+                               // let inputForma1New = document.querySelector("#inputForma1New");
+                               // let poleForMessage = document.querySelector("#poleForMessage");
+                               // let submitForma1New = document.querySelector("#submitForma1New");
+                               //     submitForma1New.addEventListener("click", function() {
+                               //          forma1New.className = "";
+                               //     });
+                               //
+                                    forma1New.className = "transp";
+                             }
+            //             });
+                         else {
                      let forma1 = document.querySelector("#forma1");
                      let inputForma1 = document.querySelector("#inputForma1");
                      let submitForma1 = document.querySelector("#submitForma1");
@@ -223,6 +260,8 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                               socket.emit("message", zapros);
                               forma1.className = "";
                          });
+                       }
+                      });
 
                      socket.on("getYouLichka", message => {
                           let objLS = {};
