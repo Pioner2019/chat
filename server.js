@@ -34,9 +34,9 @@
         this.sv5 = sv5,  // его личный пароль входа;
         this.sv6 = sv6,   // дата и время регистрации в БД;
         this.sv7 = sv7,   // таймстамп этого момента;
-        this.sv5 = sv8,   // зарезервировано;
-        this.sv6 = sv9,   // зарезервировано;
-        this.sv7 = sv10   // зарезервировано.
+        this.sv8 = sv8,   // массив, где хранятся имена участников, забаненных в личке;
+        this.sv9 = sv9,   // зарезервировано;
+        this.sv10 = sv10   // зарезервировано.
       }
    }
 
@@ -177,9 +177,15 @@ var io = require('socket.io').listen(server);
            socket.emit("colorPlease", "colorPlease");
            socket.on("object", message => {
                  let objTime = timeReg();
-                 newFace = new NewFace(socket.username, ident, message.b, null, message.c, objTime.a, objTime.b, null, null, null); // Создаём конкретный экземпляр
+                 let lichkaBan = [];
+                 newFace = new NewFace(socket.username, ident, message.b, null, message.c, objTime.a, objTime.b, lichkaBan, null, null); // Создаём конкретный экземпляр
            socket.emit("pleaseYourAccount", newFace);  //  шаблона - класса, куда передаём конкретные значения его элементов.
-           socket.broadcast.emit(`У нас новый участник. Его имя: ${socket.username}`);
+           let objAdmin = {};
+               objAdmin.a = "админ:";
+               objAdmin.b = `У нас новый участник. его имя: ${newFace.sv1}`;
+               objAdmin.c = "#dcdcdc";
+        //   socket.broadcast.emit(`У нас новый участник. Его имя: ${socket.username}`);
+           socket.broadcast.emit("otvetMessage", objAdmin);
               for (let key in newFace) {
                   console.log(`${key}: ${newFace[key]}`);
               }

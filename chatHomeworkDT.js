@@ -400,7 +400,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                             socket.on("colorPlease", message => { // Этот крошечный сокет служит лишь
                               if (message === "colorPlease") {   // для того, чтобы передать на сервер
                                 let color = PP.pluginColorSelect(); // сгенерированное здесь,на клиенте,
-                                let obj = {b:color.a, c:parole};      // значение цвета сообщений участника.
+                                let obj = {b:color, c:parole};      // значение цвета сообщений участника.
                                 console.log(`Когда сервер присылает запрос на цвет, здешний колорпикер генерирует вот это: ${color} ...`);
                                 console.log(`Скрипт обьединяет это в один обьект со значением пароля: ${parole} ...`);
                                 socket.emit("object", obj);
