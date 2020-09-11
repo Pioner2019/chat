@@ -17,6 +17,10 @@
                       bt.id = 'bt';
                       bt.innerHTML = 'Отправить';
                   forma.appendChild(bt);
+                  let closeWindow = document.createElement("button");
+                      closeWindow.id = 'closeWindow';
+                      closeWindow.innerHTML = 'Закрыть окно';
+                  forma.appendChild(closeWindow);
          body.appendChild(forma);
   //       let format = document.querySelector("#lichkaMakeMale");
 

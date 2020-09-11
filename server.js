@@ -229,6 +229,7 @@ var io = require('socket.io').listen(server);
 
       socket.on("message", message => { // ЭТО - главный сокет, в котором происходит обработка приходящих от клиента сообщений.
         console.log(`ПОЛУЧЕНО С КЛИЕНТА: obj.a = ${message.a}; obj.b = ${message.b}; obj.c = ${message.c}`);
+        console.log(`Тип полученных данных: message.a typeof: ${typeof message.a}; message.b typeof: ${typeof message.b}`);
         console.log(`На сервер с клиента всё приходит нормально!`);
 
         //----------------------------------------------------------------------
@@ -239,12 +240,14 @@ var io = require('socket.io').listen(server);
                                  const collection = db.collection(`lichkaGlobal`);
                                  let strJSON;
                                  let resultProverka;
-                                 strJSON = JSON.stringify({$or: [{toWhom: message.a}, {fromWhom: message.a}]});
-                                 collection.find(JSON.parse(strJSON)).toArray((err, result) => {
+                                 // strJSON = JSON.stringify({$or: [{toWhom: message.a}, {fromWhom: message.a}]});
+                                 // collection.find(JSON.parse(strJSON)).toArray((err, result) => {
+                                 collection.find({$or: [{toWhom: message.a}, {fromWhom: message.a}]}).toArray((err, result) => {
                                  if (err) throw err;
                                  else {
-                                  if (result) {resultProverka = false;}  // Если личка НЕ ПУСТА, то назначаем resultProverka = 'false';
-                                  else {resultProverka = true;} // А если ПУСТА, т.е. проверка была успешной, - тогда 'true'.
+                                   console.log(`Личка участника ${message.a} содержит ${result.length} сообщений.`);
+                                  if (result.length === 0) {resultProverka = true;}  // Если личка НЕ ПУСТА, то назначаем resultProverka = 'false';
+                                  else {resultProverka = false;} // А если ПУСТА, т.е. проверка была успешной, - тогда 'true'.
                                     socket.emit("resultProverkaNaPusto", resultProverka);
                                     client.close();
                                  }

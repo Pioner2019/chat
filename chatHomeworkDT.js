@@ -11,14 +11,19 @@
          let flag = 0;
          let flagLS = 0;
          let lichkaNull = 'true';
-         let forma1New = document.querySelector("#forma1New");
-      //       forma1New.className = "";
-         let inputForma1New = document.querySelector("#inputForma1New");
-         let poleForMessage = document.querySelector("#poleForMessage");
-         let submitForma1New = document.querySelector("#submitForma1New");
-             submitForma1New.addEventListener("click", function() {
-                  forma1New.className = "";
-             });
+      //    let forma1New = document.querySelector("#forma1New");
+      // //       forma1New.className = "";
+      //    let inputForma1New = document.querySelector("#inputForma1New");
+      //    let poleForMessage = document.querySelector("#poleForMessage");
+      //    let submitForma1New = document.querySelector("#submitForma1New");
+      //        submitForma1New.addEventListener("click", function() {
+      //        });
+      //    let offForma1New = document.querySelector("#offForma1New");
+      //            submitForma1New.addEventListener("click", function() {
+      //            userLS.addEventListener("click", func);
+      //            forma1New.className = "";
+      //   });
+
 
          let body = document.getElementById("body");
 
@@ -209,16 +214,21 @@ document.getElementById("files").addEventListener('change', onFileSelect);
 
                     userLS.removeEventListener("click", func);
 
+                    let forma1New = document.querySelector("#forma1New");
+                 //       forma1New.className = "";
+                    let inputForma1New = document.querySelector("#inputForma1New");
+                    let poleForMessage = document.querySelector("#poleForMessage");
+                    let submitForma1New = document.querySelector("#submitForma1New");
+                        submitForma1New.addEventListener("click", function() {
+                        });
+                    let offForma1New = document.querySelector("#offForma1New");
+                            submitForma1New.addEventListener("click", function() {
+                            userLS.addEventListener("click", func);
+                            forma1New.className = "";
+                   });
+
+
                      let zapros = {};
-                     // let forma1New = document.querySelector("#forma1New");
-                     // let inputForma1New = document.querySelector("#inputForma1New");
-                     // let poleForMessage = document.querySelector("#poleForMessage");
-                     // let submitForma1New = document.querySelector("#submitForma1New");
-                     //     submitForma1New.addEventListener("click", function() {
-                     //          forma1New.className = "";
-                     //     });
-                     //
-                     //     forma1New.className = "";
 
                          zapros.a = objMessage.sv1;
                          zapros.b = "proverkaNaPusto";
@@ -226,16 +236,20 @@ document.getElementById("files").addEventListener('change', onFileSelect);
 
                          socket.on("resultProverkaNaPusto", message => {
                            console.log("message = " + message);
-                             if (message === false) {
-                               // let forma1New = document.querySelector("#forma1New");
-                               // let inputForma1New = document.querySelector("#inputForma1New");
-                               // let poleForMessage = document.querySelector("#poleForMessage");
-                               // let submitForma1New = document.querySelector("#submitForma1New");
-                               //     submitForma1New.addEventListener("click", function() {
-                               //          forma1New.className = "";
-                               //     });
-                               //
+                             if (message === true) {
+                                   let objLS = {};
                                     forma1New.className = "transp";
+                                    inputForma1New.addEventListener("blur", function() {
+                                          nameVisavi = inputForma1New.value;
+                                    });
+                                    poleForMessage.addEventListener("blur", function() {
+                                      objLS.a = objMessage.sv1;
+                                      objLS.b = "messageLS";
+                                      objLS.c = objMessage.sv3;
+                                      objLS.d = nameVisavi;
+                                      objLS.e = poleForMessage.value;
+                                      socket.emit("message", objLS);
+                                    });
                              }
             //             });
                          else {
@@ -296,6 +310,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                     lichka.className = 'trans';
                                     lichka.style.height = '400px';
                                 let stop = document.querySelector("#stopLS");
+                                    stop.style.position = "sticky";
                                     stop.style.top = "400px";
                                 let p = document.querySelectorAll("#lichka>p"); // Для начала отключаем рендеринг всей "шапки", необходимой
                                     for (let i = 0; i < p.length; i++) {        // в случае, когда личка пуста, а здесь - не нужной.
@@ -348,11 +363,11 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                             socket.emit("message", objLS); //...и затем мы отсылаем обьект на сервер.
                           });
                         }
-                        else {
+                        else if (formaChildren[i].id === 'closeWindow'){
                           formaChildren[i].addEventListener("click", function() {
                                forma.className = "";
                           });
-                        }
+                        } else {}
                       }
                    }
 
