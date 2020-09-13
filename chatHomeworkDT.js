@@ -122,11 +122,18 @@
 
          const socket = io.connect('ws://localhost:7777');
 
+         //---------------------------------------------------------------
+                     socket.on("dialogRealTime", message => {
+                          console.log(message);
+                     });
+         //---------------------------------------------------------------
+
          let stop = document.querySelector("#stop");
              stop.addEventListener("click", function() { // По нажатию этой кнопки для участника закрывается
                let posl = {a:objMessage.sv1, b: `Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`, c:objMessage.sv3};
                socket.emit("message", posl);             // текущая сессия присутствия в чате путём отсылки
-               location.reload();                   // на сервер соответствующего сообщения и перезагрузки страницы.
+               socket.close();                      // на сервер соответствующего сообщения, корректного
+               location.reload();                   // разьединения сокета и перезагрузки страницы.
           //     location.href = location.href; // Оба варианта работают.
              });
 
@@ -276,6 +283,10 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                        }
                       });
 
+                     // socket.on("dialogRealTime", message => {
+                     //      console.log(message);
+                     // });
+
                      socket.on("getYouLichka", message => {
                           let objLS = {};
                               if (message.length === 0) {
@@ -320,6 +331,11 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                 let button = document.querySelector("#button");
                                     button.remove();
                                     console.log(`message.length = ${message.length}`);
+                        // //---------------------------------------------------------------
+                        //             socket.on("dialogRealTime", message => {
+                        //                  console.log(message);
+                        //             });
+                        // //---------------------------------------------------------------
                                      for (let i = 0; i < message.length; i++) {       // Получив массив обьектов с сервера(а он получил его из БД),
                                           let elem = PP.pluginRenderLichkaMessages(lichka, message[i], objMessage.sv1, objMessage.sv3); // Плагин отрисовывает их у нас в поле "личка".
                                    // Передаём созданный элемент в функцию как параметр(по методике Д.Т.):
@@ -343,6 +359,14 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                             forma.className = 'trans';                         // Просим её снизойти до нас, грешных, и спуститься с небес.
                             let formaChildren = forma.children;               // Получаем у неё список её детёнышей: это текстарея
                             console.log(`formaChildren.length = ${formaChildren.length}`);  // и кнопка "Отправить".
+                            formaChildren[0].addEventListener("input", function() {
+                                if (formaChildren[0].value.length !== 0) {
+                                   console.log(`Эта строка - первый шаг к реализации сообщения в личке "Ваш собеседник пишет...".`);
+                                   let objITyping = {a:objMessage.sv1, b:`Я пишу собеседнику`, c:argum};
+                                   socket.emit("message", objITyping);
+                                }
+                            });
+
                             formaChildren[0].addEventListener("blur", function func01() { // Tекстарея сообщает нам
                             let objLS = {};
                             console.log("this.id = " + this.id);                   // содержимое написанного послания,...
