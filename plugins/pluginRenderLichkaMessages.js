@@ -1,5 +1,5 @@
 
-   PP.pluginRenderLichkaMessages = function(baza, obj) {     // Получаем сюда из основного модуля обьект,
+   PP.pluginRenderLichkaMessages = function(baza, obj, param1, param2) {     // Получаем сюда из основного модуля обьект,
      let otvetMessage = document.createElement("div");   // содержащий заголовок "От такого-то"(message.a),
          otvetMessage.className = "otvetMessage";       // сам текст ответного послания(message.b),
          let zagolovok = document.createElement("div");   // и цвет его сообщений(message.c), см. ниже...
@@ -17,10 +17,25 @@
              let objTime = PP.pluginTimeClient();
              strTimeOtvet.innerHTML = obj.time;
          otvetMessage.appendChild(strTimeOtvet);
-         otvetMessage.style.backgroundColor = obj.color; //...и отрисовываем у себя на
-//         otvetMessage.addEventListener("click", funcResponse); // странице его сообщение.
+         otvetMessage.style.backgroundColor = obj.color; //...и отрисовываем у себя на странице его сообщение.
+           if (obj.fromWhom === param1) {
+                  otvetMessage.style.marginLeft = '10px';
+                  otvetMessage.style.marginTop = '10px';
+                  otvetMessage.style.border = '1px solid black';
+                  otvetMessage.style.borderTopLeftRadius = '25px';
+                  otvetMessage.style.borderTopRightRadius = '14px';
+                  otvetMessage.style.borderBottomRightRadius = '14px';
+                  otvetMessage.style.borderBottomLeftRadius = '0px';
+                  otvetMessage.style.backgroundColor = param2;
+           }
+           else {}
      baza.appendChild(otvetMessage);
-     // lichka.insertAdjacentHTML(`beforeEnd`, `<button id='stopLS'>Закрыть личку</button>`);
      baza.scrollTop = baza.scrollHeight;
+     // if (baza.scrollHeight > 0) {
+     //
+     // }
+//     let stopLS = document.querySelector("#stopLS");
+  //       stopLS.style.top = '400px';
+//     stopLS.style.top = 400 + baza.scrollHeight + 'px';
      return otvetMessage;
     }

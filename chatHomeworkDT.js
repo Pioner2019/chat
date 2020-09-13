@@ -215,17 +215,16 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                     userLS.removeEventListener("click", func);
 
                     let forma1New = document.querySelector("#forma1New");
-                 //       forma1New.className = "";
                     let inputForma1New = document.querySelector("#inputForma1New");
                     let poleForMessage = document.querySelector("#poleForMessage");
                     let submitForma1New = document.querySelector("#submitForma1New");
                         submitForma1New.addEventListener("click", function() {
                         });
                     let offForma1New = document.querySelector("#offForma1New");
-                            submitForma1New.addEventListener("click", function() {
-                            userLS.addEventListener("click", func);
-                            forma1New.className = "";
-                   });
+                        offForma1New.addEventListener("click", function() {
+                             userLS.addEventListener("click", func);
+                             forma1New.className = "";
+                        });
 
 
                      let zapros = {};
@@ -251,7 +250,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                       socket.emit("message", objLS);
                                     });
                              }
-            //             });
+
                          else {
                      let forma1 = document.querySelector("#forma1");
                      let inputForma1 = document.querySelector("#inputForma1");
@@ -322,28 +321,21 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                     button.remove();
                                     console.log(`message.length = ${message.length}`);
                                      for (let i = 0; i < message.length; i++) {       // Получив массив обьектов с сервера(а он получил его из БД),
-                                          let elem = PP.pluginRenderLichkaMessages(lichka, message[i]); // Плагин отрисовывает их у нас в поле "личка".
+                                          let elem = PP.pluginRenderLichkaMessages(lichka, message[i], objMessage.sv1, objMessage.sv3); // Плагин отрисовывает их у нас в поле "личка".
                                    // Передаём созданный элемент в функцию как параметр(по методике Д.Т.):
                                               elem.addEventListener("click", funcResponse.bind(elem, elem));
                                      }  // Превращаем каждое сообщение в кнопку, нажатие на которую вызывает исполнительное подменю(функцию funcResponse).
                               }
 
                  function funcResponse(param) {
-        //             console.log(`elem.id = ${p} !!!???`);
-        //             console.log(`elem.firstChild.id = ${p.children[0].id}`);
                      let nameElem = param.children[0].innerHTML.replace(":", ""); // Получаем имя переданного сюда элемента.
-      //                   console.log(`nameElem = ${nameElem}`);
                      let menuLS = document.querySelector("#menuLS"); // По нажатию на сообщение слева из-за края экрана выезжает
-      //               console.log("menuLS.id = " + menuLS.id);        // исполнительное подменю, состоящее из трёх пунктов: ответить
+                                                                    // исполнительное подменю, состоящее из трёх пунктов: ответить
                      menuLS.className = 'transport';               // адресату, заблокировать адресата(забанить), и разблокировать его.
-                     menuLSchildren = document.querySelectorAll(".knopki");
-    //                 console.log(`menuLS.children.length = ${menuLS.children.length}`);
-                     for (let i = 0; i < menuLSchildren.length; i++) {
-                         console.log(`menuLSchildren[i].id = ${menuLSchildren[i].id}`);
-                         if (menuLSchildren[i].innerHTML === 'Ответить') {menuLSchildren[i].addEventListener("click", funcOtvet.bind(menuLSchildren[i], nameElem));}
-                         else if (menuLSchildren[i].innerHTML === 'Заблокировать') {menuLSchildren[i].addEventListener("click", funcOnban);}
-                         else menuLSchildren[i].addEventListener("click", funcOffban);
-                     }
+                     let menuLSchildren = document.querySelectorAll(".knopki");
+                         menuLSchildren[0].addEventListener("click", funcOtvet.bind(menuLSchildren[0], nameElem));
+                         menuLSchildren[1].addEventListener("click", funcOnban.bind(menuLSchildren[0], nameElem));
+                         menuLSchildren[2].addEventListener("click", funcOffban.bind(menuLSchildren[0], nameElem));
                  }
 
                    function funcOtvet(argum) {
@@ -351,32 +343,49 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                             forma.className = 'trans';                         // Просим её снизойти до нас, грешных, и спуститься с небес.
                             let formaChildren = forma.children;               // Получаем у неё список её детёнышей: это текстарея
                             console.log(`formaChildren.length = ${formaChildren.length}`);  // и кнопка "Отправить".
-                            for (let i = 0; i < formaChildren.length; i++) {             // Обходим их по списку в цикле, и просим
-                           if (formaChildren[i].id === 'tr') {                      // по очереди выполнить свои обязанности: сначала
-                            formaChildren[i].addEventListener("blur", function() { // текстарея сообщает нам
+                            formaChildren[0].addEventListener("blur", function func01() { // Tекстарея сообщает нам
+                            let objLS = {};
                             console.log("this.id = " + this.id);                   // содержимое написанного послания,...
                             objLS.a = objMessage.sv1;                            // заполним заодно
                             objLS.b = "messageLS";                      // обьект objLS значениями имени пишущего, цвета его посланий
                             objLS.c = objMessage.sv3;                  // и типом сообщения - это "messageLS"...
                             objLS.d = argum;
-                            objLS.e = formaChildren[i].value;
+                            objLS.e = formaChildren[0].value;
                             socket.emit("message", objLS); //...и затем мы отсылаем обьект на сервер.
+                            let object = {};
+                                object.fromWhom = objMessage.sv1;
+                                object.text = formaChildren[0].value;
+                                let objTime = PP.pluginTimeClient();
+                                object.time = objTime.a;
+                                object.color = objMessage.sv3;
+                            PP.pluginRenderLichkaMessages(lichka, object, objMessage.sv1, objMessage.sv3);
                           });
-                        }
-                        else if (formaChildren[i].id === 'closeWindow'){
-                          formaChildren[i].addEventListener("click", function() {
+
+                          formaChildren[2].addEventListener("click", function() {
+                               formaChildren[0].value = "";
                                forma.className = "";
                           });
-                        } else {}
-                      }
                    }
 
-                   function funcOnban() {
+                   function funcOnban(argum) {
                         console.log(`Эта функция будет блокировать адресату доступ к вашей личке(банить его).`);
+                        console.log(`argum = ${argum}`);
+                        objMessage.sv8.push(argum);
+                        socket.emit("updateAccount", objMessage);
+                        console.log("Главный массив objMessage сейчас содержит: " + objMessage.sv8);
                    }
 
-                   function funcOffban() {
+                   function funcOffban(argum) {
                         console.log(`Эта функция будет разрешать адресату доступ к вашей личке.`);
+                        console.log(`argum = ${argum}`);
+                        objMessage.sv8.forEach(function(item, index, array) {
+                            if (item !== argum) {}
+                            else {
+                               array.splice(index, 1);
+                            }
+                        });
+                      socket.emit("updateAccount", objMessage);
+                      console.log("Главный массив objMessage сейчас содержит: " + objMessage.sv8);
                    }
 
                      });

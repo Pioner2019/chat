@@ -4,9 +4,6 @@
          let forma = document.createElement("div");
              forma.id = "lichkaMakeMale";
              forma.className = '';
-                  // let inn = document.createElement("input");
-                  //     inn.id = 'inn';
-                  // forma.appendChild(inn);
                   let tr = document.createElement("textarea");
                       tr.id = 'tr';
                       tr.rows = '5';
@@ -22,14 +19,15 @@
                       closeWindow.innerHTML = 'Закрыть окно';
                   forma.appendChild(closeWindow);
          body.appendChild(forma);
-  //       let format = document.querySelector("#lichkaMakeMale");
+
+//-----------------------------------------------------------------------------------
 
          let lichka = document.createElement("div");
          lichka.id = 'lichka';
          lichka.className = "";
 
             let p1 = document.createElement("p");
-                p1.innerHTML = '&nbsp;&nbsp;У вас пока нет диалога с этим участником.';
+                p1.innerHTML = '&nbsp;&nbsp;У вас с этим участником пока нет диалога.';
             lichka.appendChild(p1);
 
             let p2 = document.createElement("p");
@@ -40,12 +38,6 @@
                 p3.innerHTML = '&nbsp;&nbsp;Если да -';
                 p3.style.marginBottom = '10px';
             lichka.appendChild(p3);
-
-            // let inputin = document.createElement("input");
-            //     inputin.id = 'inputin';
-            //     inputin.type = 'text';
-            //     inputin.placeholder = 'введите его имя:';
-            // lichka.appendChild(inputin);
 
             let tar = document.createElement("textarea");
                 tar.id = 'dialogs';
@@ -67,34 +59,18 @@
 
          body.appendChild(lichka);
 
-        //  let male = document.createElement("button");
-        //          male.id = 'male';
-        //          male.innerHTML = "Написать послание";
-        //          male.addEventListener("click", function() {
-        //           console.log("НАЖАТИЕМ ЭТОЙ КНОПКИ будет вызываться форма для генерации сообщения.");
-        //                 format.className = 'trans';
-        //            });
-        // body.appendChild(male);
-
-    //     let stopLS = document.createElement("button");
-    //         stopLS.id = 'stopLS';
-    //         stopLS.innerHTML = "Закрыть окно";
-    // //        stopLS.addEventListener("click", funcStopLS.bind(stopLS, male));
-    //         stopLS.addEventListener("click", funcStopLS);
-    //     body.appendChild(stopLS);
-
-  //       function funcStopLS(param) {
          function funcStopLS() {
              userLS.addEventListener("click", func);
-      //           param.remove();
-      //           inputin.remove();
-    //             console.log("inputin = " + inputin);
-      //           lichka.remove();
                  lichka.className = '';
-                 stopLS.remove();
                  let menuLS = document.querySelector("#menuLS");
                  menuLS.className = "";
-  //              format.className = '';
+              setTimeout(function() {
+                lichka.innerHTML = "";
+                lichka.remove();
+                stopLS.remove();
+                menuLS.remove();
+                forma.remove();
+              }, 700);
          }
 
     }

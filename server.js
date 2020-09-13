@@ -106,13 +106,21 @@ const server = http.createServer(function(req, res) {
         });
     }
 
-     else fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
+  //   else fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
+     else {
+     fs.readFile('/projects/chatHomeworkDT/multiviews.html', 'utf-8', (err, data) => {
     if (err) throw err; else {
   res.writeHead(200, {"Content-Type": "text/html"});
   res.end(data);
             }
-
       });
+      fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
+     if (err) throw err; else {
+   res.writeHead(200, {"Content-Type": "text/html"});
+   res.end(data);
+             }
+       });
+    }
 
   });
 
@@ -182,7 +190,7 @@ var io = require('socket.io').listen(server);
                  newFace = new NewFace(socket.username, ident, message.b, null, message.c, objTime.a, objTime.b, lichkaBan, null, null); // Создаём конкретный экземпляр
            socket.emit("pleaseYourAccount", newFace);  //  шаблона - класса, куда передаём конкретные значения его элементов.
            let objAdmin = {};
-               objAdmin.a = "админ:";
+               objAdmin.a = "админ";
                objAdmin.b = `У нас новый участник. Его имя ${newFace.sv1}`;
                objAdmin.c = "#dcdcdc";
         //   socket.broadcast.emit(`У нас новый участник. Его имя: ${socket.username}`);
@@ -240,14 +248,12 @@ var io = require('socket.io').listen(server);
                                  const collection = db.collection(`lichkaGlobal`);
                                  let strJSON;
                                  let resultProverka;
-                                 // strJSON = JSON.stringify({$or: [{toWhom: message.a}, {fromWhom: message.a}]});
-                                 // collection.find(JSON.parse(strJSON)).toArray((err, result) => {
                                  collection.find({$or: [{toWhom: message.a}, {fromWhom: message.a}]}).toArray((err, result) => {
                                  if (err) throw err;
                                  else {
                                    console.log(`Личка участника ${message.a} содержит ${result.length} сообщений.`);
-                                  if (result.length === 0) {resultProverka = true;}  // Если личка НЕ ПУСТА, то назначаем resultProverka = 'false';
-                                  else {resultProverka = false;} // А если ПУСТА, т.е. проверка была успешной, - тогда 'true'.
+                                  if (result.length === 0) {resultProverka = true;}  // Если личка ПУСТА, то назначаем resultProverka = 'true';
+                                  else {resultProverka = false;}                     // А если НЕ ПУСТА,- тогда 'false'.
                                     socket.emit("resultProverkaNaPusto", resultProverka);
                                     client.close();
                                  }
@@ -298,6 +304,9 @@ var io = require('socket.io').listen(server);
                                      collection.insertOne(posl, function(err, result) {
                                      if (err) throw err;
                                      else {
+                                //       for (let i = 0; i < connections.length; i ++) {
+                                //            console.log(`Имя сокета №${i}: ${connections[i].username}`);
+                              //         }
                                         client.close();
                                      }
                                 });
@@ -325,6 +334,22 @@ var io = require('socket.io').listen(server);
             } else {}
     //----------------------------------------------------------------------
     });
+
+        socket.on("updateAccount", message => {
+
+                        const mongoClient3 = new MongoClient(url, {useNewUrlParser: true});
+                              mongoClient3.connect((err, client) => {
+                                   const db = client.db("Pioner");
+                                   const collection = db.collection("CHAT1");
+                                   collection.updateOne({sv1: message.sv1}, {$set: {sv8: message.sv8}}, (err, result) => {
+                                   if (err) throw err;
+                                   else {
+                                      client.close();
+                                   }
+                              });
+                            });
+
+        });
 
         socket.on(`history, please!`, message => {
 
