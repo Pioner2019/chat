@@ -114,6 +114,7 @@ const server = http.createServer(function(req, res) {
   res.end(data);
             }
       });
+
       fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
      if (err) throw err; else {
    res.writeHead(200, {"Content-Type": "text/html"});

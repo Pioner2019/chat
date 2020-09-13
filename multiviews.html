@@ -2,33 +2,35 @@
 <!doctype html>
 <html lang= "en">
 <head>
-	<title="">Socket.IO чат multiviews</title>
-<!---	<linkrel="shortcut icon" href="./favicon.png"> --->
+	<title>Socket.IO chat multiviews</title>
 </head>
 <style>
-	main {
+
+	#parent {
 		display: flex;
-		width: 100%;
-		height: 100vh;
-		justify-content: space-around;
-		flex-wrap: wrap;
-		align-items: center;
+		width: 95vw;
+		height: 95vh;
 	}
 
 	iframe {
-		width: 600px;
-		height: 400px;
+    display: block;
+		width: 50%;
+		height: 100%;
+    border: 1px solid black;
 		border-radius: 4px;
 	}
+
+  #ifr2 {
+    margin-left: 10px;
+  }
+
 </style>
+
 <body>
-<main>
-  <iframe src= "" frameborder="0"> ></iframe>
-  <iframe src= "" frameborder="0"> ></iframe>
-<!---	<iframe src= "/chatHomeworkDT.html" frameborder="0"> ></iframe>
-	<iframe src= "/chatHomeworkDT.html" frameborder="0"> ></iframe> --->
-<!---	<iframe src= "/"frameborder="0"> >< /iframe>
-	<iframe src= "/"frameborder="0"> >< /iframe> --->
-</main>
+    <div id='parent'>
+       <iframe id='ifr1' src= "/projects/chatHomeworkDT/chatHomeworkDT.html"></iframe>
+       <iframe id='ifr2' src= "/projects/chatHomeworkDT/chatHomeworkDT.html"></iframe>
+    </div>
 </body>
+<!--- /projects/chatHomeworkDT/chatHomeworkDT.html  --->
 </html>
