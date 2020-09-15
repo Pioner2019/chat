@@ -1,5 +1,5 @@
 
-    function pluginTime() {
+     function pluginTime() {
       let date = new Date();
       let day = Number(date.getDate());
       let month = Number(date.getMonth()) + 1;

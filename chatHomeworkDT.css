@@ -786,3 +786,12 @@
             height: 500px;
             border: 1px solid black;
           }  */
+
+          #label {
+            width: 130px;
+            height: 30px;
+            font-size: .6em;
+            font-family: Verdana;
+            color: #800000;
+            font-weight: bolder;
+          }

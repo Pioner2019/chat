@@ -1,5 +1,8 @@
 
+  //  import {pluginTime} from `/projects/chatHomeworkDT/plugins/pluginTime.js`;
           document.addEventListener('DOMContentLoaded', () => {
+
+  //    console.log(`ПРОВЕРКА РАБОТЫ МОДУЛЬНОЙ СИСТЕМЫ. СЕГОДНЯШНЯЯ ДАТА: ${pluginTime()}`);
 
          var chat_exit = true;
          let name ;
@@ -123,9 +126,9 @@
          const socket = io.connect('ws://localhost:7777');
 
          //---------------------------------------------------------------
-                     socket.on("dialogRealTime", message => {
-                          console.log(message);
-                     });
+                     // socket.on("dialogRealTime", message => {
+                     //      console.log(message);
+                     // });
          //---------------------------------------------------------------
 
          let stop = document.querySelector("#stop");
@@ -136,6 +139,15 @@
                location.reload();                   // разьединения сокета и перезагрузки страницы.
           //     location.href = location.href; // Оба варианта работают.
              });
+
+          document.body.addEventListener("beforeunload", function() {
+         // let userOnload = document.querySelector("#body");
+         //     userOnload.addEventListener("unload", function() {
+         //  //   userOnload.addEventListener("pagehide", function() {
+                let posl = {a:objMessage.sv1, b: `Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`, c:objMessage.sv3};
+                socket.emit("message", posl);
+                console.log("СОБЫТИЕ beforeunload ВСЁ ЖЕ ПРОИСХОДИТ!");
+              });
 
 //=================================== БЛОК ПОЛУЧЕНИЯ ИСТОРИИ ЧАТА. ====================================
              let history = document.querySelector("#history");
@@ -316,6 +328,11 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                       }
 
                               else {                                             // А эта ветка работает, когда в личке уже есть сообщения.
+
+                                // socket.on("dialogRealTime", message => {
+                                //      console.log(message);
+                                // });
+
                                 let lichka = document.querySelector("#lichka");
                                     lichka.className = 'trans';
                                     lichka.style.height = '400px';
@@ -331,11 +348,17 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                 let button = document.querySelector("#button");
                                     button.remove();
                                     console.log(`message.length = ${message.length}`);
-                        // //---------------------------------------------------------------
-                        //             socket.on("dialogRealTime", message => {
-                        //                  console.log(message);
-                        //             });
-                        // //---------------------------------------------------------------
+                        //---------------------------------------------------------------
+                                    socket.on("dialogRealTime", message => {
+                                         console.log("ЧТО ЗА ХЕРНЯ? ПОЧЕМУ НЕ ПРИХОДИТ?");
+                                         console.log(message);
+                                    //     console.log("ЧТО ЗА ХЕРНЯ? ПОЧЕМУ НЕ ПРИХОДИТ?");
+                                         let label = document.createElement("div");
+                                             label.id = "label";
+                                            label.innerHTML = "собеседник пишет...";
+                                         lichka.appendChild(label);
+                                    });
+                        //---------------------------------------------------------------
                                      for (let i = 0; i < message.length; i++) {       // Получив массив обьектов с сервера(а он получил его из БД),
                                           let elem = PP.pluginRenderLichkaMessages(lichka, message[i], objMessage.sv1, objMessage.sv3); // Плагин отрисовывает их у нас в поле "личка".
                                    // Передаём созданный элемент в функцию как параметр(по методике Д.Т.):
@@ -366,6 +389,13 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                    socket.emit("message", objITyping);
                                 }
                             });
+                               // formaChildren[0].addEventListener("focus", function() {
+                               //       if (formaChildren[0].value) {
+                               //              console.log(`Эта строка - первый шаг к реализации сообщения в личке "Ваш собеседник пишет...".`);
+                               //              let objITyping = {a:objMessage.sv1, b:`Я пишу собеседнику`, c:argum};
+                               //              socket.emit("message", objITyping);
+                               //       }
+                               // });
 
                             formaChildren[0].addEventListener("blur", function func01() { // Tекстарея сообщает нам
                             let objLS = {};

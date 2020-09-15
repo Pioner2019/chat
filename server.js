@@ -110,26 +110,35 @@ const server = http.createServer(function(req, res) {
 
   //   else fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
      else {
-     fs.readFile('/projects/chatHomeworkDT/multiviews.html', 'utf-8', (err, data) => {
-    if (err) throw err; else {
-  res.writeHead(200, {"Content-Type": "text/html"});
-  res.end(data);
-            }
-      });
 
       fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
-     if (err) throw err; else {
-   res.writeHead(200, {"Content-Type": "text/html"});
-   res.end(data);
-             }
-       });
+           if (err) throw err; else {
+                res.writeHead(200, {"Content-Type": "text/html"});
+        //==============================================================
+               // fs.readFile('/projects/chatHomeworkDT/multiviews.html', 'utf-8', (err, data) => {
+               //       if (err) throw err; else {
+               //           res.writeHead(200, {"Content-Type": "text/html"});
+               //           res.end(data);
+               //       }
+               // });
+        //==============================================================
+                res.end(data);
+           }
+     });
+
+     // fs.readFile('/projects/chatHomeworkDT/multiviews.html', 'utf-8', (err, data) => {
+     //       if (err) throw err; else {
+     //            res.writeHead(200, {"Content-Type": "text/html"});
+     //            res.end(data);
+     //        }
+     //  });
     }
 
   });
 
 //№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№
 
-var io = require('socket.io').listen(server);
+const io = require('socket.io').listen(server);
 
     io.sockets.on('connection', function(socket) {
 //       let username;
@@ -149,7 +158,17 @@ var io = require('socket.io').listen(server);
                        let obj = {a:"plus", b:masPers[i]};
                        socket.emit("dostup", obj);
                        let posl = {a:`админ`, b:`В ОБЩЕНИЕ ВЕРНУЛСЯ ${masPers[i].sv1}`, c:`#a9a9a9`};
-                       massAllActiveUsers.push(masPers[i].sv1); // Заносим вернувшегося в массив активных участников.
+            //-----------------------------------------------------------------------------
+                       let objUser = {a:masPers[i].sv1, b:socket.id};            // Заносим новичка в массив активных участников,
+                           massAllActiveUsers.push(objUser);                     // куда помещаем обьект, содержаший имя нового
+                           for (let i = 0; i < massAllActiveUsers.length; i++) {  // участника и присвоенный ему сокетом
+                               for (let key in  massAllActiveUsers[i]) {          // уникальный айди. Каждый раз после возвращения
+                                  console.log(`${key}: ${massAllActiveUsers[i][key]}`) // участника в чат ему присваивается
+                               }                                                       // новый уникальный id.
+                           }
+            //-----------------------------------------------------------------------------
+                  //     massAllActiveUsers.push(masPers[i].sv1); // Заносим вернувшегося в массив активных участников.
+                //       console.log(`Сейчас в массиве massAllActiveUsers находится: ${massAllActiveUsers}`);
                        socket.broadcast.emit("otvetMessage", posl);
           //----------------------------------------------------------------------
                              const mongoClient = new MongoClient(url, {useNewUrlParser: true});
@@ -199,7 +218,17 @@ var io = require('socket.io').listen(server);
                objAdmin.c = "#dcdcdc";
         //   socket.broadcast.emit(`У нас новый участник. Его имя: ${socket.username}`);
            socket.broadcast.emit("otvetMessage", objAdmin);
-           massAllActiveUsers.push(masPers[i].sv1); // Заносим новичка в массив активных участников.
+      //     massAllActiveUsers.push(newFace.sv1); // Заносим новичка в массив активных участников.
+      //     console.log(`Сейчас в массиве massAllActiveUsers находится: ${massAllActiveUsers}`);
+      //-----------------------------------------------------------------------------
+                 let objUser = {a:newFace.sv1, b:socket.id};  // Заносим новичка в массив активных участников,
+                     massAllActiveUsers.push(objUser);        // куда помещаем обьект, содержаший имя нового
+                     for (let i = 0; i < massAllActiveUsers.length; i++) { // участника и присвоенный ему сокетом
+                         for (let key in  massAllActiveUsers[i]) {         // уникальный айди, который будет сохраняться
+                            console.log(`${key}: ${massAllActiveUsers[i][key]}`) // неизменным, пока он не вышел из чата.
+                         }                                                      // Когда он вернётся в общение, ему будет
+                     }                                                       // присвоен новый уникальный айдишник.
+      //-----------------------------------------------------------------------------
               for (let key in newFace) {
                   console.log(`${key}: ${newFace[key]}`);
               }
@@ -268,25 +297,28 @@ var io = require('socket.io').listen(server);
       //----------------------------------------------------------------------
                  else if (message.b === `Я пишу собеседнику`) {
                           massAllActiveUsers.forEach(function(item, index, array) {     //
-                               if (item !== message.c) {}                              //
+                               if (item.a !== message.c) {}                              //
                                else {
                 //===========================================================================================
-                const mongoClient3 = new MongoClient(url, {useNewUrlParser: true});
-                      mongoClient3.connect((err, client) => {
-                           const db = client.db("Pioner");
-                           const collection = db.collection(`CHAT1`);
-                           collection.findOne({sv1: message.c}, (err, result) => {
-                           if (err) throw err;
-                           else {
-                             console.log(`Идентификатор socketId, присвоенный участнику ${message.c} сокетом при создании учётной записи: ${result.sv2}`);
-                             io.to(`${result.sv2}`).emit("dialogRealTime", "ВАМ ПИШУТ СЕЙЧАС!");
-                             if (io.to(`${result.sv2}`).emit("dialogRealTime", "ВАМ ПИШУТ СЕЙЧАС!")) {
+                // const mongoClient3 = new MongoClient(url, {useNewUrlParser: true});
+                //       mongoClient3.connect((err, client) => {
+                //            const db = client.db("Pioner");
+                //            const collection = db.collection(`CHAT1`);
+                //            collection.findOne({sv1: message.c}, (err, result) => {
+                //            if (err) throw err;
+                //            else {
+                      //       console.log(`Идентификатор socketId, присвоенный участнику ${message.c} сокетом при создании учётной записи: ${result.sv2}`);
+                               console.log(`Уникальный идентификатор участника ${message.c}: ${item.b}`);
+                             io.to(`${item.b}`).emit("dialogRealTime", "ВАМ ПИШУТ СЕЙЧАС!");
+                             if (io.to(`${item.b}`).emit("dialogRealTime", "ВАМ ПИШУТ СЕЙЧАС!")) {
+                      //       io.to(result.sv2).emit("dialogRealTime", "ВАМ ПИШУТ СЕЙЧАС!");
+                      //       if (io.to(result.sv2).emit("dialogRealTime", "ВАМ ПИШУТ СЕЙЧАС!")) {
                                console.log(`Отправка сообщения "ВАМ ПИШУТ СЕЙЧАС!" участнику ${message.c} произведена. Что там у него происходит - я не знаю!`);
-                             }
-                              client.close();
-                           }
-                      });
-                    });
+                              }
+                    //           client.close();
+                    //        }
+                    //   });
+                    // });
                 //===========================================================================================
                                }
                          });
@@ -344,12 +376,22 @@ var io = require('socket.io').listen(server);
             else if (message.b != "messageLS" && message.b != "myLichka" && message.b != "myLichkaAll" && message.b != "proverkaNaPusto" && message.b != `Я пишу собеседнику`) {
                   socket.broadcast.emit("otvetMessage", message);
                          if (message.b === `Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`) {  // Если участник временно выходит
+                      //          let ind = massAllActiveUsers.indexOf(message.a);
+
                              massAllActiveUsers.forEach(function(item, index, array) {     // из общения и закрывает свою
-                                  if (item !== message.a) {}                              // страницу, сервер удаляет его имя
+                                  if (item.a !== message.a) {}                              // страницу, сервер удаляет его имя
                                   else {                                                  // из массива активных участников.
-                                      array.splice(index, 1);
+                                       array.splice(index, 1);
                                    }
                               });
+                //------------------------------------------------------------------
+                              console.log(`Один участник нас временно покинул. Сейчас в массиве massAllActiveUsers находятся:`);
+                              for (let i = 0; i < massAllActiveUsers.length; i++) {
+                                  for (let key in  massAllActiveUsers[i]) {
+                                     console.log(`${key}: ${massAllActiveUsers[i][key]}`);
+                                  }
+                              }
+               //-------------------------------------------------------------------
                           }
                                const mongoClient = new MongoClient(url, {useNewUrlParser: true});
                                      mongoClient.connect(function(err, client){
