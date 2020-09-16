@@ -111,17 +111,16 @@ const server = http.createServer(function(req, res) {
   //   else fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
      else {
 
+       fs.readFile('/projects/chatHomeworkDT/multiviews.html', 'utf-8', (err, data) => {
+             if (err) throw err; else {
+                  res.writeHead(200, {"Content-Type": "text/html"});
+                  res.end(data);
+              }
+        });
+
       fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
            if (err) throw err; else {
                 res.writeHead(200, {"Content-Type": "text/html"});
-        //==============================================================
-               // fs.readFile('/projects/chatHomeworkDT/multiviews.html', 'utf-8', (err, data) => {
-               //       if (err) throw err; else {
-               //           res.writeHead(200, {"Content-Type": "text/html"});
-               //           res.end(data);
-               //       }
-               // });
-        //==============================================================
                 res.end(data);
            }
      });
@@ -270,7 +269,7 @@ const io = require('socket.io').listen(server);
 //========================================================================================
 
       socket.on("message", message => { // ЭТО - главный сокет, в котором происходит обработка приходящих от клиента сообщений.
-        console.log(`ПОЛУЧЕНО С КЛИЕНТА: obj.a = ${message.a}; obj.b = ${message.b}; obj.c = ${message.c}`);
+        console.log(`ПОЛУЧЕНО С КЛИЕНТА: его имя = ${message.a}; тип сообщения = ${message.b}; цвет его сообщений = ${message.c}`);
         console.log(`Тип полученных данных: message.a typeof: ${typeof message.a}; message.b typeof: ${typeof message.b}`);
         console.log(`На сервер с клиента всё приходит нормально!`);
 
@@ -300,25 +299,10 @@ const io = require('socket.io').listen(server);
                                if (item.a !== message.c) {}                              //
                                else {
                 //===========================================================================================
-                // const mongoClient3 = new MongoClient(url, {useNewUrlParser: true});
-                //       mongoClient3.connect((err, client) => {
-                //            const db = client.db("Pioner");
-                //            const collection = db.collection(`CHAT1`);
-                //            collection.findOne({sv1: message.c}, (err, result) => {
-                //            if (err) throw err;
-                //            else {
-                      //       console.log(`Идентификатор socketId, присвоенный участнику ${message.c} сокетом при создании учётной записи: ${result.sv2}`);
                                console.log(`Уникальный идентификатор участника ${message.c}: ${item.b}`);
-                             io.to(`${item.b}`).emit("dialogRealTime", "ВАМ ПИШУТ СЕЙЧАС!");
-                             if (io.to(`${item.b}`).emit("dialogRealTime", "ВАМ ПИШУТ СЕЙЧАС!")) {
-                      //       io.to(result.sv2).emit("dialogRealTime", "ВАМ ПИШУТ СЕЙЧАС!");
-                      //       if (io.to(result.sv2).emit("dialogRealTime", "ВАМ ПИШУТ СЕЙЧАС!")) {
-                               console.log(`Отправка сообщения "ВАМ ПИШУТ СЕЙЧАС!" участнику ${message.c} произведена. Что там у него происходит - я не знаю!`);
-                              }
-                    //           client.close();
-                    //        }
-                    //   });
-                    // });
+                               let obj = {a:message.a, b:"ВАМ ПИШУТ СЕЙЧАС!"};
+                             io.to(`${item.b}`).emit("dialogRealTime", obj);
+                               console.log(`Отправка сообщения "ВАМ ПИШУТ СЕЙЧАС!" участнику ${message.c} УСПЕШНО произведена.`);
                 //===========================================================================================
                                }
                          });
@@ -365,6 +349,17 @@ const io = require('socket.io').listen(server);
                                      collection.insertOne(posl, function(err, result) {
                                      if (err) throw err;
                                      else {
+                                       massAllActiveUsers.forEach(function(item, index, array) {     //
+                                            if (item.a !== message.d) {}                              //
+                                            else {
+                             //===========================================================================================
+                                            console.log(`Уникальный идентификатор участника ${message.d}: ${item.b}`);
+                              //              let obj = {a:message.d, b:"ВАМ ПИШУТ СЕЙЧАС!"};
+                                          io.to(`${item.b}`).emit("dialogRealTimeMessage", message);
+                                            console.log(`Отправка сообщения участнику ${message.d} УСПЕШНО произведена.`);
+                             //===========================================================================================
+                                            }
+                                      });
                                         client.close();
                                      }
                                 });

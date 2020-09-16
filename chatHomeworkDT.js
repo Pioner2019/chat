@@ -140,14 +140,11 @@
           //     location.href = location.href; // Оба варианта работают.
              });
 
-          document.body.addEventListener("beforeunload", function() {
-         // let userOnload = document.querySelector("#body");
-         //     userOnload.addEventListener("unload", function() {
-         //  //   userOnload.addEventListener("pagehide", function() {
-                let posl = {a:objMessage.sv1, b: `Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`, c:objMessage.sv3};
-                socket.emit("message", posl);
-                console.log("СОБЫТИЕ beforeunload ВСЁ ЖЕ ПРОИСХОДИТ!");
-              });
+          window.addEventListener("unload", function() {  // Здесь мы обрабатываем случай, когда участник вышел из чата не нажав
+                let posl = {a:objMessage.sv1, b: `Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`, c:objMessage.sv3}; // штатную кнопку
+                socket.emit("message", posl);                             // "выйти из чата", а по привычке перезагрузив страницу.
+                console.log("СОБЫТИЕ beforeunload ВСЁ ЖЕ ПРОИСХОДИТ!"); // При этом тоже происходит удаление записи участника из
+              });                                                       // массива активных участников massAllActiveUsers.
 
 //=================================== БЛОК ПОЛУЧЕНИЯ ИСТОРИИ ЧАТА. ====================================
              let history = document.querySelector("#history");
@@ -329,10 +326,6 @@ document.getElementById("files").addEventListener('change', onFileSelect);
 
                               else {                                             // А эта ветка работает, когда в личке уже есть сообщения.
 
-                                // socket.on("dialogRealTime", message => {
-                                //      console.log(message);
-                                // });
-
                                 let lichka = document.querySelector("#lichka");
                                     lichka.className = 'trans';
                                     lichka.style.height = '400px';
@@ -348,22 +341,42 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                 let button = document.querySelector("#button");
                                     button.remove();
                                     console.log(`message.length = ${message.length}`);
-                        //---------------------------------------------------------------
-                                    socket.on("dialogRealTime", message => {
-                                         console.log("ЧТО ЗА ХЕРНЯ? ПОЧЕМУ НЕ ПРИХОДИТ?");
-                                         console.log(message);
-                                    //     console.log("ЧТО ЗА ХЕРНЯ? ПОЧЕМУ НЕ ПРИХОДИТ?");
-                                         let label = document.createElement("div");
-                                             label.id = "label";
-                                            label.innerHTML = "собеседник пишет...";
-                                         lichka.appendChild(label);
-                                    });
-                        //---------------------------------------------------------------
+                        // //---------------------------------------------------------------
+                        //             socket.on("dialogRealTime", message => {
+                        //                  console.log(message);
+                        //                  let label = document.createElement("div");
+                        //                      label.id = "label";
+                        //                     label.innerHTML = "собеседник пишет...";
+                        //                  lichka.appendChild(label);
+                        //             });
+                        // //---------------------------------------------------------------
                                      for (let i = 0; i < message.length; i++) {       // Получив массив обьектов с сервера(а он получил его из БД),
                                           let elem = PP.pluginRenderLichkaMessages(lichka, message[i], objMessage.sv1, objMessage.sv3); // Плагин отрисовывает их у нас в поле "личка".
                                    // Передаём созданный элемент в функцию как параметр(по методике Д.Т.):
                                               elem.addEventListener("click", funcResponse.bind(elem, elem));
                                      }  // Превращаем каждое сообщение в кнопку, нажатие на которую вызывает исполнительное подменю(функцию funcResponse).
+                                     //---------------------------------------------------------------
+                                                 socket.on("dialogRealTime", message => {
+                                                      console.log(message.b);
+                                                      let label = document.createElement("div");
+                                                          label.id = "label";
+                                                         label.innerHTML = `${message.a} пишет...`;
+                                                      lichka.appendChild(label);
+                                                      lichka.scrollTop = lichka.scrollHeight;
+                                                 });
+                                     //---------------------------------------------------------------
+                                     //---------------------------------------------------------------
+                                                 socket.on("dialogRealTimeMessage", message => {
+                                                     if (document.querySelector("#label")) {
+                                                      let label = document.querySelector("#label");
+                                                          label.remove();
+                                                        }
+                                                          let obj = {a:message.a, b:message.e, c:message.c};
+                                                          PP.pluginRenderLichkaMessagesRT(lichka, obj);
+                                    //                      funcOtvet();
+                                    //                  lichka.scrollTop = lichka.scrollHeight;
+                                                 });
+                                     //---------------------------------------------------------------
                               }
 
                  function funcResponse(param) {
@@ -378,24 +391,21 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                  }
 
                    function funcOtvet(argum) {
+                        let schetchik = 0;
                         let forma = document.querySelector("#lichkaMakeMale"); // Вызываем сюда формочку для создания и отправки сообщений.
                             forma.className = 'trans';                         // Просим её снизойти до нас, грешных, и спуститься с небес.
                             let formaChildren = forma.children;               // Получаем у неё список её детёнышей: это текстарея
                             console.log(`formaChildren.length = ${formaChildren.length}`);  // и кнопка "Отправить".
                             formaChildren[0].addEventListener("input", function() {
                                 if (formaChildren[0].value.length !== 0) {
+                                  if (schetchik === 0) {
                                    console.log(`Эта строка - первый шаг к реализации сообщения в личке "Ваш собеседник пишет...".`);
                                    let objITyping = {a:objMessage.sv1, b:`Я пишу собеседнику`, c:argum};
                                    socket.emit("message", objITyping);
+                                   schetchik++;
+                                 }
                                 }
                             });
-                               // formaChildren[0].addEventListener("focus", function() {
-                               //       if (formaChildren[0].value) {
-                               //              console.log(`Эта строка - первый шаг к реализации сообщения в личке "Ваш собеседник пишет...".`);
-                               //              let objITyping = {a:objMessage.sv1, b:`Я пишу собеседнику`, c:argum};
-                               //              socket.emit("message", objITyping);
-                               //       }
-                               // });
 
                             formaChildren[0].addEventListener("blur", function func01() { // Tекстарея сообщает нам
                             let objLS = {};
@@ -415,9 +425,9 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                             PP.pluginRenderLichkaMessages(lichka, object, objMessage.sv1, objMessage.sv3);
                           });
 
-                          formaChildren[2].addEventListener("click", function() {
+                          formaChildren[1].addEventListener("click", function() {
                                formaChildren[0].value = "";
-                               forma.className = "";
+                      //         forma.className = "";
                           });
                    }
 

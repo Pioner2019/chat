@@ -22,9 +22,9 @@
                   otvetMessage.style.marginLeft = '10px';
                   otvetMessage.style.marginTop = '10px';
                   otvetMessage.style.border = '1px solid black';
-                  otvetMessage.style.borderTopLeftRadius = '25px';
-                  otvetMessage.style.borderTopRightRadius = '14px';
-                  otvetMessage.style.borderBottomRightRadius = '14px';
+                  otvetMessage.style.borderTopLeftRadius = '30px';
+                  otvetMessage.style.borderTopRightRadius = '18px';
+                  otvetMessage.style.borderBottomRightRadius = '18px';
                   otvetMessage.style.borderBottomLeftRadius = '0px';
                   otvetMessage.style.backgroundColor = param2;
            }

@@ -257,18 +257,18 @@
           color: white;
         }
 
-        .otvetMessage {
+        .otvetMessage,.otvetMessageRT {
           width: 160px;
           height: auto;
           margin-left: 85px;
           margin-top: 10px;
           border: 1px solid black;
-          border-top-right-radius: 25px;
-          border-top-left-radius: 14px;
-          border-bottom-left-radius: 14px;
+          border-top-right-radius: 30px;
+          border-top-left-radius: 18px;
+          border-bottom-left-radius: 18px;
         }
 
-        .otvetMessage>#strTimeOtvet {
+        .otvetMessage>#strTimeOtvet,.otvetMessageRT>#strTimeOtvetRT {
           width: 90px;
           height: 10px;
           margin-left: 65px;
@@ -280,7 +280,7 @@
           color: white;
         }
 
-        #telo {
+        #telo,#teloRT {
           width: 158px;
           height: auto;
           font-size: .4rem;
@@ -288,7 +288,15 @@
           text-align: center;
         }
 
-        #zagolovok {
+    /*    #teloRT {
+          width: 90px;
+          height: auto;
+          font-size: .4rem;
+          font-weight:bold;
+          text-align: center;
+        }  */
+
+        #zagolovok,#zagolovokRT {
           width: 90px;
           height: 15px;
           margin-left: 10px;
@@ -787,10 +795,15 @@
             border: 1px solid black;
           }  */
 
+
+
           #label {
             width: 130px;
             height: 30px;
-            font-size: .6em;
+            margin-left: 120px;
+            margin-top: 15px;
+            font-size: .8em;
+            font-style: italic;
             font-family: Verdana;
             color: #800000;
             font-weight: bolder;
