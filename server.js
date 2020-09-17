@@ -111,26 +111,28 @@ const server = http.createServer(function(req, res) {
   //   else fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
      else {
 
-       fs.readFile('/projects/chatHomeworkDT/multiviews.html', 'utf-8', (err, data) => {
-             if (err) throw err; else {
-                  res.writeHead(200, {"Content-Type": "text/html"});
-                  res.end(data);
-              }
-        });
+        const url = new URL(req.url);
+              console.log("url.search = " + url.search);
+    //    if (url === '/projects/chatHomeworkDT/multiviews') {
+  //       if (url === 'localhost:7777/multiviews') {
+  //
+        fs.readFile('/projects/chatHomeworkDT/multiviews.html', 'utf-8', (err, data) => {
+              if (err) throw err; else {
+                   res.writeHead(200, {"Content-Type": "text/html"});
+                   res.end(data);
+               }
+         });
+  //     }
+  // //    else if (url.pathname === '/projects/chatHomeworkDT/chatHomeworkDT.html') {
+  //     else if (url === 'localhost:7777') {
+  //     fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
+  //          if (err) throw err; else {
+  //               res.writeHead(200, {"Content-Type": "text/html"});
+  //               res.end(data);
+  //          }
+  //    });
+  //  } else {}
 
-      fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
-           if (err) throw err; else {
-                res.writeHead(200, {"Content-Type": "text/html"});
-                res.end(data);
-           }
-     });
-
-     // fs.readFile('/projects/chatHomeworkDT/multiviews.html', 'utf-8', (err, data) => {
-     //       if (err) throw err; else {
-     //            res.writeHead(200, {"Content-Type": "text/html"});
-     //            res.end(data);
-     //        }
-     //  });
     }
 
   });

@@ -372,9 +372,8 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                                           label.remove();
                                                         }
                                                           let obj = {a:message.a, b:message.e, c:message.c};
-                                                          PP.pluginRenderLichkaMessagesRT(lichka, obj);
-                                    //                      funcOtvet();
-                                    //                  lichka.scrollTop = lichka.scrollHeight;
+                                                          let elem = PP.pluginRenderLichkaMessagesRT(lichka, obj);
+                                                          elem.addEventListener("click", funcResponse.bind(elem, elem));
                                                  });
                                      //---------------------------------------------------------------
                               }
