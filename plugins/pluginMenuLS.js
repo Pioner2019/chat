@@ -6,7 +6,7 @@
          let button = document.createElement("button");
              button.id = 'otvet';
              button.className = 'knopki';
-             button.innerHTML = 'Ответить';
+             button.innerHTML = 'Написать';
              button.style.marginTop = '5px';
              button.style.marginBottom = '5px';
          menuLS.appendChild(button);

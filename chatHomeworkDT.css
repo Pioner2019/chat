@@ -795,16 +795,29 @@
             border: 1px solid black;
           }  */
 
-
-
           #label {
-            width: 130px;
-            height: 30px;
-            margin-left: 120px;
-            margin-top: 15px;
-            font-size: .8em;
-            font-style: italic;
-            font-family: Verdana;
-            color: #800000;
-            font-weight: bolder;
-          }
+           width: 130px;
+           height: 30px;
+           margin-left: 120px;
+           margin-top: 15px;
+           font-size: .8em;
+           font-style: italic;
+           font-family: Verdana;
+           color: #800000;
+           font-weight: bolder;
+         }
+
+         #ban {
+           width: 130px;
+           height: 40px;
+            line-height: 40px;
+           margin-left: 120px;
+           margin-top: 20px;
+           background-color: #483d8b;
+           font-size: .8em;
+           font-style: italic;
+           font-family: Verdana;
+           text-align: center;
+           color: red;
+           font-weight: bolder;
+         }
