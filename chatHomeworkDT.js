@@ -1,5 +1,8 @@
-
+ import {moduleRenderPoleRooms} from "./modules/moduleRenderPoleRooms.js";
 document.addEventListener('DOMContentLoaded', () => {
+
+//    let perem = prompt("Введите какое - нибудь число:", "");
+//        moduleProba01(perem);
 
        var chat_exit = true;
        let name ;
@@ -219,6 +222,17 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                            forma1New.className = "";
                       });
 
+                      let forma1 = document.querySelector("#forma1");
+                          forma1.className = "trans";
+                      let inputForma1 = document.querySelector("#inputForma1");
+                      let submitForma1 = document.querySelector("#submitForma1");
+                      let allForma1 = document.querySelector("#allForma1");
+                      let offForma1 = document.querySelector("#offForma1");
+                          offForma1.addEventListener("click", function() {
+                               userLS.addEventListener("click", func);
+                               forma1.className = "";
+                          });
+//----------------------------------------------------------------------------------------
 
                    let zapros = {};
 
@@ -245,28 +259,24 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                            }
 
                        else {
-                   let forma1 = document.querySelector("#forma1");
-                   let inputForma1 = document.querySelector("#inputForma1");
-                   let submitForma1 = document.querySelector("#submitForma1");
-                   let allForma1 = document.querySelector("#allForma1");
-
-                       forma1.className = "trans";
                        inputForma1.addEventListener("blur", function() {
-                             zapros.a = objMessage.sv1;
-                             zapros.b = "myLichka";
-                             zapros.c = inputForma1.value;
-                             nameVisavi = inputForma1.value;
-                             socket.emit("message", zapros);
-                             forma1.className = "";
-                       });
+                         zapros.a = objMessage.sv1;
+                         zapros.b = "myLichka";
+                         zapros.c = inputForma1.value;
+                         nameVisavi = inputForma1.value;
+                         socket.emit("message", zapros);
+                         forma1.className = "";
+                      });
 
                        allForma1.addEventListener("click", function() {
-                            zapros.a = objMessage.sv1;
-                            zapros.b = "myLichkaAll";
-                            socket.emit("message", zapros);
-                            forma1.className = "";
+                           zapros.a = objMessage.sv1;
+                           zapros.b = "myLichkaAll";
+                           socket.emit("message", zapros);
+                           forma1.className = "";
                        });
+
                      }
+
                     });
 
                    socket.on("getYouLichka", message => {
@@ -323,19 +333,19 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                    //---------------------------------------------------------------
                                                socket.on("dialogRealTime", message => {
                          if (message.b === "сейчас вам пишет...") {
-                                                    console.log(message.b);
-                                                    let label = document.createElement("div");
-                                                        label.id = "label";
-                                                       label.innerHTML = `${message.a} ${message.b}`;
-                                                    lichka.appendChild(label);
-                                                    lichka.scrollTop = lichka.scrollHeight;
+                                  console.log(message.b);
+                                  let label = document.createElement("div");
+                                  label.id = "label";
+                                  label.innerHTML = `${message.a} ${message.b}`;
+                                  lichka.appendChild(label);
+                                  lichka.scrollTop = lichka.scrollHeight;
                         }
                         else if (message.b === "вас забанил!") {
                                 let ban = document.createElement("div");
-                                                          ban.id = "ban";
-                                                          ban.innerHTML = `${message.a} ${message.b}`;
-                                                          lichka.appendChild(ban);
-                                                          lichka.scrollTop = lichka.scrollHeight;
+                                ban.id = "ban";
+                                ban.innerHTML = `${message.a} ${message.b}`;
+                                lichka.appendChild(ban);
+                                lichka.scrollTop = lichka.scrollHeight;
                           }
                                                });
                                    //---------------------------------------------------------------
@@ -364,19 +374,15 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                }
 
                  function funcOtvet(argum) {
-                      let schetchik = 0;
                       let forma = document.querySelector("#lichkaMakeMale"); // Вызываем сюда формочку для создания и отправки сообщений.
                           forma.className = 'trans';                         // Просим её снизойти до нас, грешных, и спуститься с небес.
                           let formaChildren = forma.children;               // Получаем у неё список её детёнышей: это текстарея
                           console.log(`formaChildren.length = ${formaChildren.length}`);  // и кнопка "Отправить".
                           formaChildren[0].addEventListener("input", function() {
                               if (formaChildren[0].value.length !== 0) {
-                                if (schetchik === 0) {
-                                 console.log(`Эта строка - первый шаг к реализации сообщения в личке "Ваш собеседник пишет...".`);
                                  let objITyping = {a:objMessage.sv1, b:`Я пишу собеседнику`, c:argum};
+                                 console.log(`Эта строка должна появляться в консоли каждый раз при активации текстареи.`);
                                  socket.emit("message", objITyping);
-                                 schetchik++;
-                               }
                               }
                           });
 
@@ -400,7 +406,6 @@ document.getElementById("files").addEventListener('change', onFileSelect);
 
                         formaChildren[1].addEventListener("click", function() {
                              formaChildren[0].value = "";
-                    //         forma.className = "";
                         });
                  }
 
@@ -429,6 +434,23 @@ document.getElementById("files").addEventListener('change', onFileSelect);
       });
 
 //=================================== ЗАКОНЧЕН БЛОК РАБОТЫ С ЛИЧКОЙ . =======================================
+
+//====================================== БЛОК РАБОТЫ С КОМНАТАМИ. ===========================================
+
+             let rooms = document.querySelector("#rooms");
+                 rooms.addEventListener("click", function func() {
+                      console.log("ЭТА КНОПКА ДОЛЖНА БУДЕТ ОТКРЫВАТЬ ДОСТУП В ПОДСРЕДУ 'КОМНАТЫ'.");
+                      moduleRenderPoleRooms(body);
+                      // let poleRooms = document.createElement("div");
+                      //     poleRooms.id = 'poleRooms';
+                      //     poleRooms.innerHTML = 'КОМНАТЫ.';
+                      //     poleRooms.addEventListener("click", function() {
+                      //           poleRooms.remove();
+                      //     });
+                      // body.appendChild(poleRooms);
+                 });
+
+//=================================== ЗАКОНЧЕН БЛОК РАБОТЫ С КОМНАТАМИ. =======================================
 
 
        let but = document.getElementById('but');                // НАЧАЛО работы на странице - нажатие

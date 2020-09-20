@@ -17,6 +17,11 @@
                   let closeWindow = document.createElement("button");
                       closeWindow.id = 'closeWindow';
                       closeWindow.innerHTML = 'Закрыть окно';
+
+                      closeWindow.addEventListener("click", function() {
+                           forma.className = '';
+                      });
+
                   forma.appendChild(closeWindow);
          body.appendChild(forma);
 

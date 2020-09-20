@@ -135,7 +135,7 @@
          }
 
          /*================================================================================*/
-         #finish,#stopLS,#stopLS1,#male,#closeWindow {
+         #finish,#stopLS,#stopLS1,#male,#closeWindow,#butRooms1,#butRooms2,#butRooms3 {
             position: absolute;
             left: 280px;
             top: 513px;
@@ -160,7 +160,7 @@
             z-index: 10;
            }
 
-           #finish:active,#stopLS:active,#stopLS1:active,#male:active,#closeWindow:active {
+           #finish:active,#stopLS:active,#stopLS1:active,#male:active,#closeWindow:active,#butRooms1:active,#butRooms2:active,#butRooms3:active {
              background: -moz-linear-gradient(top, #696969 0%, #dcdcdc);
              background: -webkit-gradient(linear, left top, left bottom, from(#696969), to(#dcdcdc));
              text-shadow: 0 -1px 0 white;
@@ -336,7 +336,7 @@
             outline:none;
         }
 
-        #but,#history,#userLS,#room,#button,#bt {
+        #but,#history,#userLS,#rooms,#button,#bt {
     /*       margin-top:  20px; */
            margin-left: 15px;
            height:30px;
@@ -371,7 +371,7 @@
            display: block;
            text-decoration: none;
           }
-           a:hover,.but:hover,#button:hover,#history:hover,#userLS:hover,#room:hover,#admin2:hover,#bt:hover {
+           a:hover,.but:hover,#button:hover,#history:hover,#userLS:hover,#rooms:hover,#admin2:hover,#bt:hover {
            background: -moz-linear-gradient(
              top,
              #42aaff 0%,
@@ -381,7 +381,7 @@
              from(#42aaff),
              to(#0d5aa7));
           }
-          a:active,.but:active,#button:active,#history:active,#userLS:active,#room:active,#admin2:active,#bt:active {
+          a:active,.but:active,#button:active,#history:active,#userLS:active,#rooms:active,#admin2:active,#bt:active {
            background: -moz-linear-gradient(
              top,
              #003366 0%,
@@ -616,7 +616,7 @@
              margin-left: 10px;
           }
 
-          #room {
+          #rooms {
             position: absolute;
             top: 430px;
             left:  0px;
@@ -820,4 +820,155 @@
            text-align: center;
            color: red;
            font-weight: bolder;
+         }
+
+         #poleRooms {
+           position: absolute;
+           top: 0px;
+           left: 0px;
+           width: 100vw;
+           height: 100vh;
+           font-family: Verdana;
+           font-size: .7rem;
+           font-weight: bolder;
+           color: #008b8b;
+           text-align: center;
+           background-color: #20b2aa;
+           text-shadow: 0 0 10px white;
+           letter-spacing: .7em;
+           z-index: 2000;
+    /*       opacity: 0;   */
+         }
+
+         #table {
+             position: absolute;
+             display: flex;
+             width: 300px;
+             height: 150px;
+             top: 30px;
+             left: 15px;
+             border: 2px solid red;
+         }
+
+         #listLeft {
+           width: 150px;
+           height: auto;
+           padding-left: 3px;
+           border: 1px solid black;
+           background-color: white;
+           box-sizing: border-box;
+           font-family: Verdana;
+           font-size: .3rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+    /*       color: #008b8b;  */
+    /*       text-align: center; */
+
+         }
+
+         #listRight {
+           width: 150px;
+           height: auto;
+           padding-left: 3px;
+           border: 1px solid black;
+           background-color: #fa8072;
+           box-sizing: border-box;
+           font-family: Verdana;
+           font-size: .3rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+      /*     color: #008b8b;   */
+      /*     text-align: center;  */
+         }
+
+         #controls {
+           position: absolute;
+           width: 300px;
+           height: 255px;
+           top: 185px;
+           left: 15px;
+           border: 2px solid blue;
+           font-family: Verdana;
+           font-size: .4rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+         }
+
+         #p1 {
+             position: absolute;
+             top:5px;
+             left: 10px;
+             font-family: Verdana;
+             font-size: .3rem;
+             font-weight: bolder;
+             letter-spacing: normal;
+         }
+
+         #p2 {
+             position: absolute;
+             top: 84px;
+             left: 10px;
+             font-family: Verdana;
+             font-size: .3rem;
+             font-weight: bolder;
+             letter-spacing: normal;
+         }
+
+         #inpRooms {
+           display: block;
+           position: absolute;
+           top: 27px;
+           left: 10px;
+           font-family: Verdana;
+           font-size: .3rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+         }
+
+         #tarea {
+           display: block;
+           position: absolute;
+           top: 107px;
+           left: 10px;
+           width: 200px;
+           height: 60px;
+           font-family: Verdana;
+           font-size: .3rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+         }
+
+         #butRooms1 {
+           left: 10px;
+           top: 49px;
+           width: 70px;
+           height: 20px;
+  /*         line-height: 20px; */
+  /*         padding: 5px;   */
+           padding-bottom: 17px;
+           display: block;
+           z-index: 2000;
+           opacity: 1;
+         }
+
+         #butRooms2 {
+           left: 10px;
+           top:180px;
+           width: 90px;
+           height: 20px;
+           padding-bottom: 17px;
+           display: block;
+           z-index: 2000;
+           opacity: 1;
+         }
+
+         #butRooms3 {
+           left: 10px;
+           top: 215px;
+           width: 100px;
+           height: 20px;
+           padding-bottom: 17px;
+           display: block;
+           z-index: 2000;
+           opacity: 1;
          }
