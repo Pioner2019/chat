@@ -135,7 +135,7 @@
          }
 
          /*================================================================================*/
-         #finish,#stopLS,#stopLS1,#male,#closeWindow,#butRooms1,#butRooms2,#butRooms3 {
+         #finish,#stopLS,#stopLS1,#male,#closeWindow,#butRooms1,#butRooms2,#butRooms3,#outRooms {
             position: absolute;
             left: 280px;
             top: 513px;
@@ -160,7 +160,7 @@
             z-index: 10;
            }
 
-           #finish:active,#stopLS:active,#stopLS1:active,#male:active,#closeWindow:active,#butRooms1:active,#butRooms2:active,#butRooms3:active {
+           #finish:active,#stopLS:active,#stopLS1:active,#male:active,#closeWindow:active,#butRooms1:active,#butRooms2:active,#butRooms3:active,#outRooms:active {
              background: -moz-linear-gradient(top, #696969 0%, #dcdcdc);
              background: -webkit-gradient(linear, left top, left bottom, from(#696969), to(#dcdcdc));
              text-shadow: 0 -1px 0 white;
@@ -268,7 +268,7 @@
           border-bottom-left-radius: 18px;
         }
 
-        .otvetMessage>#strTimeOtvet,.otvetMessageRT>#strTimeOtvetRT {
+        .otvetMessage>.strTimeOtvet,.otvetMessageRT>.strTimeOtvetRT {
           width: 90px;
           height: 10px;
           margin-left: 65px;
@@ -280,7 +280,7 @@
           color: white;
         }
 
-        #telo,#teloRT {
+        .telo,.teloRT {
           width: 158px;
           height: auto;
           font-size: .4rem;
@@ -296,7 +296,7 @@
           text-align: center;
         }  */
 
-        #zagolovok,#zagolovokRT {
+        .zagolovok,.zagolovokRT {
           width: 90px;
           height: 15px;
           margin-left: 10px;
@@ -965,6 +965,32 @@
          #butRooms3 {
            left: 10px;
            top: 215px;
+           width: 100px;
+           height: 20px;
+           padding-bottom: 17px;
+           display: block;
+           z-index: 2000;
+           opacity: 1;
+         }
+
+         #poleRoom {
+           position: absolute;
+           left: 250px;
+           top: 30px;
+           width: 300px;
+           height: 400px;
+           overflow:scroll;
+           border: 1px solid black;
+           background-color: #dcdcdc;
+           font-family: Verdana;
+           font-size: .3rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+         }
+
+         #outRooms {
+           left: 10px;
+      /*     top: 215px;  */
            width: 100px;
            height: 20px;
            padding-bottom: 17px;

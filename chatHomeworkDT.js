@@ -1,4 +1,6 @@
  import {moduleRenderPoleRooms} from "./modules/moduleRenderPoleRooms.js";
+ import {moduleMyMessageRender} from "./modules/moduleMyMessageRender.js";
+
 document.addEventListener('DOMContentLoaded', () => {
 
 //    let perem = prompt("Введите какое - нибудь число:", "");
@@ -110,6 +112,58 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
        const socket = io.connect('ws://localhost:7777');
+
+       //---------------------------------------------------------------------------------------------------------------
+              let but = document.getElementById('but');                // НАЧАЛО работы на странице - нажатие
+                  but.onclick = function() {                           // БОЛЬШОЙ ЦЕНТРАЛЬНОЙ КНОПКИ.
+                     name = prompt("Как-нибудь назовите себя: ", "");  // Посетителя просят ввести произвольное имя.
+                     socket.emit('promptingName', name);               // Оно отправляется на сервер для идентификации.
+                     socket.on("otvet", message => {
+                       if (message === "Это имя уже есть в нашей базе.") { // Сервер сообщил, что такое имя в базе уже есть.
+                         let clientCode = prompt(`Это имя уже есть в нашей базе.
+                       Если Вы - новичок в чате, нажмите "Отмена".
+                       Если Вы - УЖЕ УЧАСТНИК ЧАТА, то введите ПАРОЛЬ: ${""}`);
+                          console.log(`clientCode = ${clientCode}`);
+                          console.log(`Тип данных: ${typeof clientCode}`);
+                           if (!clientCode) { // Если посетитель нажал "Отмена", значит он новичок в чате.
+                             let nameNew = prompt(`Попробуйте другое имя: , ${""}`); // Предлагаем ему ввести
+                               if (nameNew === name) {} // другое имя. Если он снова ввёл то же самое - идём в начало.
+                               else {
+                                 socket.emit('promptingName', nameNew); // Если он ввёл наконец нормальное имя, которого
+                                 socket.username = nameNew;            // в БД нет,- отсылаем его серверу для формирования
+                               }                                        // учётной записи нового участника чата.
+                           }
+                           else {                                   // Если же это - старый участник чата,
+                             socket.emit("clientCode", clientCode); // то на сервере проверяется введённый
+                             socket.on("dostup", message => {       // им пароль...
+                               objMessage = message.b;
+                               if (message.a === "plus") {          //...и если он правильный...
+                          colorMessage = message.b.sv3;
+                          textarea.focus();
+                          banner.className = "";
+                          gardina.remove();  //...Предоставляем старому участнику
+                          but.remove();       // доступ к чату, и для этого...
+                          let send = document.createElement("button"); //...создаём на странице кнопку, которая
+                              send.id = 'send';                        // будет отправлять его сообщения.
+                              send.innerHTML = 'Отправить';
+                          body.appendChild(send);
+                            funcMain();
+                        }
+                        else if (message === "minus") { // Если же он по ошибке ввёл неверный пароль, то...
+                            let kod = prompt(`Неверный пароль! Ещё разок: ${""}`); // Это будет продолжаться до тех пор,
+                            socket.emit("clientCode", kod);                       // пока не будет введён правильный пароль.
+                        } else {}
+                        });
+                        }
+                       }
+
+                       else {              // Если это - новенький, то формируется его учётная запись, для чего
+                          funcShowBanner(); // вызываем в качестве колбэка функцию, которая покажет нам форму,
+                        }                   // на вопросы которой должен ответить претендент.
+                     });
+         //            });
+                  }
+       //----------------------------------------------------------------------------------------------------------
 
        let stop = document.querySelector("#stop");
            stop.addEventListener("click", function() { // По нажатию этой кнопки для участника закрывается
@@ -438,70 +492,54 @@ document.getElementById("files").addEventListener('change', onFileSelect);
 //====================================== БЛОК РАБОТЫ С КОМНАТАМИ. ===========================================
 
              let rooms = document.querySelector("#rooms");
-                 rooms.addEventListener("click", function func() {
+             let obj = {};
+             let val;
+             let schet = 0;
+                 rooms.addEventListener("click", function() {
                       console.log("ЭТА КНОПКА ДОЛЖНА БУДЕТ ОТКРЫВАТЬ ДОСТУП В ПОДСРЕДУ 'КОМНАТЫ'.");
                       moduleRenderPoleRooms(body);
-                      // let poleRooms = document.createElement("div");
-                      //     poleRooms.id = 'poleRooms';
-                      //     poleRooms.innerHTML = 'КОМНАТЫ.';
-                      //     poleRooms.addEventListener("click", function() {
-                      //           poleRooms.remove();
-                      //     });
-                      // body.appendChild(poleRooms);
+                      let inpRooms = document.querySelector("#inpRooms");
+                          inpRooms.addEventListener("blur", function() {
+                              obj = {a:objMessage.sv1, b:inpRooms.value};
+                              val = inpRooms.value;
+                              socket.emit("messageToRoom", obj);  // Посылаем на сервер запрос комнаты с данным именем.
+                              console.log(`На сервер ушло сообщение запроса типа "messageToRoom", содержащее обьект:
+                              obj.a: ${obj.a}, obj.b: ${obj.b}`);
+                              socket.on("roomToYou", message => {
+                              });
+                            });
+
+                      let butRooms1 = document.querySelector("#butRooms1");
+                          butRooms1.addEventListener("click", function() {
+
+                          });
+
+                          let tarea = document.querySelector("#tarea");
+                              tarea.addEventListener("blur", function() {
+                                   if (tarea.value && val) {
+                                       let object = {a: objMessage.sv1, b: tarea.value, c: objMessage.sv3};
+                                       let obj1 = {a:val, b:object};
+                                           socket.emit("messageForRoom", obj1);
+                                           moduleMyMessageRender(tarea, objMessage, socket);
+                                   }
+                                });
+
+                 });
+
+                 socket.on("broadcastToRoom", message => {
+                   if (schet === 0) {
+                   for (let key in message) {
+                     console.log(`${key}: ${message[key]}`);
+                   }
+                    let poleRoom = document.querySelector("#poleRoom");
+                      PP.pluginRenderMessages(poleRoom, message);
+                      schet++;
+                    }
                  });
 
 //=================================== ЗАКОНЧЕН БЛОК РАБОТЫ С КОМНАТАМИ. =======================================
 
 
-       let but = document.getElementById('but');                // НАЧАЛО работы на странице - нажатие
-           but.onclick = function() {                           // БОЛЬШОЙ ЦЕНТРАЛЬНОЙ КНОПКИ.
-              name = prompt("Как-нибудь назовите себя: ", "");  // Посетителя просят ввести произвольное имя.
-              socket.emit('promptingName', name);               // Оно отправляется на сервер для идентификации.
-              socket.on("otvet", message => {
-                if (message === "Это имя уже есть в нашей базе.") { // Сервер сообщил, что такое имя в базе уже есть.
-                  let clientCode = prompt(`Это имя уже есть в нашей базе.
-                Если Вы - новичок в чате, нажмите "Отмена".
-                Если Вы - УЖЕ УЧАСТНИК ЧАТА, то введите ПАРОЛЬ: ${""}`);
-                   console.log(`clientCode = ${clientCode}`);
-                   console.log(`Тип данных: ${typeof clientCode}`);
-                    if (!clientCode) { // Если посетитель нажал "Отмена", значит он новичок в чате.
-                      let nameNew = prompt(`Попробуйте другое имя: , ${""}`); // Предлагаем ему ввести
-                        if (nameNew === name) {} // другое имя. Если он снова ввёл то же самое - идём в начало.
-                        else {
-                          socket.emit('promptingName', nameNew); // Если он ввёл наконец нормальное имя, которого
-                          socket.username = nameNew;            // в БД нет,- отсылаем его серверу для формирования
-                        }                                        // учётной записи нового участника чата.
-                    }
-                    else {                                   // Если же это - старый участник чата,
-                      socket.emit("clientCode", clientCode); // то на сервере проверяется введённый
-                      socket.on("dostup", message => {       // им пароль...
-                        objMessage = message.b;
-                        if (message.a === "plus") {          //...и если он правильный...
-                   colorMessage = message.b.sv3;
-                   textarea.focus();
-                   banner.className = "";
-                   gardina.remove();  //...Предоставляем старому участнику
-                   but.remove();       // доступ к чату, и для этого...
-                   let send = document.createElement("button"); //...создаём на странице кнопку, которая
-                       send.id = 'send';                        // будет отправлять его сообщения.
-                       send.innerHTML = 'Отправить';
-                   body.appendChild(send);
-                     funcMain();
-                 }
-                 else if (message === "minus") { // Если же он по ошибке ввёл неверный пароль, то...
-                     let kod = prompt(`Неверный пароль! Ещё разок: ${""}`); // Это будет продолжаться до тех пор,
-                     socket.emit("clientCode", kod);                       // пока не будет введён правильный пароль.
-                 } else {}
-                 });
-                 }
-                }
-
-                else {              // Если это - новенький, то формируется его учётная запись, для чего
-                   funcShowBanner(); // вызываем в качестве колбэка функцию, которая покажет нам форму,
-                 }                   // на вопросы которой должен ответить претендент.
-              });
-  //            });
-           }
 
             function funcShowBanner() {
                   banner.className = "trans";

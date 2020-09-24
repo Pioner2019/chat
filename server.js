@@ -445,6 +445,91 @@ io.sockets.on('connection', function(socket) {
      socket.broadcast.emit("broadcast_foto", message);
    });
 
+
+   socket.on("messageToRoom", message => {
+     console.log(`С клиента пришло сообщение типа "messageToRoom", содержащее обьект:
+     obj.a: ${message.a}, obj.b: ${message.b}`);
+
+
+     const mongoClient4 = new MongoClient(url, {useNewUrlParser: true});
+        mongoClient4.connect((err, client) => {
+                const db = client.db("allRooms");
+                const collection = db.collection(`${message.b}`);
+            //          collection.findOne({$and: [{a: message.a}, {b: message.b}]}, (err, result) => {
+                      collection.findOne({b: message.b}, (err, result) => {
+                          if (err) throw err;
+                          else {
+                  if (!result) {
+                               //------------------------------------------------------------------------------------
+                                       collection.insertOne(message, function(err, result) {
+                                            if (err) throw err;
+                                            else {
+                                                  console.log('Данная комната пока пуста. Материализуем её, введя нулевую запись.');
+                                                  //------------------------------------------------------------------------------------
+                                                  // ЕЩЁ ОДНА ВЛОЖЕННОСТЬ МАНИПУЛЯЦИЙ С БД ВО ВРЕМЯ ОДНОЙ СЕССИИ РАБОТЫ МОНГО - клиента.
+                                                        collection.find().toArray((err, result) => {
+                                                              if (err) throw err;
+                                                              else {
+                                                                console.log('Это сообщение из ветки когда коллекция(комната) БЫЛА ПУСТОЙ.');
+                                                                  socket.emit("roomToYou", result);
+                                                                  let objAdmin = {};
+                                                                      objAdmin.a = "админ";
+                                                                      objAdmin.b = `${message.a} создал комнату ${message.b}. Желающие, welcome!`;
+                                                                      objAdmin.c = "#dcdcdc";
+                                                                  socket.broadcast.emit("otvetMessage", objAdmin);
+                                                                  client.close();
+                                                              }
+                                                        });
+                                                //------------------------------------------------------------------------------------
+                                             }
+                                        });
+                                      }
+                   //             //------------------------------------------------------------------------------------
+                   //           }
+                             else {
+                                     collection.find().toArray((err, result) => {
+                                           if (err) throw err;
+                                           else {
+                                               socket.emit("roomToYou", result);
+                                               console.log('Это сообщение из ветки когда коллекция(комната) НЕ БЫЛА ПУСТОЙ.');
+                                               client.close();
+                                           }
+                                     });
+                             }
+                           }
+                        });
+                   //
+                  //              client.close()
+            //                  }
+                          });
+                     });
+
+       socket.on("messageForRoom", message => {
+         io.on("connection", function(socket) {
+             socket.join(message.a);
+         });
+         const mongoClient5 = new MongoClient(url, {useNewUrlParser: true});
+               mongoClient5.connect(function(err, client){
+               const db = client.db("allRooms");
+               const collection = db.collection(`${message.a}`);
+               let time = timeReg();
+               let posl = {a:message.b.a, b:message.b.b, c:message.b.c, d:time.a, e:time.b};
+                     collection.insertOne(posl, function(err, result) {
+                           if (err) throw err;
+                           else {
+                              // socket.to(message.a).emit('broadcastToRoom', message.b);
+                              // if (socket.to(message.a).emit('broadcastToRoom', message.b)) {
+                              //   console.log("(message БРОДКАСТИТСЯ НОРМАЛЬНО!");
+                              // }
+                              //  else {
+                              //    console.log("(message НЕ БРОДКАСТИТСЯ !");
+                              //  }
+                              client.close();
+                           };
+                      });
+               });
+       });
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ЭТО - КРОШЕЧНЫЙ БЛОЧОК, ГДЕ Я ПРОБУЮ ПЕРЕСЛАТЬ ФОТО ИЗ ДОКУМЕНТА,
 //  ХРАНЯЩЕГОСЯ В БАЗЕ ДАННЫХ MongoDB.

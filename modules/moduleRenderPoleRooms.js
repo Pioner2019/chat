@@ -49,5 +49,23 @@
                      controls.appendChild(butRooms3);
 
              poleRooms.appendChild(controls);
+
+             let poleRoom = document.createElement("div");
+                 poleRoom.id = 'poleRoom';
+                 let outRooms = document.createElement("button");
+                     outRooms.id = 'outRooms';
+                     outRooms.innerHTML = "Закрыть окно";
+                     outRooms.addEventListener("click", funcOutRooms);
+                     outRooms.style.position = "sticky";
+                     outRooms.style.top = "430px";
+                 poleRoom.appendChild(outRooms);
+             poleRooms.appendChild(poleRoom);
+
          param1.appendChild(poleRooms);
+
+         function funcOutRooms() {
+              console.log(`Эта кнопка будет производить полный выход из среды "Комнаты".`);
+         }
+
+
     }

@@ -3,17 +3,20 @@
      let otvetMessage = document.createElement("div");
          otvetMessage.className = "otvetMessageRT";
          let zagolovok = document.createElement("div");
-             zagolovok.id = 'zagolovokRT';
+    //         zagolovok.id = 'zagolovokRT';
+             zagolovok.classList.add("zagolovokRT");
              zagolovok.innerHTML = obj.a + ":";
          otvetMessage.appendChild(zagolovok);
 
          let telo = document.createElement("div");
-             telo.id = 'teloRT';
+    //         telo.id = 'teloRT';
+             telo.classList.add("teloRT");
              telo.innerHTML = obj.b;
          otvetMessage.appendChild(telo);
 
          let strTimeOtvet = document.createElement("div");
-             strTimeOtvet.id = 'strTimeOtvetRT';
+    //         strTimeOtvet.id = 'strTimeOtvetRT';
+             strTimeOtvet.classList.add("strTimeOtvetRT");
              let objTime = PP.pluginTimeClient();
              strTimeOtvet.innerHTML = objTime.a;
          otvetMessage.appendChild(strTimeOtvet);
