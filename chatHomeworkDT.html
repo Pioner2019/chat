@@ -25,12 +25,16 @@
 
         <img src='/projects/chatHomeworkDT/kartinki/2020-02-27_02-46-53.png' style='position:absolute; left:628px;
                       top:17px; width:100px; height:78px;'/>
-
-        <div id='flexFoto'>
              <div id='wrapid0' class='wrap'><img class='image' style='width:100px;'/></div>
              <div id='wrapid1' class='wrap'><img class='image' style='width:100px;'/></div>
              <div id='wrapid2' class='wrap'><img class='image' style='width:100px;'/></div>
              <div id='wrapid3' class='wrap'><img class='image' style='width:100px;'/></div>
+    <!---    </div> --->
+        <div id='flexFoto'>
+             <div id='wrapid0' class='wrap'><img class='imagine' style='width:100px;'/></div>
+             <div id='wrapid1' class='wrap'><img class='imagine' style='width:100px;'/></div>
+             <div id='wrapid2' class='wrap'><img class='imagine' style='width:100px;'/></div>
+             <div id='wrapid3' class='wrap'><img class='imagine' style='width:100px;'/></div>
         </div>
 
         <textarea cols='30' rows='5' placeholder='Введите своё сообщение' id='textarea'></textarea>
@@ -41,8 +45,8 @@
         <input type='file' style='margin-left:5px;' id='files' multiple />
 
        <button id="history" style='margin-top:15px;'>Получить историю чата</button>
-       <button id="myLS" style='margin-top:10px;'>Создать личку</button>
-       <button id="room" style='margin-top:5px;'>Создать комнату</button>
+       <button id="userLS" style='margin-top:10px;'>Моя личка</button>
+       <button id="rooms" style='margin-top:5px;'>Мои комнаты</button>
        <button id="stop" style='margin-top:0px;'>Выйти из чата</button>
 
        <div id='bannerHistory'>Выберите интересующий вас диапазон истории чата:
@@ -72,21 +76,59 @@
     <!--- </button> --->
        </div>
 
-       <div id='gardina'></<div>
-       <button id='but' style='width:250px;'>Войти в чат</button>
+       <div id='gardina'></div>
+       <button id='but'>Войти в чат</button>
        <div id='banner'>Вы для нас - новое лицо. Хотите стать полноправным
                         участником чата?
           <button id='yes'>Да</button>
           <button id='no'>Не сейчас</button>
        </div>
 
+       <div id='forma1'>
+            <p> </p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Введите имя участника, диалог с которым вы хотите получить:</p>
+            <p> </p>
+            <input id='inputForma1' type='text' style='margin-left:6px;'/>
+            <p> </p>
+            <button id='submitForma1' style='margin-left:6px;'>Получить диалог</button>
+            <p> </p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Если вы хотите получить личку целиком со  всеми диалогами, нажмите эту кнопку:</p>
+            <p> </p>
+            <button id='allForma1' style='margin-left:6px;'>Получить всю личку</button>
+            <p> </p>
+            <button id='offForma1' style='margin-left:6px;'>Закрыть окно</button>
+       </div>
+
+       <div id='forma1New'>
+            <p> </p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;Ваша личка пока пуста.</p>
+            <p> </p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;Если хотите, напишите кому - нибудь:</p>
+            <p> </p>
+            <input id='inputForma1New' type='text' placeholder="введите сюда имя" style='margin-left:6px;'/>
+            <p> </p>
+            <textarea cols='23' rows='4' placeholder='Введите своё сообщение' style='margin-left:6px;' id='poleForMessage'></textarea>
+            <p> </p>
+            <button id='submitForma1New' style='margin-left:6px;'>Отправить</button>
+            <p> </p>
+            <button id='offForma1New' style='margin-left:6px;'>Закрыть окно</button>
+       </div>
+
+  <!---     <div id='poleRooms'></div> --->
+
 <!------------------------------------------------------------------------------------------------------>
         <script src='/projects/chatHomeworkDT/base.js'></script>
-        <script src = "/socket.io/socket.io.js"></script>
-        <script src="/projects/chatHomeworkDT/chatHomeworkDT.js"></script>
+        <script src ="/socket.io/socket.io.js"></script>
+        <script type="module" src="/projects/chatHomeworkDT/chatHomeworkDT.js"></script>
         <script src='/projects/chatHomeworkDT/plugins/pluginColorSelect.js'></script>
         <script src='/projects/chatHomeworkDT/plugins/pluginMakeMessage.js'></script>
         <script src='/projects/chatHomeworkDT/plugins/pluginTimeClient.js'></script>
+        <script src='/projects/chatHomeworkDT/plugins/pluginRenderMessages.js'></script>
+        <script src='/projects/chatHomeworkDT/plugins/pluginRenderLichkaMessages.js'></script>
+        <script src='/projects/chatHomeworkDT/plugins/pluginRenderLichkaMessagesRT.js'></script>
+        <script src='/projects/chatHomeworkDT/plugins/pluginMakeLS.js'></script>
+        <script src='/projects/chatHomeworkDT/plugins/pluginMakeMale.js'></script>
+        <script src='/projects/chatHomeworkDT/plugins/pluginMenuLS.js'></script>
 <!------------------------------------------------------------------------------------------------------->
 
     </body>

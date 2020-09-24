@@ -1411,3 +1411,1209 @@ document.getElementById("files").addEventListener('change', onFileSelect);
       }
 
 //============================== ЗАКОНЧЕН БЛОК ОТПРАВКИ И ПОЛУЧЕНИЯ ИЗОБРАЖЕНИЙ. ===============================
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ЭТО - СОХРАНЁННЫЙ НА ВСЯКИЙ СЛУЧАЙ ВАРИАНТ СЕРВЕРА ДО ПРИМЕНЕНИЯ ЭКСПРЕССА.
+
+var http = require('http');
+var fs = require('fs');
+const timeReg = require("/projects/chatHomeworkDT/plugins/pluginTime.js");
+const figlet = require("figlet");
+     figlet.text("E = mc**2 !", (err, data) => {
+         if (err) console.log("err!");
+         else console.log(data);
+     });
+
+const MongoClient = require("mongodb").MongoClient;
+const url = "mongodb://localhost:27017/";
+
+var Jmas_poset = [];
+var mas_poset = new Map();
+var  jasmas = [];
+var flag = true;
+var ident;
+var adres;
+var buffer = '';
+var buffer1 = '';
+var keyName;
+var db;
+var foto;
+
+var masPers = [];
+
+class NewFace {  // Этот класс является шаблоном - прототипом для создания учётных
+ constructor(sv1, sv2, sv3, sv4, sv5, sv6, sv7, sv8, sv9, sv10) { //  записей участников чата, где:
+   this.sv1 = sv1,  // имя участника;
+   this.sv2 = sv2,  // его идентификатор, присвоенный сокетом при соединении;
+   this.sv3 = sv3,  // цвет его сообщений, присвоенный сервером;
+   this.sv4 = sv4,  // его аватарка(если есть);
+   this.sv5 = sv5,  // его личный пароль входа;
+   this.sv6 = sv6,   // дата и время регистрации в БД;
+   this.sv7 = sv7,   // таймстамп этого момента;
+   this.sv8 = sv8,   // массив, где хранятся имена участников, забаненных в личке;
+   this.sv9 = sv9,   // зарезервировано;
+   this.sv10 = sv10   // зарезервировано.
+ }
+}
+
+let massAllActiveUsers = [];
+
+// Cоздаем объект MongoClient и передаем ему строку подключения:
+
+const mongoClient = new MongoClient(url, { useNewUrlParser: true });
+mongoClient.connect(function(err, client){
+const db = client.db("Pioner");
+const collection = db.collection("CHAT1");
+  collection.find().toArray((err, result) => {
+   if (err) throw err;
+   else {
+       masPers = result;
+       console.log(masPers);
+         client.close();
+   }
+});
+//  }
+//      client.close();
+});
+
+//№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№
+
+const server = http.createServer(function(req, res) {
+
+       if (req.url.endsWith('.css')) {
+
+   fs.readFile(req.url, (err, data) => {
+       if (err) throw err;
+       else {
+           res.writeHead(200, {"Content-Type": "text/css"});
+           res.end(data);
+       }
+   });
+}
+
+else  if (req.url.endsWith('.png')) {
+
+   fs.readFile(req.url, (err, data) => {
+       if (err) throw err;
+       else {
+           res.writeHead(200, {"Content-Type": "image/png"});
+           res.end(data);
+       }
+   });
+}
+
+else  if (req.url.endsWith('.jpg')) {
+
+   fs.readFile(req.url, (err, data) => {
+       if (err) throw err;
+       else {
+           res.writeHead(200, {"Content-Type": "image/jpg"});
+           res.end(data);
+       }
+   });
+}
+
+else  if (req.url.endsWith('.js')) {
+
+   fs.readFile(req.url, (err, data) => {
+       if (err) throw err;
+       else {
+           res.writeHead(200, {"Content-Type": "text/javascript"});
+           res.end(data);
+       }
+   });
+}
+
+//   else fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
+else if (req.url.endsWith('.html')) {
+
+//      const url = new URL(req.url);
+//            console.log("url.search = " + url.search);
+   if (req.url === 'localhost:7777/multiviews') {
+//       if (url === 'localhost:7777/multiviews') {
+//
+   fs.readFile('/projects/chatHomeworkDT/multiviews.html', 'utf-8', (err, data) => {
+         if (err) throw err; else {
+              res.writeHead(200, {"Content-Type": "text/html"});
+              res.end(data);
+          }
+    });
+  }
+//    else if (url.pathname === '/projects/chatHomeworkDT/chatHomeworkDT.html') {
+ else if (req.url === 'localhost:7777') {
+ fs.readFile('/projects/chatHomeworkDT/chatHomeworkDT.html', 'utf-8', (err, data) => {
+      if (err) throw err; else {
+           res.writeHead(200, {"Content-Type": "text/html"});
+           res.end(data);
+      }
+});
+} else {}
+
+}
+
+});
+
+//№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№
+
+const io = require('socket.io').listen(server);
+
+io.sockets.on('connection', function(socket) {
+//       let username;
+  let ident = socket.id;
+  socket.on('promptingName', message => {
+    let otvet = "";
+//     username = message;
+ //     socket.broadcast.emit("broadcast_foto", message);
+    console.log(`Из браузера от посетителя получено некое имя: ${message}`);
+    for (let i = 0; i < masPers.length; i++) {
+       if (masPers[i].sv1 === message) {
+           otvet = "Это имя уже есть в нашей базе.";
+           console.log(otvet);
+           socket.on("clientCode", message => {
+                console.log("clientCode = " + message);
+                if (message === masPers[i].sv5) {
+                  let obj = {a:"plus", b:masPers[i]};
+                  socket.emit("dostup", obj);
+                  let posl = {a:`админ`, b:`В ОБЩЕНИЕ ВЕРНУЛСЯ ${masPers[i].sv1}`, c:`#a9a9a9`};
+       //-----------------------------------------------------------------------------
+                  let objUser = {a:masPers[i].sv1, b:socket.id};            // Заносим новичка в массив активных участников,
+                      massAllActiveUsers.push(objUser);                     // куда помещаем обьект, содержаший имя нового
+                      for (let i = 0; i < massAllActiveUsers.length; i++) {  // участника и присвоенный ему сокетом
+                          for (let key in  massAllActiveUsers[i]) {          // уникальный айди. Каждый раз после возвращения
+                             console.log(`${key}: ${massAllActiveUsers[i][key]}`) // участника в чат ему присваивается
+                          }                                                       // новый уникальный id.
+                      }
+       //-----------------------------------------------------------------------------
+             //     massAllActiveUsers.push(masPers[i].sv1); // Заносим вернувшегося в массив активных участников.
+           //       console.log(`Сейчас в массиве massAllActiveUsers находится: ${massAllActiveUsers}`);
+                  socket.broadcast.emit("otvetMessage", posl);
+     //----------------------------------------------------------------------
+                        const mongoClient = new MongoClient(url, {useNewUrlParser: true});
+                              mongoClient.connect(function(err, client){
+                              const db = client.db("Pioner");
+                              const collection = db.collection("CHAT1history");
+                                    let objTime = timeReg();
+                                    posl.d = objTime.a; posl.e = objTime.b;
+                                    collection.insertOne(posl, function(err, result) {
+                                          if (err) throw err;
+                                          else {
+                                             client.close();
+                                          };
+                                     });
+                              });
+     //----------------------------------------------------------------------
+                }
+                else {socket.emit("dostup", "minus");}
+           });
+       }
+    }
+    if (otvet === "") {
+         otvet = "Этого имени в нашей базе нет.";
+         socket.username = message;
+         console.log(`socket.username = ${socket.username}`);
+         console.log(otvet);
+    }
+
+     socket.emit("otvet", otvet);
+  });
+
+  socket.on("newFace", message => {  // Именно здесь, в этой функции, мы будем формировать
+     let newFace;             // учётную запись нового участника чата, и, конечно,
+      console.log(`В чате намечается новый участник!`); // обновлять БД.
+      console.log(`Он согласился с нашим внутренним распорядком, сказав "${message}",`);
+      console.log(`и предлагает называть его так: ${socket.username}`); //
+      socket.emit("colorPlease", "colorPlease");
+      socket.on("object", message => {
+            let objTime = timeReg();
+            let lichkaBan = []; // В этом массиве, при создании пустом, будут храниться имена участников, которых я забанил в моей личке.
+            // Если нужно "отбанить", т.е. разблокировать, участника, - его имя просто удаляется из этого массива.
+            newFace = new NewFace(socket.username, ident, message.b, null, message.c, objTime.a, objTime.b, lichkaBan, null, null); // Создаём конкретный экземпляр
+      socket.emit("pleaseYourAccount", newFace);  //  шаблона - класса, куда передаём конкретные значения его элементов.
+      let objAdmin = {};
+          objAdmin.a = "админ";
+          objAdmin.b = `У нас новый участник. Его имя ${newFace.sv1}`;
+          objAdmin.c = "#dcdcdc";
+   //   socket.broadcast.emit(`У нас новый участник. Его имя: ${socket.username}`);
+      socket.broadcast.emit("otvetMessage", objAdmin);
+ //     massAllActiveUsers.push(newFace.sv1); // Заносим новичка в массив активных участников.
+ //     console.log(`Сейчас в массиве massAllActiveUsers находится: ${massAllActiveUsers}`);
+ //-----------------------------------------------------------------------------
+            let objUser = {a:newFace.sv1, b:socket.id};  // Заносим новичка в массив активных участников,
+                massAllActiveUsers.push(objUser);        // куда помещаем обьект, содержаший имя нового
+                for (let i = 0; i < massAllActiveUsers.length; i++) { // участника и присвоенный ему сокетом
+                    for (let key in  massAllActiveUsers[i]) {         // уникальный айди, который будет сохраняться
+                       console.log(`${key}: ${massAllActiveUsers[i][key]}`) // неизменным, пока он не вышел из чата.
+                    }                                                      // Когда он вернётся в общение, ему будет
+                }                                                       // присвоен новый уникальный айдишник.
+ //-----------------------------------------------------------------------------
+         for (let key in newFace) {
+             console.log(`${key}: ${newFace[key]}`);
+         }
+
+         const mongoClient = new MongoClient(url, {useNewUrlParser: true});
+            mongoClient.connect(function(err, client){
+                 const db = client.db("Pioner");
+                 const collection = db.collection("CHAT1");
+                             collection.insertOne(newFace, function(err, result) {
+                                 if (err) throw err;
+                                 else {
+                                   //------------------------------------------------------------------------------------
+                                   // ЕЩЁ ОДНА ВЛОЖЕННОСТЬ МАНИПУЛЯЦИЙ С БД ВО ВРЕМЯ ОДНОЙ СЕССИИ РАБОТЫ МОНГО - клиента.
+                                           collection.find().toArray((err, result) => {
+                                                if (err) throw err;
+                                                else {
+                                                    masPers = result;
+                                                    socket.emit("masPersNew", masPers);
+                                               //     console.log(masPers);
+                                           console.log("Ну что, похоже, работа чата подналадилась !");
+                                                }
+                                           });
+                                   //------------------------------------------------------------------------------------
+                                   client.close()
+                                 };
+                             });
+                         });
+            // masPers.push(newFace);     // И сразу же обновляем оперативный массив masPers.
+            //  console.log(`masPers.length = ${masPers.length}`);
+            //  console.log(`Массив masPers после обновления содержит:`);
+            //   for (let i = 0; i < masPers.length; i++) {
+            //     for (let key in masPers[i]) {
+            //        console.log(`${key}: ${masPers[i][key]}`);
+            //     }
+            //   }
+       });
+  });
+
+//========================================================================================
+
+ socket.on("message", message => { // ЭТО - главный сокет, в котором происходит обработка приходящих от клиента сообщений.
+   console.log(`ПОЛУЧЕНО С КЛИЕНТА: его имя = ${message.a}; тип сообщения = ${message.b}; цвет его сообщений = ${message.c}`);
+   console.log(`Тип полученных данных: message.a typeof: ${typeof message.a}; message.b typeof: ${typeof message.b}`);
+   console.log(`На сервер с клиента всё приходит нормально!`);
+
+   //----------------------------------------------------------------------
+             if (message.b === "proverkaNaPusto") {
+                 const mongoClient2 = new MongoClient(url, {useNewUrlParser: true});
+                       mongoClient2.connect((err, client) => {
+                            const db = client.db("Pioner");
+                            const collection = db.collection(`lichkaGlobal`);
+                            let strJSON;
+                            let resultProverka;
+                            collection.find({$or: [{toWhom: message.a}, {fromWhom: message.a}]}).toArray((err, result) => {
+                            if (err) throw err;
+                            else {
+                              console.log(`Личка участника ${message.a} содержит ${result.length} сообщений.`);
+                             if (result.length === 0) {resultProverka = true;}  // Если личка ПУСТА, то назначаем resultProverka = 'true';
+                             else {resultProverka = false;}                     // А если НЕ ПУСТА,- тогда 'false'.
+                               socket.emit("resultProverkaNaPusto", resultProverka);
+                               client.close();
+                            }
+                       });
+                     });
+                  }
+ //----------------------------------------------------------------------
+            else if (message.b === `Я пишу собеседнику`) {
+                     massAllActiveUsers.forEach(function(item, index, array) {     //
+                          if (item.a !== message.c) {}                              //
+                          else {
+           //===========================================================================================
+                          console.log(`Уникальный идентификатор участника ${message.c}: ${item.b}`);
+                          let obj = {a:message.a, b:"ВАМ ПИШУТ СЕЙЧАС!"};
+                        io.to(`${item.b}`).emit("dialogRealTime", obj);
+                          console.log(`Отправка сообщения "ВАМ ПИШУТ СЕЙЧАС!" участнику ${message.c} УСПЕШНО произведена.`);
+           //===========================================================================================
+                          }
+                    });
+               }
+         //----------------------------------------------------------------------
+                 else if (message.b === "myLichka" || message.b === "myLichkaAll") {
+                       const mongoClient1 = new MongoClient(url, {useNewUrlParser: true});
+                             mongoClient1.connect((err, client) => {
+                                  const db = client.db("Pioner");
+                                  const collection = db.collection(`lichkaGlobal`);
+                                  let strJSON;
+                                  if (message.b === "myLichka") {
+                                    strJSON = JSON.stringify({$or: [{$and: [{toWhom: message.a}, {fromWhom: message.c}]}, {$and: [{toWhom: message.c}, {fromWhom: message.a}]}]});
+                                  }
+                                  else {
+                                    strJSON = JSON.stringify({$or: [{toWhom: message.a}, {fromWhom: message.a}]});
+                                  }
+                                  collection.find(JSON.parse(strJSON)).toArray((err, result) => {
+                                  if (err) throw err;
+                                  else {
+                                   //  for (let i = 0; i < result.length; i++ ) {
+                                   //     for (let key in result[i]) {
+                                   //         console.log(`Вот что получено из Монги: ${key}: ${result[i][key]}`);
+                                   //     }
+                                   // }
+                                   let objLichka = {};
+                                   if (result) {}
+                                     socket.emit("getYouLichka", result);
+                                     client.close();
+                                  }
+                             });
+                           });
+                        }
+       //----------------------------------------------------------------------
+
+       //----------------------------------------------------------------------
+                   else if (message.b === "messageLS") {
+                     const mongoClient2 = new MongoClient(url, {useNewUrlParser: true});
+                           mongoClient2.connect((err, client) => {
+                                const db = client.db("Pioner");
+                                const collection = db.collection(`lichkaGlobal`);
+                                let time = timeReg();
+                                let posl = {toWhom:message.d, fromWhom:message.a, text:message.e, time:time.a, timeStamp:time.b, color:message.c};
+                                collection.insertOne(posl, function(err, result) {
+                                if (err) throw err;
+                                else {
+                                  massAllActiveUsers.forEach(function(item, index, array) {     //
+                                       if (item.a !== message.d) {}                              //
+                                       else {
+                        //===========================================================================================
+                                       console.log(`Уникальный идентификатор участника ${message.d}: ${item.b}`);
+                         //              let obj = {a:message.d, b:"ВАМ ПИШУТ СЕЙЧАС!"};
+                                     io.to(`${item.b}`).emit("dialogRealTimeMessage", message);
+                                       console.log(`Отправка сообщения участнику ${message.d} УСПЕШНО произведена.`);
+                        //===========================================================================================
+                                       }
+                                 });
+                                   client.close();
+                                }
+                           });
+                         });
+                       }
+     //----------------------------------------------------------------------
+
+       //----------------------------------------------------------------------
+       else if (message.b != "messageLS" && message.b != "myLichka" && message.b != "myLichkaAll" && message.b != "proverkaNaPusto" && message.b != `Я пишу собеседнику`) {
+             socket.broadcast.emit("otvetMessage", message);
+                    if (message.b === `Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`) {  // Если участник временно выходит
+                 //          let ind = massAllActiveUsers.indexOf(message.a);
+
+                        massAllActiveUsers.forEach(function(item, index, array) {     // из общения и закрывает свою
+                             if (item.a !== message.a) {}                              // страницу, сервер удаляет его имя
+                             else {                                                  // из массива активных участников.
+                                  array.splice(index, 1);
+                              }
+                         });
+           //------------------------------------------------------------------
+                         console.log(`Один участник нас временно покинул. Сейчас в массиве massAllActiveUsers находятся:`);
+                         for (let i = 0; i < massAllActiveUsers.length; i++) {
+                             for (let key in  massAllActiveUsers[i]) {
+                                console.log(`${key}: ${massAllActiveUsers[i][key]}`);
+                             }
+                         }
+          //-------------------------------------------------------------------
+                     }
+                          const mongoClient = new MongoClient(url, {useNewUrlParser: true});
+                                mongoClient.connect(function(err, client){
+                                const db = client.db("Pioner");
+                                const collection = db.collection("CHAT1history");
+                                let time = timeReg();
+                                let posl = {a:message.a, b:message.b, c:message.c, d:time.a, e:time.b};
+                                      collection.insertOne(posl, function(err, result) {
+                                            if (err) throw err;
+                                            else {
+                                               client.close();
+                                            };
+                                       });
+                                });
+       } else {}
+//----------------------------------------------------------------------
+});
+
+   socket.on("updateAccount", message => {
+
+                   const mongoClient3 = new MongoClient(url, {useNewUrlParser: true});
+                         mongoClient3.connect((err, client) => {
+                              const db = client.db("Pioner");
+                              const collection = db.collection("CHAT1");
+                              collection.updateOne({sv1: message.sv1}, {$set: {sv8: message.sv8}}, (err, result) => {
+                              if (err) throw err;
+                              else {
+                                 client.close();
+                              }
+                         });
+                       });
+
+   });
+
+   socket.on(`history, please!`, message => {
+
+       let key = message.a;
+       let date = new Date();
+       let time1 = date.getTime();
+       const mongoClient = new MongoClient(url, {useNewUrlParser: true});
+        switch (key) {
+          case 1:
+               console.log(`Запрашиваем в Монге получение истории чата за час.`);
+               let time2 = time1 - 3600000; // Получаем таймстамп момента, который был час назад.
+               getHistory(mongoClient, time2);
+          break;
+
+          case 2:
+               console.log(`Запрашиваем в Монге получение истории чата за сутки.`);
+               let time3 = time1 - 86400000; // Получаем таймстамп момента, который был сутки назад.
+                 getHistory(mongoClient, time3);
+          break;
+
+          case 3:
+               console.log(`Запрашиваем в Монге получение истории чата за неделю.`);
+               let time4 = time1 - 604800000; // Получаем таймстамп момента, который был неделю назад.
+                 getHistory(mongoClient, time4);
+          break;
+
+          case 4:
+               console.log(`Запрашиваем в Монге получение истории чата за диапазон.`);
+               let date1 = new Date(message.b[2], message.b[1], message.b[0], 0, 0, 0);
+               let date2 = new Date(message.c[2], message.c[1], message.c[0], 0, 0, 0);
+//---------------------------------------------------------------------------------
+                   let massHistory = [];
+                   mongoClient.connect(function(err, client){
+                   const db = client.db("Pioner");
+                   const collection = db.collection("CHAT1history");
+//  ТАЙМСТАМП КОНКРЕТНОГО СООБЩЕНИЯ ХРАНИТСЯ В ЕГО ОБЬЕКТЕ ПОДКЛЮЧОМ "е".
+                   collection.find().toArray((err, result) => {
+                       if (err) throw err;
+                       else {
+                          massHistory = result;
+                           for (let i = 0; i < massHistory.length; i++) {
+                             if (massHistory.e >= date1 && massHistory.e <= date2) {
+                                for (let key in massHistory[i]) {
+                                    delete massHistory[i]._id;
+                                    delete massHistory[i].c;
+                                    delete massHistory[i].e;
+                                }
+                             }
+                           }
+       //                 console.log(`massiv.length = ${massHistory.length}`);
+                        console.log(`massiv = ${massHistory}`);
+                   socket.emit("massHistory", massHistory);
+                   client.close();
+                    }
+                 });
+             });
+//---------------------------------------------------------------------------------
+          break;
+
+        }
+   });
+
+   socket.on("message_foto", message => {
+     socket.broadcast.emit("broadcast_foto", message);
+   });
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ЭТО - КРОШЕЧНЫЙ БЛОЧОК, ГДЕ Я ПРОБУЮ ПЕРЕСЛАТЬ ФОТО ИЗ ДОКУМЕНТА,
+//  ХРАНЯЩЕГОСЯ В БАЗЕ ДАННЫХ MongoDB.
+//    socket.on("fotku_please", message => {
+//        if (message === "expect_to_foto") {
+//      const mongoClient = new MongoClient(url, { useNewUrlParser: true });
+//      mongoClient.connect(function(err, client){
+//      const db = client.db("Pioner");
+//      const collection = db.collection("CHAT1");
+//
+//  //     let sohran = {};
+// //         sohran.id = 1962;
+// //      sohran.bin = fs.readFileSync("kartinki/logotip.jpg");
+// //       collection.insertOne(sohran, (err,data) => {
+// //           if (err) console.error(err);
+// //       })
+//
+//       collection.findOne({id: 1962}, function(err, doc){
+//      if (err) {
+//        console.error(err);
+//        }
+//        socket.emit("fotka_proba", doc.bin.buffer);
+//        });
+//        client.close();
+//      });
+//    }
+//  });
+// Оно пересылается в бинарном виде нормально,на сторону клиента
+// долетает, но там не хочет нормально открываться. Ничего не могу
+// понять!
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   function getHistory(param1, param2) {
+         let massHistory = [];
+         param1.connect(function(err, client){
+         const db = client.db("Pioner");
+         const collection = db.collection("CHAT1history");
+ //  ТАЙМСТАМП КОНКРЕТНОГО СООБЩЕНИЯ ХРАНИТСЯ В ЕГО ОБЬЕКТЕ ПОДКЛЮЧОМ "е".
+              collection.find({e: {$gte: param2}}).toArray((err, result) => {
+                    if (err) throw err;
+                    else {
+                        massHistory = result;
+                        for (let i = 0; i < massHistory.length; i++) {
+                                 for (let key in massHistory[i]) {
+                                    delete massHistory[i]._id;
+                                    delete massHistory[i].c;
+                                    delete massHistory[i].e;
+                                 }
+                         }
+                        console.log(`massiv.length = ${massHistory.length}`);
+                        console.log(`massiv = ${massHistory}`);
+                        socket.emit("massHistory", massHistory);
+         //               return massHistory;
+                        client.close();
+                    }
+               });
+          });
+   //    return massHistory;
+   }
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     socket.on('disconnect', function(data) {
+    });
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+  function escapeSpecialChars(jsonString) {
+      return jsonString.replace(/\n/g, "\\n")
+                 .replace(/\r/g, "\\r")
+                 .replace(/\t/g, "\\t")
+                 .replace(/\f/g, "\\f");
+  }
+
+}); // Это закрывающая скобка сокет - коннекта, стр.167
+//      socket.emit('message', { content: 'You are connected!', importance: '1' });
+
+server.listen(7777, function () {
+  console.log ('Работаем на порт: 7777');
+});
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+//  import {pluginTime} from `/projects/chatHomeworkDT/plugins/pluginTime.js`;
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+//    console.log(`ПРОВЕРКА РАБОТЫ МОДУЛЬНОЙ СИСТЕМЫ. СЕГОДНЯШНЯЯ ДАТА: ${pluginTime()}`);
+
+       var chat_exit = true;
+       let name ;
+       let  priznak_close ;
+       let colorMessage; // Здесь содержится цвет сообщений участника, передаваемый с сервера в обьекте участника.
+       let objMessage;  // А здесь - целиком обьект участника, передаваемый с сервера.
+       let file = 0;
+       let vibor = "";
+       let flag = 0;
+       let flagLS = 0;
+       let lichkaNull = 'true';
+    //    let forma1New = document.querySelector("#forma1New");
+    // //       forma1New.className = "";
+    //    let inputForma1New = document.querySelector("#inputForma1New");
+    //    let poleForMessage = document.querySelector("#poleForMessage");
+    //    let submitForma1New = document.querySelector("#submitForma1New");
+    //        submitForma1New.addEventListener("click", function() {
+    //        });
+    //    let offForma1New = document.querySelector("#offForma1New");
+    //            submitForma1New.addEventListener("click", function() {
+    //            userLS.addEventListener("click", func);
+    //            forma1New.className = "";
+    //   });
+
+
+       let body = document.getElementById("body");
+
+       let gardina = document.querySelector("#gardina");
+           gardina.style.width = window.innerWidth + 'px';
+           gardina.style.height = window.innerHeight + 'px';
+
+      let banner = document.querySelector("#banner");
+      let bannerHistory = document.querySelector("#bannerHistory");
+      let textarea = document.querySelector("#textarea");
+           console.log(`textarea.id = ${textarea.id}`);
+
+      let pole = document.querySelector("#pole");
+      let poleHistory = document.querySelector("#poleHistory");
+      let podmenu = document.querySelector("#podmenu");
+
+      let yes = document.querySelector("#yes");
+          yes.addEventListener("click", funcYes);
+      let no = document.querySelector("#no");
+          no.addEventListener("click", funcNo);
+            function funcYes() {
+               vibor = "yes";
+               return vibor;
+            }
+            function funcNo() {
+               vibor = "no";
+               return vibor;
+            }
+
+      let hour = document.querySelector("#hour");                       // Получение истории чата за час, сутки
+          hour.addEventListener("click", funcGetHistory.bind(hour, 1)); // и неделю абсолютно однотипно, поэтому
+      let day = document.querySelector("#day");                         // эти три варианта обрабатывает одна
+          day.addEventListener("click", funcGetHistory.bind(hour, 2));  // функция: funcGetHistory. Меняется только
+      let week = document.querySelector("#week");                       // числовой параметр.
+          week.addEventListener("click", funcGetHistory.bind(hour, 3));
+      let variation = document.querySelector("#variation");             // А вот получение истории за произвольный
+          variation.addEventListener("click", funcGetHistoryRange);    // период - посложнее, и пришлось сочинить
+      let finish = document.querySelector("#finish").addEventListener("click", funcFinish); // особую функцию:
+                                                                                            //  funcGetHistoryRange.
+      function funcGetHistory(param1) {
+          //      poleHistory.style.display = 'block';
+                bannerHistory.className = "";                  // Здесь мы просим покинуть страницу баннер с меню;
+                poleHistory.style.opacity = "1";               // и, напротив, появиться - поле для размещения искомой
+                let finish = document.querySelector("#finish"); // истории чата, а также кнопку для прекращения сеанса
+                finish.style.opacity = '1';                     // работы с полученной историей.
+                let obj = {a:param1, b:null, c:null};          // Формируем специальный обьект,
+                socket.emit(`history, please!`, obj);         // и отправляем его на сервер, чтобы он получил для нас
+             }                                               // историю чата за искомый период.
+
+      function funcGetHistoryRange() {
+          let str1, str2;
+          let mass1 = []; let mass2 = [];
+          let podmenu = document.querySelector("#podmenu");
+              podmenu.style.opacity = "1";
+              let inp1 = document.querySelector("#inp1"); // Эти инпуты - для ввода начальной и конечной
+              let inp2 = document.querySelector("#inp2"); // границы искомого периода истории.
+
+                  inp1.addEventListener("blur", function() { // Обрабатываем ввод  начальной границы.
+                      str1 = inp1.value;                     // Получаем stdin в строку,
+                      let mass = str1.split("-");            // и парсируем её в соответствующий массив,
+                      for ( let i = 0; i < mass.length; i++) { // поскольку функция date.getTime(), получающая
+                         mass1[i] = Number(mass[i]);           // на сервере таймстампы по введённым датам,
+                      }                                      // требует ввода дат в виде чисел, но не строк.
+                  });
+                  inp2.addEventListener("blur", function() {  // А теперь - ввод  конечной границы,
+                      str2 = inp2.value;                     // здесь всё аналогично.
+                      let mass = str2.split("-");
+                      for ( let i = 0; i < mass.length; i++) {
+                         mass2[i] = Number(mass[i]);
+                      }
+                  });
+              let submit = document.querySelector("#vvod");
+                  submit.addEventListener("click", function() {
+                      let obj = {a:4, b:mass1, c:mass2};         // Формируем специальный обьект,
+
+                         for (let key in obj) {
+                            console.log(`key: ${key}, obj[key]: ${obj[key]}`);
+                         }
+
+                      socket.emit(`history, please!`, obj);   // и отправляем его на сервер.
+                      bannerHistory.className = "";
+                      poleHistory.style.opacity = "1";
+                      podmenu.style.opacity = "0";
+                      let finish = document.querySelector("#finish");
+                          finish.style.opacity = '1';
+                  });
+      }
+
+      function funcFinish() {
+                                             // Нажатие на кнопку "Закончить работу с историей"
+         poleHistory.style.opacity = "0";     // приводит к исчезновению поля, отображающего историю,
+         let finish = document.querySelector("#finish"); // а также самой этой кнопки.
+         finish.style.opacity = "0";
+         poleHistory.innerHTML = "";
+      }
+
+       const socket = io.connect('ws://localhost:7777');
+
+       //---------------------------------------------------------------
+                   // socket.on("dialogRealTime", message => {
+                   //      console.log(message);
+                   // });
+       //---------------------------------------------------------------
+
+       let stop = document.querySelector("#stop");
+           stop.addEventListener("click", function() { // По нажатию этой кнопки для участника закрывается
+             let posl = {a:objMessage.sv1, b: `Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`, c:objMessage.sv3};
+             socket.emit("message", posl);             // текущая сессия присутствия в чате путём отсылки
+             socket.close();                      // на сервер соответствующего сообщения, корректного
+             location.reload();                   // разьединения сокета и перезагрузки страницы.
+        //     location.href = location.href; // Оба варианта работают.
+           });
+
+        window.addEventListener("unload", function() {  // Здесь мы обрабатываем случай, когда участник вышел из чата не нажав
+              let posl = {a:objMessage.sv1, b: `Я ВРЕМЕННО ВЫХОЖУ ИЗ ОБЩЕНИЯ. ВСЕМ ПОКА !`, c:objMessage.sv3}; // штатную кнопку
+              socket.emit("message", posl);                             // "выйти из чата", а по привычке перезагрузив страницу.
+              console.log("СОБЫТИЕ beforeunload ВСЁ ЖЕ ПРОИСХОДИТ!"); // При этом тоже происходит удаление записи участника из
+            });                                                       // массива активных участников massAllActiveUsers.
+
+//=================================== БЛОК ПОЛУЧЕНИЯ ИСТОРИИ ЧАТА. ====================================
+           let history = document.querySelector("#history");
+               history.addEventListener("click", function() {  // Фактически - это хендлер нажатия
+                     bannerHistory.className = "move";        // кнопки "Получить историю чата".
+                     poleHistory.style.zIndex = '100';
+                     let finish = document.querySelector("#finish");
+                     finish.style.xIndex = '110';
+                     pole.style.zIndex = '10';
+               });
+
+               socket.on("massHistory", message => {
+                 let massiv = message;
+            //     console.log(`massHistory = ${message}`);
+                   for (let i = 0; i < massiv.length; i++) {     // Обрабатываем поочерёдно все обьекты
+                       let str = "";                             // из прилетевшего по сокету массива обьектов.
+                       let elem = document.createElement("div");
+                            for (let key in massiv[i]) {         // Все элементы обьекта помещаем один за одним,
+                               str += `${massiv[i][key]};  `;    //  в одну строку, для удобства обозрения.
+                            }
+                      elem.innerHTML = str;
+                      poleHistory.appendChild(elem);
+                        let pustota = document.createElement("p");
+                            pustota.innerHTML = "";
+                        poleHistory.appendChild(pustota);         // Разделяем информативные записи пустыми строками.
+                        poleHistory.scrollTop = poleHistory.scrollHeight; // Производим автоматический скроллинг поля.
+                   }
+               });
+//============================== ЗАКОНЧЕН БЛОК ПОЛУЧЕНИЯ ИСТОРИИ ЧАТА. ==============================
+
+
+//==============================  БЛОК ОТПРАВКИ И ПОЛУЧЕНИЯ ИЗОБРАЖЕНИЙ. ================================
+
+document.getElementById("files").addEventListener('change', onFileSelect);
+   function onFileSelect(e) {
+      let file = e.target.files;
+      let massImage = [];
+      for (let j = 0; j < file.length; j++) {
+      let reader = new FileReader();
+      reader.onload = function(f)  {
+                 let image = document.createElement("img");
+                     image.id = `imid ${j}`;
+                     image.className = "imagine";
+                     image.src = f.target.result;
+                 pole.appendChild(image);
+                 pole.scrollTop = pole.scrollHeight;
+                  massImage.push(f.target.result);
+                  if (massImage.length < file.length) {}
+                  else {
+                     socket.emit("message_foto", massImage);
+                  }
+      }
+      reader.readAsDataURL(file[j]);
+    }
+   }
+
+  socket.on("broadcast_foto", message => {      // Получаем рассылку с сервера.
+        let massiv = [];
+            massiv = message;
+
+        let pole = document.querySelector("#pole");
+            pole.style.zIndex = "100";
+
+        let flexFoto = document.querySelector("#flexFoto");
+        let wraps = document.querySelectorAll(".wrap");
+        let images = document.querySelectorAll(".imagine");
+            for (let i = 0; i < images.length; i++) {
+                images[i].src = massiv[i];
+            }
+         pole.appendChild(flexFoto);
+         pole.scrollTop = pole.scrollHeight;
+       });
+//       });
+//============================== ЗАКОНЧЕН БЛОК ОТПРАВКИ И ПОЛУЧЕНИЯ ИЗОБРАЖЕНИЙ. ===================================
+
+//======================================= БЛОК РАБОТЫ С ЛИЧКОЙ. =======================================
+
+          let nameVisavi;
+          let userLS = document.querySelector("#userLS");
+              userLS.addEventListener("click", function func() {
+                PP.pluginMenuLS();
+                PP.pluginMakeLS(func, menuLS);
+
+                  userLS.removeEventListener("click", func);
+
+                  let forma1New = document.querySelector("#forma1New");
+                  let inputForma1New = document.querySelector("#inputForma1New");
+                  let poleForMessage = document.querySelector("#poleForMessage");
+                  let submitForma1New = document.querySelector("#submitForma1New");
+                      submitForma1New.addEventListener("click", function() {
+                      });
+                  let offForma1New = document.querySelector("#offForma1New");
+                      offForma1New.addEventListener("click", function() {
+                           userLS.addEventListener("click", func);
+                           forma1New.className = "";
+                      });
+
+
+                   let zapros = {};
+
+                       zapros.a = objMessage.sv1;
+                       zapros.b = "proverkaNaPusto";
+                       socket.emit("message", zapros);
+
+                       socket.on("resultProverkaNaPusto", message => {
+                         console.log("message = " + message);
+                           if (message === true) {
+                                 let objLS = {};
+                                  forma1New.className = "transp";
+                                  inputForma1New.addEventListener("blur", function() {
+                                        nameVisavi = inputForma1New.value;
+                                  });
+                                  poleForMessage.addEventListener("blur", function() {
+                                    objLS.a = objMessage.sv1;
+                                    objLS.b = "messageLS";
+                                    objLS.c = objMessage.sv3;
+                                    objLS.d = nameVisavi;
+                                    objLS.e = poleForMessage.value;
+                                    socket.emit("message", objLS);
+                                  });
+                           }
+
+                       else {
+                   let forma1 = document.querySelector("#forma1");
+                   let inputForma1 = document.querySelector("#inputForma1");
+                   let submitForma1 = document.querySelector("#submitForma1");
+                   let allForma1 = document.querySelector("#allForma1");
+
+                       forma1.className = "trans";
+                       inputForma1.addEventListener("blur", function() {
+                             zapros.a = objMessage.sv1;
+                             zapros.b = "myLichka";
+                             zapros.c = inputForma1.value;
+                             nameVisavi = inputForma1.value;
+                             socket.emit("message", zapros);
+                             forma1.className = "";
+                       });
+
+                       allForma1.addEventListener("click", function() {
+                            zapros.a = objMessage.sv1;
+                            zapros.b = "myLichkaAll";
+                            socket.emit("message", zapros);
+                            forma1.className = "";
+                       });
+                     }
+                    });
+
+                   // socket.on("dialogRealTime", message => {
+                   //      console.log(message);
+                   // });
+
+                   socket.on("getYouLichka", message => {
+                        let objLS = {};
+                            if (message.length === 0) {
+  // Здесь мы обрабатываем ситуацию, когда у нас ещё нет диалога с данным участником. В поле "личка" создаётся форма,
+  //  в которой система сообщает нам об этом, а также предлагает начать диалог с ним.
+//-------------------------------------------------------------------------
+              let lichka = document.querySelector("#lichka");
+                  lichka.className = 'trans';
+                  lichka.style.height = '200px';
+                  lichka.style.overflow = "visible";
+                  stopLS.style.top = "292px";
+              let stop = document.querySelector("#stopLS");
+                  stop.style.top = "160px";
+                  stop.style.left = "10px";
+
+                  let textarea = document.querySelector("#dialogs");
+                      textarea.addEventListener("blur", function() {
+                      console.log("this.id = " + this.id);
+                      objLS.a = objMessage.sv1;
+                      objLS.b = "messageLS";
+                      objLS.c = objMessage.sv3;
+                      objLS.d = nameVisavi;
+                      objLS.e = textarea.value;
+                      socket.emit("message", objLS);  //...передаётся на сервер, где сразу же и происходит отправка послания
+                  });                                // в единую личку всей БД чата, называемую lichkaGlobal.
+//--------------------------------------------------------------------------
+                    }
+
+                            else {                                             // А эта ветка работает, когда в личке уже есть сообщения.
+
+                              let lichka = document.querySelector("#lichka");
+                                  lichka.className = 'trans';
+                                  lichka.style.height = '400px';
+                              let stop = document.querySelector("#stopLS");
+                                  stop.style.position = "sticky";
+                                  stop.style.top = "400px";
+                              let p = document.querySelectorAll("#lichka>p"); // Для начала отключаем рендеринг всей "шапки", необходимой
+                                  for (let i = 0; i < p.length; i++) {        // в случае, когда личка пуста, а здесь - не нужной.
+                                    p[i].remove();
+                                  }
+                              let tar = document.querySelector("#dialogs");
+                                  tar.remove();
+                              let button = document.querySelector("#button");
+                                  button.remove();
+                                  console.log(`message.length = ${message.length}`);
+                      // //---------------------------------------------------------------
+                      //             socket.on("dialogRealTime", message => {
+                      //                  console.log(message);
+                      //                  let label = document.createElement("div");
+                      //                      label.id = "label";
+                      //                     label.innerHTML = "собеседник пишет...";
+                      //                  lichka.appendChild(label);
+                      //             });
+                      // //---------------------------------------------------------------
+                                   for (let i = 0; i < message.length; i++) {       // Получив массив обьектов с сервера(а он получил его из БД),
+                                        let elem = PP.pluginRenderLichkaMessages(lichka, message[i], objMessage.sv1, objMessage.sv3); // Плагин отрисовывает их у нас в поле "личка".
+                                 // Передаём созданный элемент в функцию как параметр(по методике Д.Т.):
+                                            elem.addEventListener("click", funcResponse.bind(elem, elem));
+                                   }  // Превращаем каждое сообщение в кнопку, нажатие на которую вызывает исполнительное подменю(функцию funcResponse).
+                                   //---------------------------------------------------------------
+                                               socket.on("dialogRealTime", message => {
+                                                    console.log(message.b);
+                                                    let label = document.createElement("div");
+                                                        label.id = "label";
+                                                       label.innerHTML = `${message.a} пишет...`;
+                                                    lichka.appendChild(label);
+                                                    lichka.scrollTop = lichka.scrollHeight;
+                                               });
+                                   //---------------------------------------------------------------
+                                   //---------------------------------------------------------------
+                                               socket.on("dialogRealTimeMessage", message => {
+                                                   if (document.querySelector("#label")) {
+                                                    let label = document.querySelector("#label");
+                                                        label.remove();
+                                                      }
+                                                        let obj = {a:message.a, b:message.e, c:message.c};
+                                                        let elem = PP.pluginRenderLichkaMessagesRT(lichka, obj);
+                                                        elem.addEventListener("click", funcResponse.bind(elem, elem));
+                                               });
+                                   //---------------------------------------------------------------
+                            }
+
+               function funcResponse(param) {
+                   let nameElem = param.children[0].innerHTML.replace(":", ""); // Получаем имя переданного сюда элемента.
+                   let menuLS = document.querySelector("#menuLS"); // По нажатию на сообщение слева из-за края экрана выезжает
+                                                                  // исполнительное подменю, состоящее из трёх пунктов: ответить
+                   menuLS.className = 'transport';               // адресату, заблокировать адресата(забанить), и разблокировать его.
+                   let menuLSchildren = document.querySelectorAll(".knopki");
+                       menuLSchildren[0].addEventListener("click", funcOtvet.bind(menuLSchildren[0], nameElem));
+                       menuLSchildren[1].addEventListener("click", funcOnban.bind(menuLSchildren[0], nameElem));
+                       menuLSchildren[2].addEventListener("click", funcOffban.bind(menuLSchildren[0], nameElem));
+               }
+
+                 function funcOtvet(argum) {
+                      let schetchik = 0;
+                      let forma = document.querySelector("#lichkaMakeMale"); // Вызываем сюда формочку для создания и отправки сообщений.
+                          forma.className = 'trans';                         // Просим её снизойти до нас, грешных, и спуститься с небес.
+                          let formaChildren = forma.children;               // Получаем у неё список её детёнышей: это текстарея
+                          console.log(`formaChildren.length = ${formaChildren.length}`);  // и кнопка "Отправить".
+                          formaChildren[0].addEventListener("input", function() {
+                              if (formaChildren[0].value.length !== 0) {
+                                if (schetchik === 0) {
+                                 console.log(`Эта строка - первый шаг к реализации сообщения в личке "Ваш собеседник пишет...".`);
+                                 let objITyping = {a:objMessage.sv1, b:`Я пишу собеседнику`, c:argum};
+                                 socket.emit("message", objITyping);
+                                 schetchik++;
+                               }
+                              }
+                          });
+
+                          formaChildren[0].addEventListener("blur", function func01() { // Tекстарея сообщает нам
+                          let objLS = {};
+                          console.log("this.id = " + this.id);                   // содержимое написанного послания,...
+                          objLS.a = objMessage.sv1;                            // заполним заодно
+                          objLS.b = "messageLS";                      // обьект objLS значениями имени пишущего, цвета его посланий
+                          objLS.c = objMessage.sv3;                  // и типом сообщения - это "messageLS"...
+                          objLS.d = argum;
+                          objLS.e = formaChildren[0].value;
+                          socket.emit("message", objLS); //...и затем мы отсылаем обьект на сервер.
+                          let object = {};
+                              object.fromWhom = objMessage.sv1;
+                              object.text = formaChildren[0].value;
+                              let objTime = PP.pluginTimeClient();
+                              object.time = objTime.a;
+                              object.color = objMessage.sv3;
+                          PP.pluginRenderLichkaMessages(lichka, object, objMessage.sv1, objMessage.sv3);
+                        });
+
+                        formaChildren[1].addEventListener("click", function() {
+                             formaChildren[0].value = "";
+                    //         forma.className = "";
+                        });
+                 }
+
+                 function funcOnban(argum) {
+                      console.log(`Эта функция будет блокировать адресату доступ к вашей личке(банить его).`);
+                      console.log(`argum = ${argum}`);
+                      objMessage.sv8.push(argum);
+                      socket.emit("updateAccount", objMessage);
+                      console.log("Главный массив objMessage сейчас содержит: " + objMessage.sv8);
+                 }
+
+                 function funcOffban(argum) {
+                      console.log(`Эта функция будет разрешать адресату доступ к вашей личке.`);
+                      console.log(`argum = ${argum}`);
+                      objMessage.sv8.forEach(function(item, index, array) {
+                          if (item !== argum) {}
+                          else {
+                             array.splice(index, 1);
+                          }
+                      });
+                    socket.emit("updateAccount", objMessage);
+                    console.log("Главный массив objMessage сейчас содержит: " + objMessage.sv8);
+                 }
+
+                   });
+      });
+
+//=================================== ЗАКОНЧЕН БЛОК РАБОТЫ С ЛИЧКОЙ . =======================================
+
+
+       let but = document.getElementById('but');                // НАЧАЛО работы на странице - нажатие
+           but.onclick = function() {                           // БОЛЬШОЙ ЦЕНТРАЛЬНОЙ КНОПКИ.
+              name = prompt("Как-нибудь назовите себя: ", "");  // Посетителя просят ввести произвольное имя.
+              socket.emit('promptingName', name);               // Оно отправляется на сервер для идентификации.
+              socket.on("otvet", message => {
+                if (message === "Это имя уже есть в нашей базе.") { // Сервер сообщил, что такое имя в базе уже есть.
+                  let clientCode = prompt(`Это имя уже есть в нашей базе.
+                Если Вы - новичок в чате, нажмите "Отмена".
+                Если Вы - УЖЕ УЧАСТНИК ЧАТА, то введите ПАРОЛЬ: ${""}`);
+                   console.log(`clientCode = ${clientCode}`);
+                   console.log(`Тип данных: ${typeof clientCode}`);
+                    if (!clientCode) { // Если посетитель нажал "Отмена", значит он новичок в чате.
+                      let nameNew = prompt(`Попробуйте другое имя: , ${""}`); // Предлагаем ему ввести
+                        if (nameNew === name) {} // другое имя. Если он снова ввёл то же самое - идём в начало.
+                        else {
+                          socket.emit('promptingName', nameNew); // Если он ввёл наконец нормальное имя, которого
+                          socket.username = nameNew;            // в БД нет,- отсылаем его серверу для формирования
+                        }                                        // учётной записи нового участника чата.
+                    }
+                    else {                                   // Если же это - старый участник чата,
+                      socket.emit("clientCode", clientCode); // то на сервере проверяется введённый
+                      socket.on("dostup", message => {       // им пароль...
+                        objMessage = message.b;
+                        if (message.a === "plus") {          //...и если он правильный...
+                   colorMessage = message.b.sv3;
+                   textarea.focus();
+                   banner.className = "";
+                   gardina.remove();  //...Предоставляем старому участнику
+                   but.remove();       // доступ к чату, и для этого...
+                   let send = document.createElement("button"); //...создаём на странице кнопку, которая
+                       send.id = 'send';                        // будет отправлять его сообщения.
+                       send.innerHTML = 'Отправить';
+                   body.appendChild(send);
+                     funcMain();
+                 }
+                 else if (message === "minus") { // Если же он по ошибке ввёл неверный пароль, то...
+                     let kod = prompt(`Неверный пароль! Ещё разок: ${""}`); // Это будет продолжаться до тех пор,
+                     socket.emit("clientCode", kod);                       // пока не будет введён правильный пароль.
+                 } else {}
+                 });
+                 }
+                }
+
+                else {              // Если это - новенький, то формируется его учётная запись, для чего
+                   funcShowBanner(); // вызываем в качестве колбэка функцию, которая покажет нам форму,
+                 }                   // на вопросы которой должен ответить претендент.
+              });
+  //            });
+           }
+
+            function funcShowBanner() {
+                  banner.className = "trans";
+             let stop = setInterval(function() {
+                  if (vibor != "") {
+                     console.log(`vibor = ${vibor}`);
+                     clearInterval(stop);
+                     if (vibor === "no") {
+                        banner.remove();
+                        but.remove();
+                        gardina.style.backgroundColor = "rgba(0, 0, 0, 1)";
+                        gardina.innerHTML = "Вход в чат ЗАБЛОКИРОВАН.";
+                     }
+                     else if (vibor === "yes") {
+                         let account;
+                          let parole = prompt(`Введите любой пароль: ${""}`);
+                          socket.emit("newFace", vibor);
+                          socket.on("colorPlease", message => { // Этот крошечный сокет служит лишь
+                            if (message === "colorPlease") {   // для того, чтобы передать на сервер
+                              let color = PP.pluginColorSelect(); // сгенерированное здесь,на клиенте,
+                              let obj = {b:color, c:parole};      // значение цвета сообщений участника.
+                              console.log(`Когда сервер присылает запрос на цвет, здешний колорпикер генерирует вот это: ${color} ...`);
+                              console.log(`Скрипт обьединяет это в один обьект со значением пароля: ${parole} ...`);
+                              socket.emit("object", obj);
+                              console.log(`...и отправляет этот обьект серверу.`);
+                            }
+                          });     // сокет "colorPlease" закрыт.
+
+                          socket.on("pleaseYourAccount", message => {
+                             objMessage = message;
+                             colorMessage = objMessage.sv3;
+                             console.log(`Новому участнику выбран цвет сообщений: ${objMessage.sv3}`);
+                             textarea.focus();
+                             console.log(`colorMessage = ${colorMessage}`);
+                          console.log(`Новый участник получает с сервера свою учётную запись: ${message}`);
+                            for (let key in message) {
+                               console.log(`${key}: ${message[key]}`);
+                            }
+                              banner.className = "";
+                              but.remove();
+                              gardina.remove();
+                              let send = document.createElement("button"); //...создаём на странице кнопку, которая
+                                  send.id = 'send';                        // будет отправлять его сообщения.
+                                  send.innerHTML = 'Отправить';
+                              body.appendChild(send);
+                              socket.on("masPersNew", message => {
+
+                              });
+                              funcMain();
+                        });
+                     }
+                  }
+             }, 100);
+           }
+
+          function funcMain()  {
+
+// ЗДЕСЬ, В ГЛАВНОЙ ФУНКЦИИ funcMain, БУДЕТ ПРОИСХОДИТЬ ОСНОВНАЯ РАБОТА ЧАТА: СОЗДАНИЕ И ОТСЫЛКА НА СЕРВЕР
+// СООБЩЕНИЙ УЧАСТНИКА(ВКЛЮЧАЯ КАРТИНКИ), А ТАКЖЕ ПРИЁМ И РЕНДЕРИНГ СООБЩЕНИЙ ВСЕХ ДРУГИХ УЧАСТНИКОВ, КОТОРЫЕ
+// БУДУТ ПРИХОДИТЬ С СЕРВЕРА.
+// ЗДЕСЬ ЖЕ, ВИДИМО, БУДУТ СОЗДАВАТЬСЯ КОМНАТЫ И ЛИЧКИ.
+
+                 textarea.addEventListener("blur", function() {
+      //         console.log("Привет из функции - изготовителя сообщений!");
+               if (textarea.value) {
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// В этом месте должен находиться локальный анализатор текста, который будет парсить содержимое
+// textarea.value и формировать элемент нужных параметров для размещения в нём послания.
+// Для начала хочу научиться вытаскивать размеры в пикселях символов при заданных font- параметрах.
+
+                let mesString = textarea.value + "";
+                    console.log(`Длина введённого текста, представленного в виде строки: ${mesString.length} символов.`);
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                     let message = document.createElement("div"); // Здесь создаётся сообщение участника.
+                         message.className = "message";           // Генерируем сам элемент сообщения,
+                         message.innerHTML = textarea.value;     // передаём в него то, что написал участник
+                            let strTime = document.createElement("div");  // в своей textarea,
+                                strTime.id = 'strTime';                   // затем создаём элемент - див,
+                                let objTime = PP.pluginTimeClient();
+                                strTime.innerHTML = objTime.a; // в котором размещаем время
+                            message.appendChild(strTime);                 // создания сообщения,
+                         message.style.backgroundColor = colorMessage;   // задаём цвет сообщения,
+                         let obj = {a: objMessage.sv1, b: textarea.value, c: colorMessage}; // формируем обьект,
+                         socket.emit("message", obj);      // содержащий сообщение, и отправляем его на сервер.
+                         textarea.value = "";
+                         textarea.focus();
+                     pole.insertAdjacentElement("beforeEnd", message);
+              //       pole.scrollTop = 999999;
+                     pole.scrollTop = pole.scrollHeight;               // Делаем автоматич. прокрутку поля.
+               }
+             });
+
+             socket.on("otvetMessage", message => {
+                 PP.pluginRenderMessages(pole, message);
+           }); //
+
+         } // Эта скобка закрывает главную функцию funcMain.
+
+   }); // ЭТО ГЛАВНАЯ ЗАКРЫВАЮЩАЯ СКОБКА СКРИПТА. АККУРАТНЕЙ С НЕЙ!
+
+//          const socket = io.connect('ws://localhost:7777');
+//            socket.binaryType = "arraybuffer";
+
+    //      button.addEventListener("click", funcExpect);
+    //      function funcExpect() {
+  //            socket.emit("fotku_please", "expect_to_foto");
+  //            socket.on("fotka_proba", message => {
+  //                let image = document.createElement('img');
+  //                image.width = 120;
+  //                image.src = message;
+  //                image.style.marginTop = 12 + "px";
+  //                image.style.borderRadius = "15px";
+  //                image.style.display = 'block';
+  //                body.appendChild(image);
+  //            });
+  //        }

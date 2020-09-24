@@ -15,7 +15,7 @@
 		   --kakbylo_a4:       #ffa07a;
               }
 
-                    button  {
+  /*                  button  {
         width:                250px;
         height:               30px;
 		display:              block;
@@ -26,7 +26,7 @@
 		  }
 		        button:active {
 		background:           #dc143c;
-		  }
+		  }  */
 
         h2 {
          position: absolute;
@@ -97,6 +97,7 @@
         }
 
          #pole {
+           position: absolute;
            margin-left:270px;
            margin-top:95px;
            width: 450px;
@@ -134,16 +135,16 @@
          }
 
          /*================================================================================*/
-         #finish {
+         #finish,#stopLS,#stopLS1,#male,#closeWindow,#butRooms1,#butRooms2,#butRooms3,#outRooms {
             position: absolute;
             left: 280px;
-            top: 495px;
+            top: 513px;
             width: 250px;
-            height: 40px;
+            height: 30px;
             font-family: Verdana;
             font-size: 10px;
             color: black;
-            padding: 10px 10px;
+            padding: 5px 0px;
             background: -moz-linear-gradient(top, #dcdcdc 0%, #a9a9a9);
             background: -webkit-gradient(linear, left top, left bottom, from(#dcdcdc), to(#696969));
             border-radius: 10px;
@@ -159,7 +160,7 @@
             z-index: 10;
            }
 
-           #finish:active {
+           #finish:active,#stopLS:active,#stopLS1:active,#male:active,#closeWindow:active,#butRooms1:active,#butRooms2:active,#butRooms3:active,#outRooms:active {
              background: -moz-linear-gradient(top, #696969 0%, #dcdcdc);
              background: -webkit-gradient(linear, left top, left bottom, from(#696969), to(#dcdcdc));
              text-shadow: 0 -1px 0 white;
@@ -168,37 +169,44 @@
 
          .wrap {
                margin-left:   3px;
+               margin-bottom: 10px;
                border-radius: 15px;
                width:         100px;
                height:        100px;
-               border:        1px solid black;
+        /*       border:        1px solid black; */
                box-sizing: border-box;
                transition:          0.6s;
          }
 
          .wrap:hover {
-               transform: scale(2.5);
+               transform: scale(2);
          }
 
-         .image {
+         .image,.imagine {
                margin-left: 5px;
                margin-top: 10px;
+               margin-bottom: 10px;
+          /*     padding-bottom: 10px;  */
                border-radius: 15px;
                width:         98px;
-               transition:          0.6s;
+               max-height:    98px;
+               transition:    0.6s;
+          /*     z-index: 1;  */
          }
 
-         .image:hover { 
-             transform: scale(2.5);
+         .imagine:hover {
+             transform: scale(2);
+      /*       z-index: 10000;  */
          }
 
         #flexFoto {
            display: flex;
            margin-top: 10px;
+           margin-bottom: 10px;
            width: 415px;
-           height: 100px;
-           border: 2px red solid;
-           transition:  0.6s;
+           height: 110px;
+      /*     border: 2px red solid;
+           transition:  0.6s; */
         }
 
     /*    #flexFoto:hover {
@@ -249,18 +257,18 @@
           color: white;
         }
 
-        .otvetMessage {
+        .otvetMessage,.otvetMessageRT {
           width: 160px;
           height: auto;
           margin-left: 85px;
           margin-top: 10px;
           border: 1px solid black;
-          border-top-right-radius: 25px;
-          border-top-left-radius: 14px;
-          border-bottom-left-radius: 14px;
+          border-top-right-radius: 30px;
+          border-top-left-radius: 18px;
+          border-bottom-left-radius: 18px;
         }
 
-        .otvetMessage>#strTimeOtvet {
+        .otvetMessage>.strTimeOtvet,.otvetMessageRT>.strTimeOtvetRT {
           width: 90px;
           height: 10px;
           margin-left: 65px;
@@ -272,7 +280,7 @@
           color: white;
         }
 
-        #telo {
+        .telo,.teloRT {
           width: 158px;
           height: auto;
           font-size: .4rem;
@@ -280,7 +288,15 @@
           text-align: center;
         }
 
-        #zagolovok {
+    /*    #teloRT {
+          width: 90px;
+          height: auto;
+          font-size: .4rem;
+          font-weight:bold;
+          text-align: center;
+        }  */
+
+        .zagolovok,.zagolovokRT {
           width: 90px;
           height: 15px;
           margin-left: 10px;
@@ -320,14 +336,14 @@
             outline:none;
         }
 
-        #but,#history,#myLS,#room {
+        #but,#history,#userLS,#rooms,#button,#bt {
     /*       margin-top:  20px; */
            margin-left: 15px;
-           height:40px;
+           height:30px;
            font-family: Arial, Helvetica, sans-serif;
-           font-size: 15px;
+           font-size: 10px;
            color: #ffffff;
-           padding: 10px 10px;
+           padding: 7px 7px;
            background: -moz-linear-gradient(
              top,
              #42aaff 0%,
@@ -355,7 +371,7 @@
            display: block;
            text-decoration: none;
           }
-           a:hover,.but:hover,#history:hover,#myLS:hover,#room:hover,#admin2:hover {
+           a:hover,.but:hover,#button:hover,#history:hover,#userLS:hover,#rooms:hover,#admin2:hover,#bt:hover {
            background: -moz-linear-gradient(
              top,
              #42aaff 0%,
@@ -365,7 +381,7 @@
              from(#42aaff),
              to(#0d5aa7));
           }
-          a:active,.but:active,#history:active,#myLS:active,#room:active,#admin2:active {
+          a:active,.but:active,#button:active,#history:active,#userLS:active,#rooms:active,#admin2:active,#bt:active {
            background: -moz-linear-gradient(
              top,
              #003366 0%,
@@ -376,13 +392,13 @@
              to(#42aaff));
           }
 /*================================================================================*/
-#stop,#vvod {
+#stop,#vvod,.knopki {
    margin-left: 15px;
-   height:40px;
+   height:30px;
    font-family: Verdana;
-   font-size: 15px;
+   font-size: 10px;
    color: #ffffff;
-   padding: 10px 10px;
+   padding: 7px 7px;
    background: -moz-linear-gradient(top, #da70d6 0%, #800080);
    background: -webkit-gradient(linear, left top, left bottom, from(#da70d6), to(#800080));
    border-radius: 10px;
@@ -395,7 +411,7 @@
    text-decoration: none;
   }
 
-  #stop:active,#vvod:active {
+  #stop:active,#vvod:active,.knopki:active {
     background: -moz-linear-gradient(top, #800080 0%, #da70d6);
    background: -webkit-gradient(linear, left top, left bottom, from(#800080), to(#da70d6));
   }
@@ -407,7 +423,7 @@
             z-index: 1;
           }
 
-          #myLS {
+          #userLS {
             position: absolute;
     /*        margin-top: 20px; */
             top: 380px;
@@ -415,7 +431,192 @@
             z-index: 1;
           }
 
-          #room {
+          #lichka {
+            position: absolute;
+            width: 260px;
+            height: 400px;
+            border: 2px solid black;
+            background-color: white;
+            top:100px;
+            left:350px;
+            overflow:scroll;
+            font-family: Verdana;
+            font-size: .5em;
+            font-weight: bolder;
+            z-index: 1000;
+            transform:    translateY(-500px);
+            transition:   transform .6s linear;
+          }
+
+          #lichka.trans {
+               transform:    translateY(100px);
+          }
+
+          #lichkaMakeMale {
+            position: absolute;
+            width: 200px;
+            height: 160px;
+            border: 1px solid black;
+            background-color: #dcdcdc;
+            top:100px;
+            left:100px;
+            font-family: Verdana;
+            font-size: .5em;
+            font-weight: bolder;
+            z-index: 1300;
+            transform:    translateY(-300px);
+            transition:   transform .6s linear;
+          }
+
+          #lichkaMakeMale.trans {
+               transform:    translateY(270px);
+          }
+
+          #forma1 {
+            position: absolute;
+            width: 200px;
+            height: 150px;
+            border: 1px solid black;
+            background-color: #dcdcdc;
+            top:100px;
+            left:100px;
+            font-family: Verdana;
+            font-size: .5em;
+            font-weight: bolder;
+            z-index: 1300;
+            transform:    translateY(-400px);
+            transition:   transform .6s linear;
+          }
+
+          #forma1.trans {
+               transform:    translateY(100px);
+          }
+
+          #forma1New {
+            position: absolute;
+            width: 200px;
+            height: 190px;
+            border: 1px solid black;
+            background-color: #dcdcdc;
+            top:100px;
+            left:100px;
+            font-family: Verdana;
+            font-size: .5em;
+            font-weight: bolder;
+            z-index: 1400;
+            transform:    translateY(-300px);
+            transition:   transform .6s linear;
+          }
+
+          #forma1New.transp {
+               transform:    translateY(100px);
+          }
+
+          p {
+            font-family: Verdana;
+            font-size: .6em;
+            font-weight: bolder;
+          }
+
+          #stopLS,#stopLS1 {
+             position: absolute;
+             width: 110px;
+             left:352px;
+             top:495px;
+             font-size: 10px;
+             padding: 7px 7px;
+             height: 30px;
+             z-index: 1001;
+             opacity: 1;
+          }
+
+          #stopLS {
+  /*          position: fixed;   */
+            left: 0px;
+            top: 100px;
+          }
+
+          #male {
+             position: absolute;
+             width: 150px;
+             left:470px;
+             top:495px;
+             font-size: 10px;
+             padding: 7px 7px;
+             height: 30px;
+             z-index: 1001;
+             opacity: 1;
+          }
+
+          #inputin,#inputin1,#inn {
+             margin-left: 15px;
+             font-size: 10px;
+             margin-bottom: 10px;
+          }
+
+          #inn,#tr {
+            margin-top: 10px;
+          }
+
+          #dialogs,#dialogs1,#tr {
+             margin-left: 15px;
+             font-size: 10px;
+             margin-bottom: 10px;
+          }
+
+          #button,#button1 {
+              font-size: 10px;
+              width: 100px;
+              height: 30px;
+          }
+
+          #bt {
+            font-size: 10px;
+            width: 80px;
+            height: 25px;
+      /*      text-align: center;
+            line-height: 25px; */
+            padding: 6px 5px;
+            margin-left: 10px;
+      /*      display: block;  */
+          }
+
+          #closeWindow {
+      /*      position: absolute;  */
+            left: 0px;
+            top: 122px;
+            font-size: 10px;
+            width: 110px;
+            height: 25px;
+            padding: 6px 5px;
+            margin-left: 10px;
+            opacity: 1;
+    /*        z-index: 1500;    */
+          }
+
+          #menuLS {
+             position: absolute;
+             left: -200px;
+             top:220px;
+             width: 150px;
+             height: 150px;
+             z-index:    2000;
+             transform:    translateX(-200px);
+             transition:   transform 1s linear;
+          }
+
+          #menuLS.transport {
+               transform:    translateX(460px);
+          }
+
+          .knopki {
+             width: 140px;
+             height: 40px;
+             font-size: .5em;
+             margin-left: 10px;
+          }
+
+          #rooms {
             position: absolute;
             top: 430px;
             left:  0px;
@@ -426,7 +627,7 @@
             position: absolute;
             top: 480px;
             left:  0px;
-            height:60px;
+            height:30px;
             z-index: 1;
           }
 
@@ -434,7 +635,8 @@
             position: absolute;
             left: 320px;
             top: 250px;
-            height:80px;
+            width: 170px;
+            height:60px;
             z-index: 102;
           }
 
@@ -576,3 +778,223 @@
              transition-property:  opacity;
              transition-duration:  1s;
           }
+
+    /*      main {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            align-items: center;
+          }
+
+          iframe {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border: 1px solid black;
+          }  */
+
+          #label {
+           width: 130px;
+           height: 30px;
+           margin-left: 120px;
+           margin-top: 15px;
+           font-size: .8em;
+           font-style: italic;
+           font-family: Verdana;
+           color: #800000;
+           font-weight: bolder;
+         }
+
+         #ban {
+           width: 130px;
+           height: 40px;
+            line-height: 40px;
+           margin-left: 120px;
+           margin-top: 20px;
+           background-color: #483d8b;
+           font-size: .8em;
+           font-style: italic;
+           font-family: Verdana;
+           text-align: center;
+           color: red;
+           font-weight: bolder;
+         }
+
+         #poleRooms {
+           position: absolute;
+           top: 0px;
+           left: 0px;
+           width: 100vw;
+           height: 100vh;
+           font-family: Verdana;
+           font-size: .7rem;
+           font-weight: bolder;
+           color: #008b8b;
+           text-align: center;
+           background-color: #20b2aa;
+           text-shadow: 0 0 10px white;
+           letter-spacing: .7em;
+           z-index: 2000;
+    /*       opacity: 0;   */
+         }
+
+         #table {
+             position: absolute;
+             display: flex;
+             width: 300px;
+             height: 150px;
+             top: 30px;
+             left: 15px;
+             border: 2px solid red;
+         }
+
+         #listLeft {
+           width: 150px;
+           height: auto;
+           padding-left: 3px;
+           border: 1px solid black;
+           background-color: white;
+           box-sizing: border-box;
+           font-family: Verdana;
+           font-size: .3rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+    /*       color: #008b8b;  */
+    /*       text-align: center; */
+
+         }
+
+         #listRight {
+           width: 150px;
+           height: auto;
+           padding-left: 3px;
+           border: 1px solid black;
+           background-color: #fa8072;
+           box-sizing: border-box;
+           font-family: Verdana;
+           font-size: .3rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+      /*     color: #008b8b;   */
+      /*     text-align: center;  */
+         }
+
+         #controls {
+           position: absolute;
+           width: 300px;
+           height: 255px;
+           top: 185px;
+           left: 15px;
+           border: 2px solid blue;
+           font-family: Verdana;
+           font-size: .4rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+         }
+
+         #p1 {
+             position: absolute;
+             top:5px;
+             left: 10px;
+             font-family: Verdana;
+             font-size: .3rem;
+             font-weight: bolder;
+             letter-spacing: normal;
+         }
+
+         #p2 {
+             position: absolute;
+             top: 84px;
+             left: 10px;
+             font-family: Verdana;
+             font-size: .3rem;
+             font-weight: bolder;
+             letter-spacing: normal;
+         }
+
+         #inpRooms {
+           display: block;
+           position: absolute;
+           top: 27px;
+           left: 10px;
+           font-family: Verdana;
+           font-size: .3rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+         }
+
+         #tarea {
+           display: block;
+           position: absolute;
+           top: 107px;
+           left: 10px;
+           width: 200px;
+           height: 60px;
+           font-family: Verdana;
+           font-size: .3rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+         }
+
+         #butRooms1 {
+           left: 10px;
+           top: 49px;
+           width: 70px;
+           height: 20px;
+  /*         line-height: 20px; */
+  /*         padding: 5px;   */
+           padding-bottom: 17px;
+           display: block;
+           z-index: 2000;
+           opacity: 1;
+         }
+
+         #butRooms2 {
+           left: 10px;
+           top:180px;
+           width: 90px;
+           height: 20px;
+           padding-bottom: 17px;
+           display: block;
+           z-index: 2000;
+           opacity: 1;
+         }
+
+         #butRooms3 {
+           left: 10px;
+           top: 215px;
+           width: 100px;
+           height: 20px;
+           padding-bottom: 17px;
+           display: block;
+           z-index: 2000;
+           opacity: 1;
+         }
+
+         #poleRoom {
+           position: absolute;
+           left: 250px;
+           top: 30px;
+           width: 300px;
+           height: 400px;
+           overflow:scroll;
+           border: 1px solid black;
+           background-color: #dcdcdc;
+           font-family: Verdana;
+           font-size: .3rem;
+           font-weight: bolder;
+           letter-spacing: normal;
+         }
+
+         #outRooms {
+           left: 10px;
+      /*     top: 215px;  */
+           width: 100px;
+           height: 20px;
+           padding-bottom: 17px;
+           display: block;
+           z-index: 2000;
+           opacity: 1;
+         }
