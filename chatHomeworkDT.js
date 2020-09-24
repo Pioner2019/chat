@@ -505,7 +505,20 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                               socket.emit("messageToRoom", obj);  // Посылаем на сервер запрос комнаты с данным именем.
                               console.log(`На сервер ушло сообщение запроса типа "messageToRoom", содержащее обьект:
                               obj.a: ${obj.a}, obj.b: ${obj.b}`);
+                              socket.on("youCreator", message => {
+                                  if (message === "youCreator") {
+                                      console.log("Вы - создатель этой комнаты. Получите права админа!");
+                                      setTimeout(function() {
+                                      let but3 = document.querySelector("#butRooms3");
+                                          but3.style.display = 'block';
+                                        }, 3000);
+                                  }
+                              });
+
                               socket.on("roomToYou", message => {
+                                 for (let i = 0; i < message.length; i++) {       // Получив массив обьектов с сервера(а сервер получил его из БД),
+                                     let elem = PP.pluginRenderLichkaMessages(lichka, message[i], objMessage.sv1, objMessage.sv3); // Плагин отрисовывает их у нас в поле "личка".
+                                }
                               });
                             });
 

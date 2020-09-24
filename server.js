@@ -461,6 +461,7 @@ io.sockets.on('connection', function(socket) {
                           else {
                   if (!result) {
                                //------------------------------------------------------------------------------------
+                                   socket.emit("youCreator", "youCreator");
                                        collection.insertOne(message, function(err, result) {
                                             if (err) throw err;
                                             else {

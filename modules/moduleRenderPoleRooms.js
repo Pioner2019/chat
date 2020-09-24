@@ -46,6 +46,7 @@
                      let butRooms3 = document.createElement("button");
                          butRooms3.id = 'butRooms3';
                          butRooms3.innerHTML = 'Управление';
+                         butRooms3.style.display = 'none';
                      controls.appendChild(butRooms3);
 
              poleRooms.appendChild(controls);
