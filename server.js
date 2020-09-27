@@ -59,6 +59,9 @@ class NewFace {  // Этот класс является шаблоном - пр
 }
 
 let massAllActiveUsers = [];
+let myCreateRooms = [];  // В этом массиве хранится список комнат, созданных мной.
+let myVisitorRooms = [];  // А в этом - список чужих комнат, в которых я участвую.
+let nameMyCreateRoom;
 
 // Cоздаем объект MongoClient и передаем ему строку подключения:
 
@@ -141,7 +144,7 @@ io.sockets.on('connection', function(socket) {
             let objTime = timeReg();
             let lichkaBan = ['0']; // В этом массиве, при создании пустом, будут храниться имена участников, которых я забанил в моей личке.
             // Если нужно "отбанить", т.е. разблокировать, участника, - его имя просто удаляется из этого массива.
-            newFace = new NewFace(socket.username, ident, message.b, null, message.c, objTime.a, objTime.b, lichkaBan, null, null); // Создаём конкретный экземпляр
+            newFace = new NewFace(socket.username, ident, message.b, null, message.c, objTime.a, objTime.b, lichkaBan, myCreateRooms, myVisitorRooms); // Создаём конкретный экземпляр
       socket.emit("pleaseYourAccount", newFace);  //  шаблона - класса, куда передаём конкретные значения его элементов.
       let objAdmin = {};
           objAdmin.a = "админ";
@@ -459,9 +462,32 @@ io.sockets.on('connection', function(socket) {
                       collection.findOne({b: message.b}, (err, result) => {
                           if (err) throw err;
                           else {
+
                   if (!result) {
                                //------------------------------------------------------------------------------------
-                                   socket.emit("youCreator", "youCreator");
+                                 nameMyCreateRoom = message.b;
+                                 myCreateRooms.push(message.b);
+                                 console.log(`массив myCreateRooms содержит: ${myCreateRooms}`);
+
+                                  //??????????????????????????????????????????????????????????????????????????????????????????????????????????????
+                                  //=================================================================================
+                                  const mongoClient6 = new MongoClient(url, {useNewUrlParser: true});
+                                        mongoClient6.connect(function(err, client) {
+                                        const db = client.db("Pioner");
+                                        const collection = db.collection("CHAT1");
+                                        let time = timeReg();
+                                              console.log(`А в этом месте массив myCreateRooms содержит: ${myCreateRooms}`);
+                                              collection.updateOne({sv1: message.a}, {$set: {sv9: myCreateRooms}}, (err, result) => {
+                                                    if (err) throw err;
+                                                    else {
+                                                       client.close();
+                                                    };
+                                               });
+                                        });
+                                  //=================================================================================
+                                  //??????????????????????????????????????????????????????????????????????????????????????????????????????????????
+
+                                 socket.emit("youCreator", "youCreator");
                                        collection.insertOne(message, function(err, result) {
                                             if (err) throw err;
                                             else {
@@ -488,6 +514,9 @@ io.sockets.on('connection', function(socket) {
                    //             //------------------------------------------------------------------------------------
                    //           }
                              else {
+                               if (result.a === message.a && result.b === message.b) {
+                                    socket.emit("youCreator", "youCreator");
+                               }
                                      collection.find().toArray((err, result) => {
                                            if (err) throw err;
                                            else {
@@ -503,6 +532,7 @@ io.sockets.on('connection', function(socket) {
                   //              client.close()
             //                  }
                           });
+
                      });
 
        socket.on("messageForRoom", message => {
@@ -510,7 +540,7 @@ io.sockets.on('connection', function(socket) {
              socket.join(message.a);
          });
          const mongoClient5 = new MongoClient(url, {useNewUrlParser: true});
-               mongoClient5.connect(function(err, client){
+               mongoClient5.connect(function(err, client) {
                const db = client.db("allRooms");
                const collection = db.collection(`${message.a}`);
                let time = timeReg();
@@ -518,13 +548,13 @@ io.sockets.on('connection', function(socket) {
                      collection.insertOne(posl, function(err, result) {
                            if (err) throw err;
                            else {
-                              // socket.to(message.a).emit('broadcastToRoom', message.b);
-                              // if (socket.to(message.a).emit('broadcastToRoom', message.b)) {
-                              //   console.log("(message БРОДКАСТИТСЯ НОРМАЛЬНО!");
-                              // }
-                              //  else {
-                              //    console.log("(message НЕ БРОДКАСТИТСЯ !");
-                              //  }
+                               socket.to(message.a).emit('broadcastToRoom', message.b);
+                              if (socket.to(message.a).emit('broadcastToRoom', message.b)) {
+                                console.log("message БРОДКАСТИТСЯ НОРМАЛЬНО!");
+                              }
+                               else {
+                                 console.log("message НЕ БРОДКАСТИТСЯ !");
+                               }
                               client.close();
                            };
                       });

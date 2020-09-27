@@ -998,3 +998,47 @@
            z-index: 2000;
            opacity: 1;
          }
+
+         #menuman {
+           position: absolute;
+           width: 150px;
+           height: 120px;
+           top: 200px;
+           left: 100px;
+           transform: translateX(-900px);
+           transition: transform 1s linear;
+           z-index: 4000;
+         }
+
+         #menuman.move {
+               transform: translateX(100px);
+         }
+
+         #inpmenuman {
+                display:   block;
+                font-size: .4em;
+         }
+
+         #but1menuman {
+                display: block;
+                font-size: .4em;
+                border: 1px solid #dcdcdc;
+                background-color: black;
+                color: red;
+         }
+
+         #but2menuman {
+                display: block;
+                font-size: .4em;
+                border: 1px solid #dcdcdc;
+                background-color: black;
+                color: #00ff00;
+         }
+
+         #but3menuman {
+                display: block;
+                font-size: .4em;
+                border: 1px solid #dcdcdc;
+                background-color: black;
+                color: yellow;
+         }

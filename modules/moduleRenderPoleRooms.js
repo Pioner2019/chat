@@ -1,4 +1,4 @@
-
+   import {moduleRenderMenuManagement} from './moduleRenderMenuManagement.js';
    export function moduleRenderPoleRooms(param1) {
   //    console.log(`ЕСЛИ Я ВИЖУ ЭТО В КОНСОЛИ - ЗНАЧИТ, МОДУЛИ ЗАРАБОТАЛИ! УРА!`);
         let poleRooms = document.createElement("div");
@@ -47,6 +47,11 @@
                          butRooms3.id = 'butRooms3';
                          butRooms3.innerHTML = 'Управление';
                          butRooms3.style.display = 'none';
+                         butRooms3.addEventListener("click", function() {
+                             let menuman = moduleRenderMenuManagement(param1);
+                  //           let menuman = document.querySelector("#menuman");
+                                 menuman.className = 'move';
+                         });
                      controls.appendChild(butRooms3);
 
              poleRooms.appendChild(controls);
@@ -66,6 +71,10 @@
 
          function funcOutRooms() {
               console.log(`Эта кнопка будет производить полный выход из среды "Комнаты".`);
+              let rooms = document.querySelector("#poleRooms");
+              let menuman = document.querySelector("#menuman");
+                  rooms.remove();
+                  menuman.remove();
          }
 
 

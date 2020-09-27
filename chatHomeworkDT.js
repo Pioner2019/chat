@@ -516,8 +516,22 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                               });
 
                               socket.on("roomToYou", message => {
-                                 for (let i = 0; i < message.length; i++) {       // Получив массив обьектов с сервера(а сервер получил его из БД),
-                                     let elem = PP.pluginRenderLichkaMessages(lichka, message[i], objMessage.sv1, objMessage.sv3); // Плагин отрисовывает их у нас в поле "личка".
+                                let poleRoom = document.querySelector("#poleRoom");
+                                  console.log(`message.length = ${message.length}`);
+                                 for (let i = 1; i < message.length; i++) {       // Получив массив обьектов с сервера(а сервер получил его из БД),
+                                   if (message[i].a === objMessage.sv1) {        // мы отсекаем нулевую запись(i = не 0, а 1), и, отфильтровав все
+                                      let el = PP.pluginRenderMessages(poleRoom, message[i]); // мои собственные сообщения, отображаем их с левой
+                                           el.style.marginLeft = '10px';                      // стороны поля poleRoom,...
+                                           el.style.borderTopLeftRadius = '30px';
+                                           el.style.borderTopRightRadius = '18px';
+                                           el.style.borderBottomRightRadius = '18px';
+                                           el.style.borderBottomLeftRadius = '0px';
+                                           continue;
+                                   }
+                                     let elem = PP.pluginRenderMessages(poleRoom, message[i]);  //...а все остальные - с правой его стороны.
+                          //--------------------------------------------------------------------------------------------------------------------
+                          //             if (message.a === objMessage.sv1 && message)
+                          //--------------------------------------------------------------------------------------------------------------------
                                 }
                               });
                             });
@@ -536,7 +550,6 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                            moduleMyMessageRender(tarea, objMessage, socket);
                                    }
                                 });
-
                  });
 
                  socket.on("broadcastToRoom", message => {
