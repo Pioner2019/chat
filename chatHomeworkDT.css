@@ -843,11 +843,11 @@
          #table {
              position: absolute;
              display: flex;
-             width: 300px;
+             width: 310px;
              height: 150px;
-             top: 30px;
+             top: 23px;
              left: 15px;
-             border: 2px solid red;
+      /*       border: 2px solid red; */
          }
 
          #listLeft {
@@ -870,6 +870,7 @@
            width: 150px;
            height: auto;
            padding-left: 3px;
+           margin-left: 2px;
            border: 1px solid black;
            background-color: #fa8072;
            box-sizing: border-box;
@@ -975,7 +976,7 @@
 
          #poleRoom {
            position: absolute;
-           left: 250px;
+           left: 320px;
            top: 30px;
            width: 300px;
            height: 400px;
@@ -1041,4 +1042,11 @@
                 border: 1px solid #dcdcdc;
                 background-color: black;
                 color: yellow;
+         }
+
+         .lishka,.li {
+            list-style-type: none;
+            margin-left: 10px;
+            color: black;
+            text-align: left;
          }

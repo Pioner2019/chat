@@ -144,7 +144,7 @@ io.sockets.on('connection', function(socket) {
             let objTime = timeReg();
             let lichkaBan = ['0']; // В этом массиве, при создании пустом, будут храниться имена участников, которых я забанил в моей личке.
             // Если нужно "отбанить", т.е. разблокировать, участника, - его имя просто удаляется из этого массива.
-            newFace = new NewFace(socket.username, ident, message.b, null, message.c, objTime.a, objTime.b, lichkaBan, myCreateRooms, myVisitorRooms); // Создаём конкретный экземпляр
+            newFace = new NewFace(socket.username, ident, message.b, null, message.c, objTime.a, objTime.b, lichkaBan, [], []); // Создаём конкретный экземпляр
       socket.emit("pleaseYourAccount", newFace);  //  шаблона - класса, куда передаём конкретные значения его элементов.
       let objAdmin = {};
           objAdmin.a = "админ";
@@ -449,7 +449,49 @@ io.sockets.on('connection', function(socket) {
    });
 
 
+//   socket.on("messageToRoom", message => {
+
+      socket.on("needAllRoomsList", message => {
+        console.log(`С клиента пришёл запрос массива комнат с моим участием: ${message}`);
+      //---------------------------------------------------------------------------------------------------
+      // Это будет очень сложный цикл со многими вложениями, включая обращения к МОНГЕ.
+
+          let massiv = [];
+          if (message.b === "allRoomsList") {
+              for (let i = 0; i < masPers.length; i++) { // Перебираем оперативный массив masPers. В нём нас интересуют
+                  if (masPers[i].sv1 !== message.a) {     // все элементы, кроме меня самого.
+                       for (let j = 0; j < masPers[i].sv9.length; j++) { // В каждом элементе берём массив sv9, где
+                      let mongoClient = new MongoClient(url, {useNewUrlParser: true}); // собраны все комнаты, созданные
+                          mongoClient.connect((err, client) => {                       // данным участником, и по имени
+                                const db = client.db("allRooms");                   // каждой комнаты в Монге получаем
+                                const collection = db.collection(masPers[i].sv9[j]); // всю коллекцию сообщений в этой
+                                collection.find().toArray((err, result) => {         // комнате.
+                                   if (err) throw err;
+                                   else {
+                                       console.log(`result.length = ${result.length}`); // Затем проверяем, есть ли среди
+                                       for (let i = 1; i < result.length; i++) {        // них сообщения от меня. Если есть -
+                                            if (result[i].a === message.a) {         // значит я участвую в этой комнате.
+                                                 massiv.push(result[0].b);           // Её имя поступает в массив,
+                                                 console.log(`massiv = ${massiv}`); // специально созданный для этого,
+                                                 socket.emit("receiveAllRoomsList", massiv); // и отправляется на клиент.
+                                                 break;                                     // Всё, запрос на получение всех
+                                            }                                          // комнат, в которых я участвую, обработан !
+                                       }                                // P.S. Недостаток: пока не придумал, как в данном конкретном
+                                       client.close();                 // случае решить проблему асинхронности, т.е. как передать
+                                   }                               // весь массив целиком(видимо, можно сделать через промисы, но я
+                                });                             //  ещё не очень ими владею). Пришлось передавать их изнутри цикла,
+                          });                                 // а затем на клиенте удалять все повторы. Грязновато, неэстетично,
+                                                              // но - пока так.
+                       }
+                  }
+              }
+          }
+
+      //----------------------------------------------------------------------------------------------------
+      });
+
    socket.on("messageToRoom", message => {
+
      console.log(`С клиента пришло сообщение типа "messageToRoom", содержащее обьект:
      obj.a: ${message.a}, obj.b: ${message.b}`);
 
@@ -465,9 +507,20 @@ io.sockets.on('connection', function(socket) {
 
                   if (!result) {
                                //------------------------------------------------------------------------------------
-                                 nameMyCreateRoom = message.b;
-                                 myCreateRooms.push(message.b);
-                                 console.log(`массив myCreateRooms содержит: ${myCreateRooms}`);
+                        //         nameMyCreateRoom = message.b;
+                        //         myCreateRooms.push(message.b);                                  // Дополняем массив, содержащий созданные мной комнаты,
+                      //           console.log(`массив myCreateRooms содержит: ${myCreateRooms}`); // названием новой только что созданной комнаты,
+                                 for (let i = 0; i < masPers.length; i++) {                      // а также немедленно обновляем оперативный массив
+                                      for (let key in masPers[i]) {                              // masPers теми же новыми данными, и...
+                                            if (masPers[i].sv1 === message.a) {
+                                                  console.log(`массив созданных мной комнат до обновления содержит: ${masPers[i].sv9}`);
+                                                  masPers[i].sv9.push(message.b);
+                                                  console.log(`массив созданных мной комнат после обновления содержит: ${masPers[i].sv9}`);
+                                                  socket.emit("updateObjMessage", masPers[i].sv9); //...сообщаем их на клиент, чтобы там обновился
+                                 //                  break;
+                                 //            }                                                     // оперативный обьект objMessage.
+                                 //      }
+                                 // }
 
                                   //??????????????????????????????????????????????????????????????????????????????????????????????????????????????
                                   //=================================================================================
@@ -477,7 +530,8 @@ io.sockets.on('connection', function(socket) {
                                         const collection = db.collection("CHAT1");
                                         let time = timeReg();
                                               console.log(`А в этом месте массив myCreateRooms содержит: ${myCreateRooms}`);
-                                              collection.updateOne({sv1: message.a}, {$set: {sv9: myCreateRooms}}, (err, result) => {
+                                    //          collection.updateOne({sv1: message.a}, {$set: {sv9: myCreateRooms}}, (err, result) => {
+                                              collection.updateOne({sv1: message.a}, {$push: {sv9: message.b}}, (err, result) => {
                                                     if (err) throw err;
                                                     else {
                                                        client.close();
@@ -486,7 +540,10 @@ io.sockets.on('connection', function(socket) {
                                         });
                                   //=================================================================================
                                   //??????????????????????????????????????????????????????????????????????????????????????????????????????????????
-
+                                  break;
+                            }                                                     // оперативный обьект objMessage.
+                      }
+                 }
                                  socket.emit("youCreator", "youCreator");
                                        collection.insertOne(message, function(err, result) {
                                             if (err) throw err;
@@ -528,17 +585,14 @@ io.sockets.on('connection', function(socket) {
                              }
                            }
                         });
-                   //
-                  //              client.close()
-            //                  }
-                          });
-
-                     });
+                      });
+                    socket.join(message.a);
+                  });
 
        socket.on("messageForRoom", message => {
-         io.on("connection", function(socket) {
-             socket.join(message.a);
-         });
+  //       io.on("connection", function(socket) {
+  //           socket.join(message.a);
+  //       });
          const mongoClient5 = new MongoClient(url, {useNewUrlParser: true});
                mongoClient5.connect(function(err, client) {
                const db = client.db("allRooms");
@@ -548,6 +602,9 @@ io.sockets.on('connection', function(socket) {
                      collection.insertOne(posl, function(err, result) {
                            if (err) throw err;
                            else {
+                  //            socket.to(message.a).emit(message.b);
+                      //         socket.to(message.a).broadcast.emit('broadcastToRoom', message.b);
+                      //         socket.to(message.a).emit('broadcastToRoom', message.b);
                                socket.to(message.a).emit('broadcastToRoom', message.b);
                               if (socket.to(message.a).emit('broadcastToRoom', message.b)) {
                                 console.log("message БРОДКАСТИТСЯ НОРМАЛЬНО!");

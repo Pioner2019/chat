@@ -495,9 +495,52 @@ document.getElementById("files").addEventListener('change', onFileSelect);
              let obj = {};
              let val;
              let schet = 0;
+             let massivAllRooms = [];
                  rooms.addEventListener("click", function() {
                       console.log("ЭТА КНОПКА ДОЛЖНА БУДЕТ ОТКРЫВАТЬ ДОСТУП В ПОДСРЕДУ 'КОМНАТЫ'.");
                       moduleRenderPoleRooms(body);
+      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // В самом начале работы с комнатами, как только мы вошли в среду "Мои комнаты", мы должны заполнить стартовую таблицу.
+
+                      let ulLeft = document.querySelector("#listLeft");       // Получаем левую сторону таблицы, которая служит
+                          for (let i = 0; i < objMessage.sv9.length; i++) {   // для размещения списка всех комнат, созданных мной,
+                               let li = document.createElement("li");         // и вставляем туда содержимое соответствующего
+                                   li.innerHTML = objMessage.sv9[i];          // массива из оперативного обьекта objMessage.
+                                   li.className = 'li';
+                                   if (i === 0) {
+                                      li.style.marginTop = '10px';
+                                   } else {}
+                               ulLeft.appendChild(li);
+                          }
+
+                        let obj = {a: objMessage.sv1, b:"allRoomsList"};
+                        socket.emit("needAllRoomsList", obj);
+                        console.log(`На сервер ушёл запрос массива комнат с моим участием: ${obj}`);
+                        socket.on("receiveAllRoomsList", message => {
+                             massivAllRooms = message;
+                             let ulRight = document.querySelector("#listRight");       // Получаем правую сторону таблицы,
+                             for (let i = 0; i < message.length; i++) {             // куда помещаем пришедший с сервера
+                                  let li = document.createElement("li");          // массив всех комнат всех участников,
+                                      li.className = 'lishka';                   // в которых я состою. Они приходят
+                                      li.innerHTML = message[i];                // оттуда из цикла(эта часть скрипта
+                                      if (i === 0) {                           // недоработана), увеличивающимся с каждым
+                                         li.style.marginTop = '10px';          // разом списком, и поэтому...
+                                      } else {}
+                                  ulRight.appendChild(li);
+                             }
+
+                             let allli = document.querySelectorAll(".lishka");
+                             let opora;
+                             let x = 0;
+                              for (let j = 0; j < allli.length; j++) {
+                                 opora = allli[j];                           //...пришлось написать вот этот специальный блок,
+                                 for (let i = j + 1; i < allli.length; i++) { // чтобы в нём ничтожить все повторы в списке li - шек.
+                                         if (allli[i].innerHTML === opora.innerHTML) allli[i].remove();
+                                 }
+                            }
+                        });
+
+      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                       let inpRooms = document.querySelector("#inpRooms");
                           inpRooms.addEventListener("blur", function() {
                               obj = {a:objMessage.sv1, b:inpRooms.value};
@@ -514,6 +557,21 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                         }, 3000);
                                   }
                               });
+                              let ulLeft = document.querySelector("#listLeft");       // Получаем левую сторону таблицы.
+                                       let li = document.createElement("li");        // Создаём новый элемент списка...
+                                           li.innerHTML = val;
+                                           li.className = 'li';
+                                  let deti = ulLeft.children;
+                                  let flag = true;
+                                      for (let i = 0; i < deti.length; i++) {
+                                        console.log(`deti[i].innerHTML = ${deti[i].innerHTML}`)
+                                          if (deti[i].innerHTML === li.innerHTML) {
+                                              flag = false;
+                                          }
+                                      }
+                                      if (flag) {
+                                          ulLeft.appendChild(li);   //...и добавляем его в конец таблицы, только
+                                      } else {}                   // если это - вновь созданная комната.
 
                               socket.on("roomToYou", message => {
                                 let poleRoom = document.querySelector("#poleRoom");
@@ -554,6 +612,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
 
                  socket.on("broadcastToRoom", message => {
                    if (schet === 0) {
+                     console.log(`С сервера пришло послание с обьектом для отрисовки в поле poleRoom:`);
                    for (let key in message) {
                      console.log(`${key}: ${message[key]}`);
                    }
@@ -563,6 +622,9 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                     }
                  });
 
+                 socket.on("updateObjMessage", message => {
+                     objMessage.sv9 = message;           // Дополняем оперативный обьект objMessage
+                 });                                       // названием внобь созданной мной комнаты.
 //=================================== ЗАКОНЧЕН БЛОК РАБОТЫ С КОМНАТАМИ. =======================================
 
 
