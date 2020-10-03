@@ -602,6 +602,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                           let tarea = document.querySelector("#tarea");
                               tarea.addEventListener("blur", function() {
                                    if (tarea.value && val) {
+                            //       if (tarea.value) {
                                        let object = {a: objMessage.sv1, b: tarea.value, c: objMessage.sv3};
                                        let obj1 = {a:val, b:object};
                                            socket.emit("messageForRoom", obj1);
@@ -611,15 +612,15 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                  });
 
                  socket.on("broadcastToRoom", message => {
-                   if (schet === 0) {
+            //       if (schet === 0) {
                      console.log(`С сервера пришло послание с обьектом для отрисовки в поле poleRoom:`);
                    for (let key in message) {
                      console.log(`${key}: ${message[key]}`);
                    }
                     let poleRoom = document.querySelector("#poleRoom");
-                      PP.pluginRenderMessages(poleRoom, message);
-                      schet++;
-                    }
+                      let elem = PP.pluginRenderMessages(poleRoom, message);
+            //          schet++;
+            //        }
                  });
 
                  socket.on("updateObjMessage", message => {
@@ -722,7 +723,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
              });
 
              socket.on("otvetMessage", message => {
-                 PP.pluginRenderMessages(pole, message);
+                 let elem = PP.pluginRenderMessages(pole, message);
            }); //
 
          } // Эта скобка закрывает главную функцию funcMain.
@@ -730,7 +731,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
    }); // ЭТО ГЛАВНАЯ ЗАКРЫВАЮЩАЯ СКОБКА СКРИПТА. АККУРАТНЕЙ С НЕЙ!
 
 //          const socket = io.connect('ws://localhost:7777');
-//            socket.binaryType = "arraybuffer";
+//            socket.binaryType = "arraybuffer";b
 
     //      button.addEventListener("click", funcExpect);
     //      function funcExpect() {

@@ -460,6 +460,7 @@ io.sockets.on('connection', function(socket) {
           if (message.b === "allRoomsList") {
               for (let i = 0; i < masPers.length; i++) { // Перебираем оперативный массив masPers. В нём нас интересуют
                   if (masPers[i].sv1 !== message.a) {     // все элементы, кроме меня самого.
+                     if (masPers[i].sv9) {
                        for (let j = 0; j < masPers[i].sv9.length; j++) { // В каждом элементе берём массив sv9, где
                       let mongoClient = new MongoClient(url, {useNewUrlParser: true}); // собраны все комнаты, созданные
                           mongoClient.connect((err, client) => {                       // данным участником, и по имени
@@ -483,6 +484,7 @@ io.sockets.on('connection', function(socket) {
                           });                                 // а затем на клиенте удалять все повторы. Грязновато, неэстетично,
                                                               // но - пока так.
                        }
+                     }
                   }
               }
           }
@@ -586,13 +588,13 @@ io.sockets.on('connection', function(socket) {
                            }
                         });
                       });
-                    socket.join(message.a);
+                     socket.join(message.b);
                   });
 
        socket.on("messageForRoom", message => {
-  //       io.on("connection", function(socket) {
-  //           socket.join(message.a);
-  //       });
+
+             socket.join(message.a);
+
          const mongoClient5 = new MongoClient(url, {useNewUrlParser: true});
                mongoClient5.connect(function(err, client) {
                const db = client.db("allRooms");
@@ -602,16 +604,7 @@ io.sockets.on('connection', function(socket) {
                      collection.insertOne(posl, function(err, result) {
                            if (err) throw err;
                            else {
-                  //            socket.to(message.a).emit(message.b);
-                      //         socket.to(message.a).broadcast.emit('broadcastToRoom', message.b);
-                      //         socket.to(message.a).emit('broadcastToRoom', message.b);
                                socket.to(message.a).emit('broadcastToRoom', message.b);
-                              if (socket.to(message.a).emit('broadcastToRoom', message.b)) {
-                                console.log("message БРОДКАСТИТСЯ НОРМАЛЬНО!");
-                              }
-                               else {
-                                 console.log("message НЕ БРОДКАСТИТСЯ !");
-                               }
                               client.close();
                            };
                       });
