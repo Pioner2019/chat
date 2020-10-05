@@ -1,5 +1,6 @@
 
-   export function moduleMyMessageRender(param1, param2, param3) {
+  // export function moduleMyMessageRender(param1, param2, param3) {
+   export function moduleMyMessageRender(param1, param2) {
 
      let poleRoom = document.querySelector("#poleRoom");
      let message = document.createElement("div"); // Здесь создаётся сообщение участника.
@@ -11,12 +12,9 @@
                 strTime.innerHTML = objTime.a;            // в котором размещаем время
             message.appendChild(strTime);                 // создания сообщения,
          message.style.backgroundColor = param2.sv3;   // задаём цвет сообщения,
-         let obj = {a: param2.sv1, b: param1.value, c: param2.sv3}; // формируем обьект,
-         param3.emit("message", obj);      // содержащий сообщение, и отправляем его на сервер.
          param1.value = "";
          param1.focus();
-     poleRoom.insertAdjacentElement("beforeEnd", message);
-//       pole.scrollTop = 999999;
+     poleRoom.insertAdjacentElement("beforeEnd", message); // и отрисовываем его в поле poleRoom.
      poleRoom.scrollTop = poleRoom.scrollHeight;               // Делаем автоматич. прокрутку поля.
 
     }

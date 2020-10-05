@@ -49,7 +49,7 @@
                          butRooms3.style.display = 'none';
                          butRooms3.addEventListener("click", function() {
                              let menuman = moduleRenderMenuManagement(param1);
-                  //           let menuman = document.querySelector("#menuman");
+                             console.log("По нажатию этой кнопки будет появляться меню админа.");
                                  menuman.className = 'move';
                          });
                      controls.appendChild(butRooms3);
@@ -58,14 +58,16 @@
 
              let poleRoom = document.createElement("div");
                  poleRoom.id = 'poleRoom';
+             poleRooms.appendChild(poleRoom);
+
                  let outRooms = document.createElement("button");
                      outRooms.id = 'outRooms';
                      outRooms.innerHTML = "Закрыть окно";
                      outRooms.addEventListener("click", funcOutRooms);
                      outRooms.style.position = "sticky";
                      outRooms.style.top = "430px";
-                 poleRoom.appendChild(outRooms);
-             poleRooms.appendChild(poleRoom);
+                 poleRooms.appendChild(outRooms);
+  //           poleRooms.appendChild(poleRoom);
 
          param1.appendChild(poleRooms);
 
@@ -75,6 +77,9 @@
               let menuman = document.querySelector("#menuman");
                   rooms.remove();
                   menuman.remove();
+        //      let poleRoom = document.querySelector("#poleRoom");
+          //        poleRoom.innerHTML = "";
+      //            poleRoom.remove();
          }
 
 

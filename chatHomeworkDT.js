@@ -494,8 +494,10 @@ document.getElementById("files").addEventListener('change', onFileSelect);
              let rooms = document.querySelector("#rooms");
              let obj = {};
              let val;
+             let nameBedMan;
              let schet = 0;
              let massivAllRooms = [];
+             let attributeBlocking = true;
                  rooms.addEventListener("click", function() {
                       console.log("ЭТА КНОПКА ДОЛЖНА БУДЕТ ОТКРЫВАТЬ ДОСТУП В ПОДСРЕДУ 'КОМНАТЫ'.");
                       moduleRenderPoleRooms(body);
@@ -517,10 +519,11 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                         socket.emit("needAllRoomsList", obj);
                         console.log(`На сервер ушёл запрос массива комнат с моим участием: ${obj}`);
                         socket.on("receiveAllRoomsList", message => {
+                             console.log(`С сервера пришёл массив комнат с моим участием: ${message}`);
                              massivAllRooms = message;
-                             let ulRight = document.querySelector("#listRight");       // Получаем правую сторону таблицы,
-                             for (let i = 0; i < message.length; i++) {             // куда помещаем пришедший с сервера
-                                  let li = document.createElement("li");          // массив всех комнат всех участников,
+                             let ulRight = document.querySelector("#listRight");  // Получаем правую сторону таблицы,
+                             for (let i = 0; i < message.length; i++) {           // куда помещаем пришедший с сервера
+                                  let li = document.createElement("li");         // массив всех комнат всех участников,
                                       li.className = 'lishka';                   // в которых я состою. Они приходят
                                       li.innerHTML = message[i];                // оттуда из цикла(эта часть скрипта
                                       if (i === 0) {                           // недоработана), увеличивающимся с каждым
@@ -543,6 +546,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
       //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                       let inpRooms = document.querySelector("#inpRooms");
                           inpRooms.addEventListener("blur", function() {
+                            if (inpRooms.value) {
                               obj = {a:objMessage.sv1, b:inpRooms.value};
                               val = inpRooms.value;
                               socket.emit("messageToRoom", obj);  // Посылаем на сервер запрос комнаты с данным именем.
@@ -554,6 +558,42 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                       setTimeout(function() {
                                       let but3 = document.querySelector("#butRooms3");
                                           but3.style.display = 'block';
+                                          //6666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666
+                                          //------------ НИЖЕ НАЧИНАЕТСЯ БЛОК ОБРАБОТКИ ПРАВ АДМИНА И ДЕЛЕГИРОВАНИЯ ИХ НАЗНАЧЕННЫМ МОДЕРАТОРАМ. ------------
+
+                                          but3.addEventListener("click", function() {
+                                                                   let inpmenuman = document.querySelector("#inpmenuman");
+                                                                       inpmenuman.addEventListener("blur", function() {
+                                                                          if (inpmenuman.value) {
+                                                                               nameBedMan = inpmenuman.value;
+                                                                               console.log(`Имя плохиша, которого надо заблокировать: ${nameBedMan}`);
+                                                                          }
+                                                                       });
+
+                                                                   let but1menuman = document.querySelector("#but1menuman");
+                                                                       but1menuman.addEventListener("click", function() {
+                                                                           let obj = {a:objMessage.sv1, b:val, c:nameBedMan};
+                                                                           console.log(`Название текущей комнаты: ${val}`);
+                                                                           socket.emit("toBlackList", obj);
+                                                                           console.log(`На сервер ушло уведомление о БЛОКИРОВКЕ юзера ${nameBedMan} в комнате ${val}`);
+                                                                       });
+                                                              //       });
+
+                                                                     let but2menuman = document.querySelector("#but2menuman");
+                                                                             but2menuman.addEventListener("click", function() {
+                                                                               let obj = {a:objMessage.sv1, b:val, c:nameBedMan};
+                                                                               console.log(`Название текущей комнаты: ${val}`);
+                                                                               socket.emit("fromBlackList", obj);
+                                                                               console.log(`На сервер ушло уведомление о РАЗБЛОКИРОВКЕ юзера ${nameBedMan} в комнате ${val}`);
+                                                                     });
+
+                                                                     // let but3menuman = document.querySelector("#but3menuman");
+                                                                     //     but3menuman.addEventListener("click", function() {
+                                                                     // });
+                                                                   });
+
+                                          //--------------- ЗАКОНЧЕН БЛОК ОБРАБОТКИ ПРАВ АДМИНА И ДЕЛЕГИРОВАНИЯ ИХ НАЗНАЧЕННЫМ МОДЕРАТОРАМ. ----------------
+                                          //6666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666
                                         }, 3000);
                                   }
                               });
@@ -567,31 +607,34 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                         console.log(`deti[i].innerHTML = ${deti[i].innerHTML}`)
                                           if (deti[i].innerHTML === li.innerHTML) {
                                               flag = false;
+                                              break;
                                           }
                                       }
-                                      if (flag) {
+                                      if (flag && deti.length !== 0) {
                                           ulLeft.appendChild(li);   //...и добавляем его в конец таблицы, только
                                       } else {}                   // если это - вновь созданная комната.
 
                               socket.on("roomToYou", message => {
+                                let schetchik = message.length;
                                 let poleRoom = document.querySelector("#poleRoom");
-                                  console.log(`message.length = ${message.length}`);
-                                 for (let i = 1; i < message.length; i++) {       // Получив массив обьектов с сервера(а сервер получил его из БД),
+                                    poleRoom.innerHTML = "";
+                                  console.log(`message.length = ${schetchik}`);
+                                  if (attributeBlocking) {
+                                 for (let i = 1; i < schetchik; i++) {       // Получив массив обьектов с сервера(а сервер получил его из БД),
                                    if (message[i].a === objMessage.sv1) {        // мы отсекаем нулевую запись(i = не 0, а 1), и, отфильтровав все
                                       let el = PP.pluginRenderMessages(poleRoom, message[i]); // мои собственные сообщения, отображаем их с левой
-                                           el.style.marginLeft = '10px';                      // стороны поля poleRoom,...
-                                           el.style.borderTopLeftRadius = '30px';
-                                           el.style.borderTopRightRadius = '18px';
-                                           el.style.borderBottomRightRadius = '18px';
-                                           el.style.borderBottomLeftRadius = '0px';
-                                           continue;
+                                          el.style.marginLeft = '10px';                      // стороны поля poleRoom,...
+                                          el.style.borderTopLeftRadius = '30px';
+                                          el.style.borderTopRightRadius = '18px';
+                                          el.style.borderBottomRightRadius = '18px';
+                                          el.style.borderBottomLeftRadius = '0px';
+                                  //        continue;
                                    }
-                                     let elem = PP.pluginRenderMessages(poleRoom, message[i]);  //...а все остальные - с правой его стороны.
-                          //--------------------------------------------------------------------------------------------------------------------
-                          //             if (message.a === objMessage.sv1 && message)
-                          //--------------------------------------------------------------------------------------------------------------------
+                                     else {let elem = PP.pluginRenderMessages(poleRoom, message[i]);}  //...а все остальные - с правой его стороны.
                                 }
+                              } else {}
                               });
+                             }
                             });
 
                       let butRooms1 = document.querySelector("#butRooms1");
@@ -602,30 +645,42 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                           let tarea = document.querySelector("#tarea");
                               tarea.addEventListener("blur", function() {
                                    if (tarea.value && val) {
-                            //       if (tarea.value) {
                                        let object = {a: objMessage.sv1, b: tarea.value, c: objMessage.sv3};
                                        let obj1 = {a:val, b:object};
                                            socket.emit("messageForRoom", obj1);
-                                           moduleMyMessageRender(tarea, objMessage, socket);
+                                           moduleMyMessageRender(tarea, objMessage);
                                    }
                                 });
                  });
 
+                 socket.on("youBlock", message => {
+                     if (message === "youBlock") {
+                        attributeBlocking = false;
+                     }
+                     else if (message === "youUnblock") {
+                       attributeBlocking = true;
+                     }
+                 });
+
                  socket.on("broadcastToRoom", message => {
-            //       if (schet === 0) {
-                     console.log(`С сервера пришло послание с обьектом для отрисовки в поле poleRoom:`);
-                   for (let key in message) {
-                     console.log(`${key}: ${message[key]}`);
-                   }
+                   if (attributeBlocking) {
                     let poleRoom = document.querySelector("#poleRoom");
                       let elem = PP.pluginRenderMessages(poleRoom, message);
-            //          schet++;
-            //        }
+                    }
+                    else {
+                       let poleRoom = document.querySelector("#poleRoom");
+                       let block = document.createElement("div");
+                           block.className = 'blocking';
+                           block.innerHTML = 'Вас забанили!';
+                       poleRoom.appendChild(block);
+                    }
                  });
 
                  socket.on("updateObjMessage", message => {
                      objMessage.sv9 = message;           // Дополняем оперативный обьект objMessage
-                 });                                       // названием внобь созданной мной комнаты.
+                 });                                       // названием вновь созданной мной комнаты.
+
+
 //=================================== ЗАКОНЧЕН БЛОК РАБОТЫ С КОМНАТАМИ. =======================================
 
 
@@ -723,6 +778,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
              });
 
              socket.on("otvetMessage", message => {
+                 let pole = document.querySelector("#pole");
                  let elem = PP.pluginRenderMessages(pole, message);
            }); //
 
