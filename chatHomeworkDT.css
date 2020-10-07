@@ -1051,6 +1051,24 @@
                 color: yellow;
          }
 
+         #but4menuman {
+                display: block;
+                font-size: .4em;
+                border: 2px solid black;
+                background-color: grey;
+                color: white;
+         }
+
+         #but5menuman {
+                display: block;
+                font-size: .4em;
+                font-weight: bold;
+                border: 1px solid black;
+                border-radius: 6px;
+                background-color: grey;
+                color: red;
+         }
+
          .lishka,.li {
             list-style-type: none;
             margin-left: 10px;
@@ -1066,9 +1084,25 @@
             border: 2px solid red;
             border-radius: 10px;
             background-color: black;
-            font-size: .6em;
+            font-size: .7em;
             font-family: Verdana;
             color: red;
             text-align: center;
             line-height: 50px;
+         }
+
+         #otkaz {
+           position: absolute;
+           top: 200px;
+           left: 10px;
+           width: 250px;
+           height: 200px;
+           border: 2px solid black;
+           border-radius: 6px;
+           background-color: red;
+           padding: 10px 10px;
+           font-family: Verdana;
+           font-size: .8rem;
+           color: white;
+           z-index: 5000;
          }

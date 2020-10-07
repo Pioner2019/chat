@@ -1,5 +1,6 @@
  import {moduleRenderPoleRooms} from "./modules/moduleRenderPoleRooms.js";
  import {moduleMyMessageRender} from "./modules/moduleMyMessageRender.js";
+ import {moduleHendlerManagement} from "./modules/moduleHendlerManagement.js";
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -16,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
        let flag = 0;
        let flagLS = 0;
        let lichkaNull = 'true';
+       let i_am_moder = true;
 
        let body = document.getElementById("body");
 
@@ -556,47 +558,32 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                   if (message === "youCreator") {
                                       console.log("Вы - создатель этой комнаты. Получите права админа!");
                                       setTimeout(function() {
-                                      let but3 = document.querySelector("#butRooms3");
-                                          but3.style.display = 'block';
-                                          //6666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666
-                                          //------------ НИЖЕ НАЧИНАЕТСЯ БЛОК ОБРАБОТКИ ПРАВ АДМИНА И ДЕЛЕГИРОВАНИЯ ИХ НАЗНАЧЕННЫМ МОДЕРАТОРАМ. ------------
-
-                                          but3.addEventListener("click", function() {
-                                                                   let inpmenuman = document.querySelector("#inpmenuman");
-                                                                       inpmenuman.addEventListener("blur", function() {
-                                                                          if (inpmenuman.value) {
-                                                                               nameBedMan = inpmenuman.value;
-                                                                               console.log(`Имя плохиша, которого надо заблокировать: ${nameBedMan}`);
-                                                                          }
-                                                                       });
-
-                                                                   let but1menuman = document.querySelector("#but1menuman");
-                                                                       but1menuman.addEventListener("click", function() {
-                                                                           let obj = {a:objMessage.sv1, b:val, c:nameBedMan};
-                                                                           console.log(`Название текущей комнаты: ${val}`);
-                                                                           socket.emit("toBlackList", obj);
-                                                                           console.log(`На сервер ушло уведомление о БЛОКИРОВКЕ юзера ${nameBedMan} в комнате ${val}`);
-                                                                       });
-                                                              //       });
-
-                                                                     let but2menuman = document.querySelector("#but2menuman");
-                                                                             but2menuman.addEventListener("click", function() {
-                                                                               let obj = {a:objMessage.sv1, b:val, c:nameBedMan};
-                                                                               console.log(`Название текущей комнаты: ${val}`);
-                                                                               socket.emit("fromBlackList", obj);
-                                                                               console.log(`На сервер ушло уведомление о РАЗБЛОКИРОВКЕ юзера ${nameBedMan} в комнате ${val}`);
-                                                                     });
-
-                                                                     // let but3menuman = document.querySelector("#but3menuman");
-                                                                     //     but3menuman.addEventListener("click", function() {
-                                                                     // });
-                                                                   });
-
-                                          //--------------- ЗАКОНЧЕН БЛОК ОБРАБОТКИ ПРАВ АДМИНА И ДЕЛЕГИРОВАНИЯ ИХ НАЗНАЧЕННЫМ МОДЕРАТОРАМ. ----------------
-                                          //6666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666
-                                        }, 3000);
+                                            moduleHendlerManagement(nameBedMan, objMessage, val, socket, true);
+                                        }, 2000);
                                   }
                               });
+                        //==============================================================================================================
+                        //========== ЗДЕСЬ НАХОДИТСЯ БЛОК ПРЕДОСТАВЛЕНИЯ ПРАВ МОДЕРАТОРА ВЫБРАННОМУ ДЛЯ ЭТОГО ЮЗЕРУ. ============
+
+                                   socket.on("youModerator", message => {
+                                        if (message === "youModerator") {
+                                          console.log("Вы - модератор этой комнаты. Получите права модератора!");
+                                          setTimeout(function() {
+                                                moduleHendlerManagement(nameBedMan, objMessage, val, socket, false);
+                                            }, 2000);
+                                        }
+                                   });
+                        //==============================================================================================================
+
+                              let ulRight = document.querySelector("#listRight");
+                              let child = ulRight.children;
+                              let flagLSimile = true;
+                                 for (let i = 0; i < child.length; i++) {
+                                     if (child[i].innerHTML === val) {
+                                          flagLSimile = false;
+                                          break;
+                                     }
+                                 }
                               let ulLeft = document.querySelector("#listLeft");       // Получаем левую сторону таблицы.
                                        let li = document.createElement("li");        // Создаём новый элемент списка...
                                            li.innerHTML = val;
@@ -604,15 +591,15 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                   let deti = ulLeft.children;
                                   let flag = true;
                                       for (let i = 0; i < deti.length; i++) {
-                                        console.log(`deti[i].innerHTML = ${deti[i].innerHTML}`)
+                                        console.log(`deti[i].innerHTML = ${deti[i].innerHTML}`);
                                           if (deti[i].innerHTML === li.innerHTML) {
                                               flag = false;
                                               break;
                                           }
                                       }
-                                      if (flag && deti.length !== 0) {
-                                          ulLeft.appendChild(li);   //...и добавляем его в конец таблицы, только
-                                      } else {}                   // если это - вновь созданная комната.
+                                      if (flag && deti.length !== 0 && flagLSimile) {  //...и добавляем его в конец таблицы, только если это -
+                                          ulLeft.appendChild(li);                    // вновь созданная комната, список созданных мной комнат
+                                      } else {}                                 // не пуст и этого имени нет в списке комнат с моим участием.
 
                               socket.on("roomToYou", message => {
                                 let schetchik = message.length;
@@ -632,23 +619,79 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                    }
                                      else {let elem = PP.pluginRenderMessages(poleRoom, message[i]);}  //...а все остальные - с правой его стороны.
                                 }
-                              } else {}
+                              } else {
+                                    poleRoom.innerHTML = "";
+                                    let block = document.createElement("div");
+                                        block.className = 'blocking';
+                                        block.innerHTML = 'Вам заблокирован доступ!';
+                                    poleRoom.appendChild(block);
+                                //---------------------------------------
+                                    let audio = new Audio();
+                                  //      audio.src = "/projects/chatHomeworkDT/sounds/Sound_08092.mp3";
+                                        audio.src = "/projects/chatHomeworkDT/sounds/Sound_05952.mp3";
+                                  //      audio.src = "/projects/chatHomeworkDT/sounds/Sound_02215.mp3";
+                                        audio.autoplay = "true";
+                               //----------------------------------------
+                              }
                               });
                              }
                             });
 
                       let butRooms1 = document.querySelector("#butRooms1");
                           butRooms1.addEventListener("click", function() {
-
                           });
+
+                          //==============================================================================================================
+                          //========== ЗДЕСЬ НАХОДИТСЯ БЛОК ПРЕДОСТАВЛЕНИЯ ПРАВ МОДЕРАТОРА ВЫБРАННОМУ ДЛЯ ЭТОГО ЮЗЕРУ. ============
+
+                                     socket.on("youModer", message => {
+                                          if (message === "youModer") {
+                                              let perem = prompt(`Вам предлагается стать модератором данной комнаты.
+                                                   Ваши обязанности: следить за соблюдением всеми участниками комнаты
+                                              внутренних правил нашего чата, а также общечеловеческих законов общения;
+                                              пресекать грубость, хамство, нецензурную лексику, личные оскорбления и угрозы и т.п.
+                                                   Ваши права: вы можете заблокировать участника, грубо нарушающего
+                                              вышеуказанные правила, т.е. полностью лишить его доступа к чату данной
+                                              комнаты, а также разблокировать ранее заблокированного участника, если
+                                              необходимость в его блокировке отпала.
+                                                   Если вы хотите стать модератором - введите цифру 1.
+                                                   Если не хотите - цифру 0.`, ``);
+                                                if (perem === '1') {
+                                                      moduleHendlerManagement(nameBedMan, objMessage, val, socket, false);
+                                                } else {}
+                                          }
+                                          else if (message === "youUnmoder") {
+                                             let poleRooms = document.querySelector("#poleRooms");
+                                             let menuman = document.querySelector("#menuman");
+                                                 menuman.remove();
+                                                 poleRooms.remove();
+                                                 let otkaz = document.createElement("div");
+                                                     otkaz.id = 'otkaz';
+                                                     otkaz.innerHTML = "Вы больше не модератор данной комнаты. Но продолжаете оставаться её участником.";
+                                                 body.appendChild(otkaz);
+                                                 //---------------------------------------
+                                                     let audio = new Audio();
+                                                         audio.src = "/projects/chatHomeworkDT/sounds/Sound_08092.mp3";
+                                                  //       audio.src = "/projects/chatHomeworkDT/sounds/Sound_05952.mp3";
+                                                   //      audio.src = "/projects/chatHomeworkDT/sounds/Sound_02215.mp3";
+                                                         audio.autoplay = "true";
+                                                //----------------------------------------
+                                              setTimeout(function() {
+                                                  otkaz.remove();
+                                              }, 2500);
+                                          } else {}
+                                     });
+                          //==============================================================================================================
 
                           let tarea = document.querySelector("#tarea");
                               tarea.addEventListener("blur", function() {
                                    if (tarea.value && val) {
+                                     if (attributeBlocking) {
                                        let object = {a: objMessage.sv1, b: tarea.value, c: objMessage.sv3};
                                        let obj1 = {a:val, b:object};
                                            socket.emit("messageForRoom", obj1);
                                            moduleMyMessageRender(tarea, objMessage);
+                                      } else {}
                                    }
                                 });
                  });
@@ -656,9 +699,28 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                  socket.on("youBlock", message => {
                      if (message === "youBlock") {
                         attributeBlocking = false;
+                        let poleRoom = document.querySelector("#poleRoom");
+                            poleRoom.innerHTML = "";
+                        let block = document.createElement("div");
+                            block.className = 'blocking';
+                            block.innerHTML = 'Вам заблокирован доступ!';
+                        poleRoom.appendChild(block);
+                        //---------------------------------------
+                            let audio = new Audio();
+                          //      audio.src = "/projects/chatHomeworkDT/sounds/Sound_08092.mp3";
+                                audio.src = "/projects/chatHomeworkDT/sounds/Sound_05952.mp3";
+                          //      audio.src = "/projects/chatHomeworkDT/sounds/Sound_02215.mp3";
+                                audio.autoplay = "true";
+                       //----------------------------------------
+                        console.log(`С сервера пришло уведомление "youBlock".
+                        Значение attributeBlocking = ${attributeBlocking}.
+                        ВАС ЗАБЛОКИРОВАЛИ!`);
                      }
-                     else if (message === "youUnblock") {
+                     else {
                        attributeBlocking = true;
+                       console.log(`С сервера пришло уведомление "youUnblock".
+                       Значение attributeBlocking = ${attributeBlocking}.
+                       ВАС РАЗБЛОКИРОВАЛИ!`);
                      }
                  });
 
@@ -669,10 +731,18 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                     }
                     else {
                        let poleRoom = document.querySelector("#poleRoom");
+                           poleRoom.innerHTML = "";
                        let block = document.createElement("div");
                            block.className = 'blocking';
-                           block.innerHTML = 'Вас забанили!';
+                           block.innerHTML = 'Вам заблокирован доступ!';
                        poleRoom.appendChild(block);
+                       //---------------------------------------
+                           let audio = new Audio();
+                          //     audio.src = "/projects/chatHomeworkDT/sounds/Sound_08092.mp3";
+                               audio.src = "/projects/chatHomeworkDT/sounds/Sound_05952.mp3";
+                          //     audio.src = "/projects/chatHomeworkDT/sounds/Sound_02215.mp3";
+                               audio.autoplay = "true";
+                      //----------------------------------------
                     }
                  });
 

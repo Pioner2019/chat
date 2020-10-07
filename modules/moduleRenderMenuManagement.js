@@ -9,23 +9,11 @@
                      let inpmenuman = document.createElement("input");
                          inpmenuman.id = 'inpmenuman';
                          inpmenuman.placeholder = 'Введите имя:';
-                         // inpmenuman.addEventListener("blur", function() {
-                         //      if (inpmenuman.value) {
-                         //          nameBedMan = inpmenuman.value;
-                         //          console.log(`Имя плохого парня, которого надо заблокировать: ${nameBedMan}`);
-                         //      }
-                         // });
                      menuman.appendChild(inpmenuman);
 
                      let but1menuman = document.createElement("button");
                          but1menuman.id = 'but1menuman';
                          but1menuman.innerHTML = 'Заблокировать';
-                        //  but1menuman.addEventListener("click", function() {
-                        //       let obj = {a:val, b:nameBedMan};
-                        //       console.log(`Название текущей комнаты: ${val}`);
-                        //       socket.emit("toBlackList", obj);
-                        //       console.log(`На сервер ушло уведомление о блокировке юзера ${nameBedMan} в комнате ${val}`);
-                        // });
                      menuman.appendChild(but1menuman);
 
                      let but2menuman = document.createElement("button");
@@ -37,6 +25,19 @@
                          but3menuman.id = 'but3menuman';
                          but3menuman.innerHTML = 'Сделать модератором';
                      menuman.appendChild(but3menuman);
+
+                     let but4menuman = document.createElement("button");
+                         but4menuman.id = 'but4menuman';
+                         but4menuman.innerHTML = 'Исключить из модераторов';
+                     menuman.appendChild(but4menuman);
+
+                     let but5menuman = document.createElement("button");
+                         but5menuman.id = 'but5menuman';
+                         but5menuman.innerHTML = 'Закрыть меню';
+                         but5menuman.addEventListener("click", function() {
+                              menuman.remove();
+                         });
+                     menuman.appendChild(but5menuman);
 
          param1.appendChild(menuman);
 

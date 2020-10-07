@@ -496,7 +496,7 @@ io.sockets.on('connection', function(socket) {
 
      console.log(`С клиента пришло сообщение типа "messageToRoom", содержащее обьект:
      obj.a: ${message.a}, obj.b: ${message.b}`);
-
+     let flagBL = true;
 
      const mongoClient4 = new MongoClient(url, {useNewUrlParser: true});
         mongoClient4.connect((err, client) => {
@@ -556,12 +556,12 @@ io.sockets.on('connection', function(socket) {
                       }
                  }
                                  socket.emit("youCreator", "youCreator");
-                                       let obj = {creatorName:message.a, roomName:message.b, blackList:[]}; // Создаём нулевую запись, состоящую
+                                       let obj = {creatorName:message.a, roomName:message.b, blackList:[], moderators:[]}; // Создаём нулевую запись, состоящую
                                        collection.insertOne(obj, function(err, result) {                   // из имени создателя комнаты, имени
-                                           if (err) throw err;                                  // самой комнаты, и "чёрного списка" комнаты(изначально
+                                           if (err) throw err;                                  // самой комнаты, "чёрного списка" комнаты(изначально
                                             else {                                            // пустого), который будет вести админ комнаты(её создатель)
-                                                  console.log('Данная комната пока пуста. Материализуем её, введя нулевую запись.'); // или назначенные
-                                                  //------------------------------------------------------------------------------------ // им модераторы.
+                                                  console.log('Данная комната пока пуста. Материализуем её, введя нулевую запись.'); // или назначенные им модераторы,
+                                                  //------------------------------------------------------------------------------------ // и списка собственно модераторов.
                                                   // ЕЩЁ ОДНА ВЛОЖЕННОСТЬ МАНИПУЛЯЦИЙ С БД ВО ВРЕМЯ ОДНОЙ СЕССИИ РАБОТЫ МОНГО - клиента.
                                                         collection.find().toArray((err, result) => {
                                                               if (err) throw err;
@@ -579,13 +579,34 @@ io.sockets.on('connection', function(socket) {
                                                 //------------------------------------------------------------------------------------
                                              }
                                         });
+                                        socket.join(message.b);
                                       }
                    //             //------------------------------------------------------------------------------------
                    //           }
                              else {
-                               if (result.creatorName === message.a && result.roomName === message.b) {
-                                    socket.emit("youCreator", "youCreator");
-                               }
+                               for (let i = 0; i < result.blackList.length; i++) {
+                                    if (result.blackList[i] === message.a) {       // Если данный участник есть
+                                        socket.emit("youBlock", "youBlock");      // в "чёрном списке" этой комнаты,
+                                        socket.leave(message.b);                 // то он отрезается от неё.
+                                        flagBL = false;
+                                        break;
+                                    }
+                                }
+                                  if (flagBL) {
+                                    if (result.creatorName === message.a && result.roomName === message.b) {
+                                         socket.emit("youCreator", "youCreator");
+                                          socket.join(message.b);
+                                    }
+                                    let moders = result.moderators;
+                                        for (let elem of moders) {
+                                           for (let key in elem) {
+                                              if (key === 'nameModer' && elem[key] === message.a) {
+                                                 socket.emit("youModerator", "youModerator");
+                                                 socket.join(message.b);
+                                                 break;
+                                              }
+                                           }
+                                        }
                                      collection.find().toArray((err, result) => {
                                            if (err) throw err;
                                            else {
@@ -594,16 +615,16 @@ io.sockets.on('connection', function(socket) {
                                                client.close();
                                            }
                                      });
+                                     socket.join(message.b);
+                                }
                              }
                            }
                         });
-                      });
-                     socket.join(message.b);
+                     });
                   });
 
        socket.on("messageForRoom", message => {
 
-         let flag = 0;
          const mongoClient5 = new MongoClient(url, {useNewUrlParser: true});
                mongoClient5.connect(function(err, client) {
                const db = client.db("allRooms");
@@ -611,43 +632,16 @@ io.sockets.on('connection', function(socket) {
                collection.findOne({roomName: message.a}, (err, result) => {
                    if (err) throw err;
                    else {
-                     for (let i = 0; i < result.blackList.length; i++) {
-                           if (result.blackList[i] === message.b.a) {
-                                flag = 1;
-                                break;
-                           }
-                      }
-                           if (flag !== 0) {
-                             // ЗДЕСЬ БУДУТ ВЫПОЛНЕНЫ ВСЕ ДЕЙСТВИЯ ПО БЛОКИРОВКЕ ЮЗЕРА message.b.a
-                             // НАДО ЕЩЁ ПРИДУМАТЬ, ЧТО ЭТО БУДУТ ЗА ДЕЙСТВИЯ. ОЧЕВИДНО, ЧТО:
-                             //  1. ДОЛЖНА БЫТЬ ПРЕСЕЧЕНА РАССЫЛКА ЕГО СООБЩЕНИЙ СРЕДИ УЧАСТНИКОВ КОМНАТЫ.
-                             //  2. ПРИ ПОПЫТКЕ ПОСЛАТЬ СООБЩЕНИЕ В КОМНАТУ ЕМУ ДОЛЖНО ПРИХОДИТЬ УВЕДОМЛЕНИЕ:
-                             //     "ВЫ ЗАБЛОКИРОВАНЫ".
-                             //  3. ЕМУ ТОЖЕ НЕ ДОЛЖНЫ ПРИХОДИТЬ СООБЩЕНИЯ УЧАСТНИКОВ ДАННОЙ КОМНАТЫ.
-                             //  4. ОН НЕ ДОЛЖЕН ПОЛУЧАТЬ ЧАТ КОМНАТЫ ПРИ ПЕРВИЧНОМ ПОДКЛЮЧЕНИИ К НЕЙ, Т.Е ОН
-                             //     ДОЛЖЕН БЫТЬ ПОЛНОСТЬЮ ОТРЕЗАН ОТ КОМНАТЫ.
-                             //     А ПОКА, ДЛЯ НАЧАЛА:
-                                console.log("ЗДЕСЬ БУДУТ ВЫПОЛНЕНЫ ВСЕ ДЕЙСТВИЯ ПО БЛОКИРОВКЕ ЮЗЕРА message.b.a");
-                                massAllActiveUsers.forEach(function(item, index, array) {
-                                     if (item.a !== message.b.a) {}
-                                     else {
-                                     console.log(`Уникальный идентификатор участника ${message.b.a}: ${item.b}`);
-                                   io.to(`${item.b}`).emit("youBlock", "youBlock");
-                                     console.log(`Отправка сообщения участнику ${message.b.a} УСПЕШНО произведена.`);
-                                     }
-                               });
-                           }
-                           else {
                                let time = timeReg();
                                let posl = {a:message.b.a, b:message.b.b, c:message.b.c, d:time.a, e:time.b};
                                collection.insertOne(posl, function(err, result) {
                                     if (err) throw err;
                                     else {
+                                        socket.join(message.a);
                                         socket.to(message.a).emit("broadcastToRoom", message.b);
                                         client.close();
                                      };
                                });
-                           }
                       }
                  });
             });
@@ -661,6 +655,15 @@ io.sockets.on('connection', function(socket) {
                      collection.updateOne({roomName: message.b}, {$push: {blackList: message.c}}, (err, result) => {
                            if (err) throw err;      // Здесь мы вносим данного юзера с "чёрный список" этой комнаты,
                            else {                   // т.е. блокируем ему доступ в комнату(баним его).
+                             massAllActiveUsers.forEach(function(item, index, array) {
+                                  if (item.a !== message.c) {}
+                                  else {
+                                  console.log(`Уникальный идентификатор участника ${message.c}: ${item.b}`);
+                                io.to(`${item.b}`).emit("youBlock", "youBlock");
+                                  console.log(`Отправка сообщения о его блокировке участнику ${message.c} УСПЕШНО произведена.`);
+                                  }
+                            });
+                              client.close();
                            };                      // Пока что изменение списка - это и всё. Собственно сама
                       });                          // блокировка пока не сделана.
                });
@@ -674,11 +677,88 @@ io.sockets.on('connection', function(socket) {
                      collection.updateOne({roomName: message.b}, {$pull: {blackList: message.c}}, (err, result) => {
                            if (err) throw err;          // Здесь мы исключаем данного юзера из "чёрного списка"
                            else {                        // этой комнаты, т.е. разблокируем ему доступ в комнату.
+                                  massAllActiveUsers.forEach(function(item, index, array) {
+                                       if (item.a !== message.c) {}
+                                       else {
+                                       console.log(`Уникальный идентификатор участника ${message.c}: ${item.b}`);
+                                     io.to(`${item.b}`).emit("youBlock", "youUnblock");
+                                       console.log(`Отправка сообщения участнику ${message.c} о его разблокировке УСПЕШНО произведена.`);
+                                       }
+                                 });
+                              client.close();
                            };
                       });
                });
+    //          socket.emit("youBlock", "youUnblock");
        });
 
+       socket.on("youModerator", message => {
+            console.log(`Админ комнаты ${message.b} хочет ПРЕДОСТАВИТЬ права модератора участнику ${message.a}.`);
+              let mongoClient = new MongoClient(url, {useNewUrlParser: true});
+                  mongoClient.connect(function(err, client) {
+                  const db = client.db("allRooms");
+                  const collection = db.collection(`${message.b}`);
+                        let time = timeReg();
+                        let obj = {nameModer:message.a, dateModer:time.a, dateUnmoder:""};
+                         collection.updateOne({roomName: message.b}, {$push: {moderators: obj}}, (err, result) => {
+                              if (err) throw err;
+                              else {
+                                     massAllActiveUsers.forEach(function(item, index, array) {
+                                          if (item.a !== message.a) {}
+                                          else {
+                                          console.log(`Уникальный идентификатор участника ${message.a}: ${item.b}`);
+                                          io.to(`${item.b}`).emit("youModer", "youModer");
+                                          console.log(`Отправка сообщения участнику ${message.a} о назначении его модератором УСПЕШНО произведена.`);
+                                          }
+                                    });
+                                  client.close();
+                              };
+                         });
+                  });
+       });
+
+       socket.on("youNoModerator", message => {
+            console.log(`Админ комнаты ${message.b} хочет ИЗЬЯТЬ права модератора у участника ${message.a}.`);
+            let mongoClient = new MongoClient(url, {useNewUrlParser: true});
+                mongoClient.connect(function(err, client) {
+                const db = client.db("allRooms");
+                const collection = db.collection(`${message.b}`);
+                      let time = timeReg();
+                      collection.findOne({roomName: message.b}, (err, result) => { // Получаем 0-ю запись данной коллекции(комнаты).
+
+                            if (err) throw err;
+                            else {
+
+                              let allModerators = result.moderators;
+                                 console.log(`Массив allModerators содержит: ${allModerators}`);
+                                 console.log(`allModerators.length = ${allModerators.length}`);
+
+                                  allModerators.forEach((item, index, array) => {
+                                       if (item.nameModer === message.a) {
+                                            array.splice(index, 1);
+                                       }
+                                  });
+
+                                   massAllActiveUsers.forEach(function(item, index, array) {
+                                        if (item.a !== message.a) {}
+                                        else {
+                                        console.log(`Уникальный идентификатор участника ${message.a}: ${item.b}`);
+                                        io.to(`${item.b}`).emit("youModer", "youUnmoder");
+                                        console.log(`Отправка сообщения участнику ${message.a} об изьятии у него прав модератора УСПЕШНО произведена.`);
+                                        }
+                                  });
+
+                                  collection.updateOne({roomName: message.b}, {$set: {moderators: allModerators}}, (err, result) => {
+                                       if (err) throw err;
+                                       else {
+                                             client.close();
+                                       }
+                                  });
+          //                      client.close();
+                            };
+                       });
+                });
+       });
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ЭТО - КРОШЕЧНЫЙ БЛОЧОК, ГДЕ Я ПРОБУЮ ПЕРЕСЛАТЬ ФОТО ИЗ ДОКУМЕНТА,
