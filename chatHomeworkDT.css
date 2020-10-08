@@ -761,6 +761,8 @@
             position: absolute;
             left:0px;
             top:0px;
+            width: 100vw;
+            height: 100vh;
             background-color: rgba(0, 0, 0, .5);
             font-family: Verdana;
             font-size: 1.5em;
@@ -1084,7 +1086,7 @@
             border: 2px solid red;
             border-radius: 10px;
             background-color: black;
-            font-size: .7em;
+            font-size: .6em;
             font-family: Verdana;
             color: red;
             text-align: center;
@@ -1102,7 +1104,7 @@
            background-color: red;
            padding: 10px 10px;
            font-family: Verdana;
-           font-size: .8rem;
+           font-size: .7rem;
            color: white;
            z-index: 5000;
          }

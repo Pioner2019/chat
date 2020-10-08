@@ -645,7 +645,8 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                           //========== ЗДЕСЬ НАХОДИТСЯ БЛОК ПРЕДОСТАВЛЕНИЯ ПРАВ МОДЕРАТОРА ВЫБРАННОМУ ДЛЯ ЭТОГО ЮЗЕРУ. ============
 
                                      socket.on("youModer", message => {
-                                          if (message === "youModer") {
+                                          if (message.a === "youModer") {
+                                            if (message.b === true) {
                                               let perem = prompt(`Вам предлагается стать модератором данной комнаты.
                                                    Ваши обязанности: следить за соблюдением всеми участниками комнаты
                                               внутренних правил нашего чата, а также общечеловеческих законов общения;
@@ -658,9 +659,12 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                                    Если не хотите - цифру 0.`, ``);
                                                 if (perem === '1') {
                                                       moduleHendlerManagement(nameBedMan, objMessage, val, socket, false);
-                                                } else {}
+                                                } else {
+                                                    moduleHendlerManagement(nameBedMan, objMessage, val, socket, false);
+                                                }
+                                              }
                                           }
-                                          else if (message === "youUnmoder") {
+                                          else if (message.a === "youUnmoder") {
                                              let poleRooms = document.querySelector("#poleRooms");
                                              let menuman = document.querySelector("#menuman");
                                                  menuman.remove();
@@ -678,7 +682,7 @@ document.getElementById("files").addEventListener('change', onFileSelect);
                                                 //----------------------------------------
                                               setTimeout(function() {
                                                   otkaz.remove();
-                                              }, 2500);
+                                              }, 4000);
                                           } else {}
                                      });
                           //==============================================================================================================

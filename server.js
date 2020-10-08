@@ -539,8 +539,6 @@ io.sockets.on('connection', function(socket) {
                                         const db = client.db("Pioner");
                                         const collection = db.collection("CHAT1");
                                         let time = timeReg();
-                                    //          console.log(`А в этом месте массив myCreateRooms содержит: ${myCreateRooms}`);
-                                    //          collection.updateOne({sv1: message.a}, {$set: {sv9: myCreateRooms}}, (err, result) => {
                                               collection.updateOne({sv1: message.a}, {$push: {sv9: message.b}}, (err, result) => {
                                                     if (err) throw err;
                                                     else {
@@ -556,6 +554,8 @@ io.sockets.on('connection', function(socket) {
                       }
                  }
                                  socket.emit("youCreator", "youCreator");
+                              //         let moders = new Set;
+                              //             moders = [];   // Используем конструктор Set для того, чтобы исключить существование повторов в массиве  moderators.
                                        let obj = {creatorName:message.a, roomName:message.b, blackList:[], moderators:[]}; // Создаём нулевую запись, состоящую
                                        collection.insertOne(obj, function(err, result) {                   // из имени создателя комнаты, имени
                                            if (err) throw err;                                  // самой комнаты, "чёрного списка" комнаты(изначально
@@ -597,16 +597,15 @@ io.sockets.on('connection', function(socket) {
                                          socket.emit("youCreator", "youCreator");
                                           socket.join(message.b);
                                     }
-                                    let moders = result.moderators;
-                                        for (let elem of moders) {
-                                           for (let key in elem) {
-                                              if (key === 'nameModer' && elem[key] === message.a) {
-                                                 socket.emit("youModerator", "youModerator");
-                                                 socket.join(message.b);
-                                                 break;
-                                              }
-                                           }
-                                        }
+                                    
+                                    for (let i = 0; i < result.moderators.length; i++) {
+                                        if (result.moderators[i] === message.a) {
+                                              socket.emit("youModerator", "youModerator");
+                                              socket.join(message.b);
+                                              break;
+                                      }
+                                    }
+
                                      collection.find().toArray((err, result) => {
                                            if (err) throw err;
                                            else {
@@ -693,27 +692,57 @@ io.sockets.on('connection', function(socket) {
        });
 
        socket.on("youModerator", message => {
+            let flag = true;
             console.log(`Админ комнаты ${message.b} хочет ПРЕДОСТАВИТЬ права модератора участнику ${message.a}.`);
               let mongoClient = new MongoClient(url, {useNewUrlParser: true});
                   mongoClient.connect(function(err, client) {
                   const db = client.db("allRooms");
                   const collection = db.collection(`${message.b}`);
-                        let time = timeReg();
-                        let obj = {nameModer:message.a, dateModer:time.a, dateUnmoder:""};
-                         collection.updateOne({roomName: message.b}, {$push: {moderators: obj}}, (err, result) => {
+                        collection.findOne({roomName: message.b}, (err, result) => { // Получаем 0-ю запись данной коллекции(комнаты).
+                           if (err) throw err;
+
+                           else {
+                             console.log(`result.moderators.length = ${result.moderators.length}`);
+                             for (let i = 0; i < result.moderators.length; i++) {
+                                  if (result.moderators[i] === message.a) {
+                                        console.log(`result.moderators[i] = ${result.moderators[i]}`);
+                                        flag = false;
+                                        break;
+                                  }
+                             }
+
+                        collection.bulkWrite([                      // Это очень классная штука в Монге: возможность обьединить
+                            {                                      // несколько запросов к БД в один: в данном конкретном случае мы...
+                              updateOne: {
+                                  filter: {roomName: message.b},           //...сперва удаляем из массива "moderators" все вхождения
+                                  update: {$pull: {moderators: message.a}}   // имени юзера в массив,...
+                              }
+                            },
+                            {
+                              updateOne: {
+                                  filter: {roomName: message.b},
+                                  update: {$push: {moderators: message.a}} //...а затем помещаем туда его имя заново. Этим мы устраняем
+                              }                                            // возможность множественного вхождения имени юзера в массив.
+                            }
+
+                        ], (err, result) => {
                               if (err) throw err;
                               else {
                                      massAllActiveUsers.forEach(function(item, index, array) {
                                           if (item.a !== message.a) {}
                                           else {
                                           console.log(`Уникальный идентификатор участника ${message.a}: ${item.b}`);
-                                          io.to(`${item.b}`).emit("youModer", "youModer");
+                                          let obj = {a:"youModer", b:flag};
+                                          io.to(`${item.b}`).emit("youModer", obj);
                                           console.log(`Отправка сообщения участнику ${message.a} о назначении его модератором УСПЕШНО произведена.`);
                                           }
                                     });
-                                  client.close();
+                  //                client.close();
                               };
                          });
+                           client.close();
+                       }
+                     });
                   });
        });
 
@@ -729,21 +758,22 @@ io.sockets.on('connection', function(socket) {
                             if (err) throw err;
                             else {
 
-                              let allModerators = result.moderators;
+                              let allModerators = result.moderators; // Из 0-й записи получаем массив имён всех модераторов...
                                  console.log(`Массив allModerators содержит: ${allModerators}`);
                                  console.log(`allModerators.length = ${allModerators.length}`);
 
-                                  allModerators.forEach((item, index, array) => {
-                                       if (item.nameModer === message.a) {
-                                            array.splice(index, 1);
-                                       }
-                                  });
+                                  for (let i = 0; i < allModerators.length; i++) {
+                                   if (allModerators[i] === message.a) {
+                                         allModerators.splice(i, 1);        //...и удаляем из него имя данного юзера.
+                                    }
+                                  }
 
                                    massAllActiveUsers.forEach(function(item, index, array) {
                                         if (item.a !== message.a) {}
                                         else {
                                         console.log(`Уникальный идентификатор участника ${message.a}: ${item.b}`);
-                                        io.to(`${item.b}`).emit("youModer", "youUnmoder");
+                                        let obj = {a: "youUnmoder", b:flag};
+                                        io.to(`${item.b}`).emit("youModer", obj);
                                         console.log(`Отправка сообщения участнику ${message.a} об изьятии у него прав модератора УСПЕШНО произведена.`);
                                         }
                                   });
