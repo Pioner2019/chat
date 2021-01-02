@@ -29,8 +29,10 @@ PP.pluginColorSelect = function() { // Данный плагин возвращ�
 
       let canvas = document.createElement("canvas");
           canvas.style.position = "absolute";
-          canvas.width = '50';
-          canvas.height = '400';
+          // canvas.width = '50';
+          // canvas.height = '400';
+          canvas.setAttribute('width', '50px');
+          canvas.setAttribute('height', '400px');
           canvas.style.left = "202px";
           canvas.style.top = "0px";
           canvas.style.border = '1px solid black';
